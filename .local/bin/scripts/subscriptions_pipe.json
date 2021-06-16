@@ -1,0 +1,1131 @@
+{
+"app_version": "0.20.2",
+"app_version_int": 956,
+"subscriptions": [
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCs6KfncB4OV6Vug4o_bzijg",
+    "name": "Techlore"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCaouGqskTD28h7_aL4lD1zA",
+    "name": "Кар'єрна 44"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCidLfFs1b0vwCW8WJdszENQ",
+    "name": "Служение Александра Шевченко Aleksandr Shevchenko"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCOJJ0MFDa2A8rU7T3WvFzuQ",
+    "name": "theMike97_"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC6uFoHcr_EEK6DgCS-LeTNA",
+    "name": "PRO Hi-Tech"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCYVU6rModlGxvJbszCclGGw",
+    "name": "Rob Braxman Tech"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCVls1GmFKf6WlTraIb_IaJg",
+    "name": "DistroTube"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCZ26MoNJKaGXFQWKuGVzmAg",
+    "name": "Чёрный Треугольник"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCsnGwSIHyoYN0kiINAGUKxg",
+    "name": "Wolfgang's Channel"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC5UAwBUum7CPN5buc-_N1Fw",
+    "name": "The Linux Experiment"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCg6gPGh8HU2U01vaFCAsvmQ",
+    "name": "Chris Titus Tech"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCnxk5BzZxRN7y3a1IqHhVlA",
+    "name": "Pingvinus"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCZUyPT9DkJWmS_DzdOi7RIA",
+    "name": "Caleb Curry"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCmyGZ0689ODyReHw3rsKLtQ",
+    "name": "Michael Tunnell - TuxDigital"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCjr2bPAyPV7t35MvcgT3W8Q",
+    "name": "The Hated One"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC7YOGHUfC1Tb6E4pudI9STA",
+    "name": "Mental Outlaw"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCX_WM2O-X96URC5n66G-hvw",
+    "name": "EF - Tech Made Simple"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UClLh_2vcLwQFCyxDjzXi1dg",
+    "name": "Tune To Linux"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCZiL6BoryLWxyapUuVYW27g",
+    "name": "Average Linux User"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCVQaJ0AipeuQxP1ZOe7h_Vg",
+    "name": "Алексей Лещенко"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC29ju8bIPH5as8OGnQzwJyA",
+    "name": "Traversy Media"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCld68syR8Wi-GY_n4CaoJGA",
+    "name": "Brodie Robertson"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC5_Y-BKzq1uW_2rexWkUzlA",
+    "name": "New Mind"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCD0b5d9sqNQTjrXfg5ik3eQ",
+    "name": "paranoid.life"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC3kAbMcYr-JEMSb2xX4OdpA",
+    "name": "Aleksey Samoilov"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCXuqSBlHAE6Xw-yeJA0Tunw",
+    "name": "Linus Tech Tips"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCbertc-gMbkkHuSmg0qwnxw",
+    "name": "Bethel Music"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCM7-8EfoIv0T9cCI4FhHbKQ",
+    "name": "Алексей Шевцов"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC3jSNmKWYA04R47fDcc1ImA",
+    "name": "InfinitelyGalactic"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCkKK9gF5skutDEiiqWSc0hg",
+    "name": "LinuxComp Tutorial"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCJYVW4HVrMWpUvvsjPQc8-Q",
+    "name": "DorianDotSlash"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCoryWpk4QVYKFCJul9KBdyw",
+    "name": "Switched to Linux"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCCezIgC97PvUuR4_gbFUs5g",
+    "name": "Corey Schafer"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCCROBQj3rdGNc-E_aMpbV_A",
+    "name": "MyGap"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCZzdWp_r4-_KSWcdSjuvjUA",
+    "name": "Casting Crowns"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCDMnCGlkv4gyFGZo_ZT3atg",
+    "name": "Windows Central"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCM2qHCPylAaoSjN5LAi0cHw",
+    "name": "House of NHTi"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC5JegsRbZuLF5bHg2_Oj7Rw",
+    "name": "КостяПрав"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCS25Y-2DUke9uOU5OtLwwgg",
+    "name": "Linux Tex"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCDnVly9Vuu5FrhSYxmczKMw",
+    "name": "Argument600"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCAK3bHMWDa33R9Y6nD9GxNg",
+    "name": "Рома Грищук"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCtZO3K2p8mqFwiKWb9k7fXA",
+    "name": "TechAltar"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC2eYFnH61tmytImy1mTYvhA",
+    "name": "Luke Smith"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCyvYoGiKx89QAwlyaSRqJog",
+    "name": "Xiaomi Techno Blog"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCzc_TAfzPCecAJBHc8sEZ2Q",
+    "name": "KPI TV"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCHQDjDDW8w2RieO-IuqYlyg",
+    "name": "AMD"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC_hvS-IJ_SY04Op14v3l4Lg",
+    "name": "Мир IT с Антоном Павленко"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC29BKw2DaNMQe2B90QRVCNw",
+    "name": "Billy Graham Evangelistic Association"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCDF_NIAEkcAUvzxe1DUzaQA",
+    "name": "Rozetked"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCbiGcwDWZjz05njNPrJU7jA",
+    "name": "ExplainingComputers"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCHErB0TULAlldbhPMfBJ1Xg",
+    "name": "linuxhint"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCJdmdUp5BrsWsYVQUylCMLg",
+    "name": "Erik Dubois"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCMZxtiWIdrXUUbWMAe6D-Iw",
+    "name": "msjche"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCs6nmQViDpUw0nuIx9c_WvA",
+    "name": "ProgrammingKnowledge"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC2xqkl7Ic5BV5jGCVC8OznQ",
+    "name": "Семен Боднарчук"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCd4XwUn2Lure2NHHjukoCwA",
+    "name": "Linux For Everyone"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC0vBXGSyV14uvJ4hECDOl0Q",
+    "name": "Techquickie"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCCIHOP7e271SIumQgyl6XBQ",
+    "name": "OldTechBloke"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCAPR27YUyxmgwm3Wc2WSHLw",
+    "name": "Chris Were Digital"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCkK9UDm_ZNrq_rIXCz3xCGA",
+    "name": "Bryan Lunduke"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCoHW8oCZbWtNzFKJO3rG2-w",
+    "name": "Simon Khorolskiy"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC0ArlFuFYMpEewyRBzdLHiw",
+    "name": "The Cyber Mentor"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCwFpzG5MK5Shg_ncAhrgr9g",
+    "name": "Awesome Open Source"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCCTVrRB5KpIiK6V2GGVsR1Q",
+    "name": "kudvenkat"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCWJUSpXVHTaHErtGWC5qPlQ",
+    "name": "Destination Linux Network"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC-f_LxJoe6sgBIEIkHAM8mA",
+    "name": "Linux King"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCeKE6c-kQXm4x_sJQxZPvlg",
+    "name": "Linux Lounge"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCvA_wgsX6eFAOXI8Rbg_WiQ",
+    "name": "tutoriaLinux"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCG7GW-X1cczyzLswoYTTnjQ",
+    "name": "Byte++"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCz1ihxXAGG6PF1wf_fyApUg",
+    "name": "ilovekpi"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCNnUnr4gwyNmzx_Bbzvt29g",
+    "name": "Linux Scoop"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCXJWKuGh0qedrYviGEJmlWw",
+    "name": "Tom Spark Reviews"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC0ZTPkdxlAKf-V33tqXwi3Q",
+    "name": "HackerSploit"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC9RM-iSvTu1uPJb8X5yp3EQ",
+    "name": "Wendover Productions"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC0A3ldncnGQ1M_RU2Wb4L2A",
+    "name": "quidsup"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC2Mq09_FBWckT1WmcraWr-g",
+    "name": "Crypto The Llama"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCi0vcqSkvbymAmID-S_4Ehg",
+    "name": "Russian OSINT"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCUoiowJDi3zNsasYbSPaCmQ",
+    "name": "game one"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCR1IuLEqb6UEA_zQ81kwXfg",
+    "name": "Real Engineering"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC9-y-6csu5WGm29I7JiwpnA",
+    "name": "Computerphile"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCIme1suHyN7cAGrTy8RBdhQ",
+    "name": "DASGeek"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCxQKHvKbmSzGMvUrVtJYnUA",
+    "name": "LearnLinuxTV"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCk9NvmsPBC3lTn_L9kFaylA",
+    "name": "iBSD"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCgNg3vwj3xt7QOrcIDaHdFg",
+    "name": "PolyMatter"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCSip0Wc0WjzBcGpjRiLrQAw",
+    "name": "GamesBusters"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCMCgOm8GZkHp8zJ6l7_hIuA",
+    "name": "вДудь"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCHugE6eRhqB9_AZQh4DDbIw",
+    "name": "Jupiter Broadcasting"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC4axiS76D784-ofoTdo5zOA",
+    "name": "Заметки Ардуинщика"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCEUTgM6GtfKliRf6DvqDB_Q",
+    "name": "Павел Мудрый"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCRG_N2uO405WO4P3Ruef9NA",
+    "name": "The Friday Checkout"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCximsD7EJ38jzCNgfP_YTmA",
+    "name": "Paweł Zadrożniak"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UChBPkMCpF1CcOZ01ufa7lDw",
+    "name": "Ukrainian Liberation"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCU_yU4xGT9hrVFo6euH8LLw",
+    "name": "SlivkiShow"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCqzBihYmH0u-8h8XW2fv55A",
+    "name": "Флесс"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCummjh4-fycnRdAZFHYtucQ",
+    "name": "Могучий Сисадмин"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCADyUOnhyEoQqrw_RrsGleA",
+    "name": "Chris Coyier"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCYO_jab_esuFRV4b17AJtAw",
+    "name": "3Blue1Brown"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCZ1vdUnlEZdtw0NysynGYPQ",
+    "name": "How They Got Hacked"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UChSGI2R2kRMjzXJuYqHWQZg",
+    "name": "Timur Shemsedinov"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCD4EOyXKjfDUhCI6jlOZZYQ",
+    "name": "Eli the Computer Guy"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC5dgoavpIertLkNDDITDoBQ",
+    "name": "Дмитрий Бачило"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UChBPkMCpF1CcOZ01ufa7lDw",
+    "name": "Ukrainian Liberation"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC_I96RAvt_H4UojX1VYnTzA",
+    "name": "ProDrive"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCHFNDph3zTYh8-hwofOVXsg",
+    "name": "stupidmadworld техноблог"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCtZRKfyvx7GUEi-Lr7f4Nxg",
+    "name": "BigDaddyLinux"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCX6b17PVsYBQ0ip5gyeme-Q",
+    "name": "CrashCourse"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCEBb1b_L6zDS3xTUrIALZOw",
+    "name": "MIT OpenCourseWare"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCeqMRt_qlZOAfQ_fDxc0D4g",
+    "name": "forKINGANDCOUNTRY"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCHo0495AAlj-dinGYf96Liw",
+    "name": "UnderMind"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCRXnmeekJTPyjxhL-7W-28Q",
+    "name": "Belka Space"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCe--4KWUPFH7PY0siAT6rDQ",
+    "name": "БУЛ"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCF3d6ZcTRBhnrNC0-cvzicw",
+    "name": "Nitroxsenys"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCVBErcpqaokOf4fI5j73K_w",
+    "name": "Learn English with Emma [engVid]"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCBORYU3g3C5kFXJc7kLwqGA",
+    "name": "Олександр Авраменко"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCKgpamMlm872zkGDcBJHYDg",
+    "name": "Learn English With TV Series"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCAL3JXZSzSm8AlZyD3nQdBA",
+    "name": "Primitive Technology"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCZCFT11CWBi3MHNlGf019nw",
+    "name": "Abdul Bari"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCoxcjq-8xIDTYp3uz647V5A",
+    "name": "Numberphile"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCY03gpyR__MuJtBpoSyIGnw",
+    "name": "Droider.Ru"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCdJ_sF-R6PPqFgPNOjcwSxQ",
+    "name": "Write to Top"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCZuRMfF5ZUHqYlKkvU12xvg",
+    "name": "Простые Мысли"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCwRXb5dUK4cvsHbx-rGzSgw",
+    "name": "Derek Banas"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UClF9NLW6p4QZ28rGp8ExbAg",
+    "name": "monobank"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCpNzWUlO6PVb_v7chefBnig",
+    "name": "GalileoRU"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCL4BwOrBEKggPyqsdVpraFg",
+    "name": "Johe News"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCVCXGJKuCBLURdEvZ5AEKiQ",
+    "name": "A"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCZLvQirxGaxiCRtxh2hasow",
+    "name": "Live Games"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCwjafl4RJa6st6caneVWHkQ",
+    "name": "danscourses"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCdp4_l1vPmpN-gDbUwhaRUQ",
+    "name": "Branch Education"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCcJEcTGtV0awEOgQm0lm2VQ",
+    "name": "TOTAL OS TODAY"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC_0NfufarVw04vDfWFm8z_Q",
+    "name": "English Lessons with Adam - Learn English [engVid]"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCximsD7EJ38jzCNgfP_YTmA",
+    "name": "Paweł Zadrożniak"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCMIVE71tHEUDkuw8tPxtzSQ",
+    "name": "Цікава наука"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCO1cgjhGzsSYb1rsB4bFe4Q",
+    "name": "Fun Fun Function"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCXa6sE6cKXcQ97vI0Emn1XA",
+    "name": "Egee"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCagoIYmo_gO1iVaCeeSikEg",
+    "name": "This Week in Tech"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC_L8X6xw9VpepFWVe5_cAdQ",
+    "name": "Телеграмер"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC8uT9cgJorJPWu7ITLGo9Ww",
+    "name": "The 8-Bit Guy"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCC552Sd-3nyi_tk2BudLUzA",
+    "name": "AsapSCIENCE"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCN9v4QG3AQEP3zuRvVs2dAg",
+    "name": "History Time"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCLxT-YVIAR4F3dRHped9Dkg",
+    "name": "All About Android"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCUHW94eEFW7hkUMVaZz4eDg",
+    "name": "minutephysics"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCBk48R8tFfqaDWUB84NENLQ",
+    "name": "Уроки Java"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UChSGI2R2kRMjzXJuYqHWQZg",
+    "name": "Timur Shemsedinov"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCo9HMu-rMypRaZSJUM2GDgw",
+    "name": "Рух молоді УЦХВЄ"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCZ1vdUnlEZdtw0NysynGYPQ",
+    "name": "How They Got Hacked"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCxwcmRAmBRzZMNS37dCgmHA",
+    "name": "RoboNuggie"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCyU5wkjgQYGRB0hIHMwm2Sg",
+    "name": "LevelUpTuts"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCYt1sfh5464XaDBH0oH_o7Q",
+    "name": "Java Brains"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC20M3T-H-Pv0FPOEfeQJtNQ",
+    "name": "Dima Maleev"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCZLvQirxGaxiCRtxh2hasow",
+    "name": "Live Games"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCVBErcpqaokOf4fI5j73K_w",
+    "name": "Learn English with Emma [engVid]"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCUf_ku6USLnX4ZiAZqxIbbg",
+    "name": "FONKI Христианские песни и караоке"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCPme28sMOcWS50CgtTWUZIw",
+    "name": "Trevor Payne"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCg3efSXiDAMyokCbTdIdG5g",
+    "name": "Рядом с компьютером"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC6bTF68IAV1okfRfwXIP1Cg",
+    "name": "itpedia"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCRQBxgGh4Rg3zduFEEd50nA",
+    "name": "Грильков"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCBORYU3g3C5kFXJc7kLwqGA",
+    "name": "Олександр Авраменко"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCoxcjq-8xIDTYp3uz647V5A",
+    "name": "Numberphile"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCwRXb5dUK4cvsHbx-rGzSgw",
+    "name": "Derek Banas"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCBnKMiYzbE9opd0Mtg9B7Dg",
+    "name": "55x55"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCZCFT11CWBi3MHNlGf019nw",
+    "name": "Abdul Bari"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC59K-uG2A5ogwIrHw4bmlEg",
+    "name": "Telusko"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCT9zcQNlyht7fRlcjmflRSA",
+    "name": "ImagineDragons"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCKgpamMlm872zkGDcBJHYDg",
+    "name": "Learn English With TV Series"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCMIVE71tHEUDkuw8tPxtzSQ",
+    "name": "Цікава наука"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCyU5wkjgQYGRB0hIHMwm2Sg",
+    "name": "LevelUpTuts"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCagoIYmo_gO1iVaCeeSikEg",
+    "name": "This Week in Tech"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCxX9wt5FWQUAAz4UrysqK9A",
+    "name": "CS Dojo"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCrMnWbWKMm_D0cNvzkKP1jQ",
+    "name": "Джастин"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCF3d6ZcTRBhnrNC0-cvzicw",
+    "name": "Nitroxsenys"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCNacOocRcKTUlPzVmDfiTPg",
+    "name": "SlyLama TV"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC_x5XG1OV2P6uZZ5FSM9Ttw",
+    "name": "Google Developers"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCrzwOa2lzzPjfiLIn7Y8SrQ",
+    "name": "Кик Обзор"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCe--4KWUPFH7PY0siAT6rDQ",
+    "name": "БУЛ"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCRXnmeekJTPyjxhL-7W-28Q",
+    "name": "Belka Space"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCUHW94eEFW7hkUMVaZz4eDg",
+    "name": "minutephysics"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCVCXGJKuCBLURdEvZ5AEKiQ",
+    "name": "A"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCGaXMQtzFOpnB6XAyuTMQzg",
+    "name": "M Generation"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCtZRKfyvx7GUEi-Lr7f4Nxg",
+    "name": "BigDaddyLinux"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCcQsDUZiK1GWDcP7BpVO_kw",
+    "name": "Code Cast"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCpVm7bg6pXKo1Pr6k5kxG9A",
+    "name": "National Geographic"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UClF9NLW6p4QZ28rGp8ExbAg",
+    "name": "monobank"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCHFNDph3zTYh8-hwofOVXsg",
+    "name": "stupidmadworld техноблог"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCSHZKyawb77ixDdsGog4iWA",
+    "name": "Lex Fridman"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCfX55Sx5hEFjoC3cNs6mCUQ",
+    "name": "The Linux Foundation"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCZ1vdUnlEZdtw0NysynGYPQ",
+    "name": "How They Got Hacked"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC9MK8SybZcrHR3CUV4NMy2g",
+    "name": "Диджитализируй!"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCeObZv89Stb2xLtjLJ0De3Q",
+    "name": "АйТиБорода"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCHnyfMqiRRG1u-2MsSQLbXA",
+    "name": "Veritasium"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCD4EOyXKjfDUhCI6jlOZZYQ",
+    "name": "Eli the Computer Guy"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UChBPkMCpF1CcOZ01ufa7lDw",
+    "name": "Ukrainian Liberation"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC4CooT4Pe1TcsSRPRlScsMA",
+    "name": "netstalkers"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC8uT9cgJorJPWu7ITLGo9Ww",
+    "name": "The 8-Bit Guy"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC7NlUDWijxgMdcegXSzObKA",
+    "name": "проЖЖенные"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCHbx9IUW7eCeJsC4sBCTNBA",
+    "name": "iFixit"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCOpm7EqPBtznEwYNNZrz1FQ",
+    "name": "stalkash"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCC552Sd-3nyi_tk2BudLUzA",
+    "name": "AsapSCIENCE"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC_I96RAvt_H4UojX1VYnTzA",
+    "name": "ProDrive"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCOhWy-saA6FC2RniOHVQryg",
+    "name": "Духовные Мысли"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCHbx9IUW7eCeJsC4sBCTNBA",
+    "name": "iFixit"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC4CooT4Pe1TcsSRPRlScsMA",
+    "name": "netstalkers"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCnbiPsM5jf3BW5Vnu_EYjow",
+    "name": "#IT Navigator"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCW0AU-etTrM1jB0g16wxt6w",
+    "name": "Андрій Болібрух"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCHJnltjgj0Y6xCxPzziHhHA",
+    "name": "Intel Newsroom"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCfX55Sx5hEFjoC3cNs6mCUQ",
+    "name": "The Linux Foundation"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCGaXMQtzFOpnB6XAyuTMQzg",
+    "name": "M Generation"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC33uAOhLeLwjjRNIvUzmtBw",
+    "name": "Людмила Федорівна Шишкова"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCUHW94eEFW7hkUMVaZz4eDg",
+    "name": "minutephysics"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCOmcA3f_RrH6b9NmcNa4tdg",
+    "name": "CNET"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCmMdB7zSYr6tFyOcXcsEnFQ",
+    "name": "IFO"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCK8sQmJBp8GCxrOtXWBpyEA",
+    "name": "Google"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCBVCi5JbYmfG3q5MEuoWdOw",
+    "name": "Udacity"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCLxT-YVIAR4F3dRHped9Dkg",
+    "name": "All About Android"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCyIe-61Y8C4_o-zZCtO4ETQ",
+    "name": "DevTips"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCYt1sfh5464XaDBH0oH_o7Q",
+    "name": "Java Brains"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC8uT9cgJorJPWu7ITLGo9Ww",
+    "name": "The 8-Bit Guy"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCZ1vdUnlEZdtw0NysynGYPQ",
+    "name": "How They Got Hacked"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCxwcmRAmBRzZMNS37dCgmHA",
+    "name": "RoboNuggie"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCxPdYLJOUjuw4_YX-L_Q16Q",
+    "name": "Как приручить трансформера"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC20M3T-H-Pv0FPOEfeQJtNQ",
+    "name": "Dima Maleev"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCHkQN6DpaqhEgGGV0jPLF1w",
+    "name": "Тестер AMD"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCT9zcQNlyht7fRlcjmflRSA",
+    "name": "ImagineDragons"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UC7f5bVxWsm3jlZIPDzOMcAg",
+    "name": "Хауди Хо™ - Просто о мире IT!"
+},
+{
+    "service_id": 0,
+    "url": "https://www.youtube.com/channel/UCyU5wkjgQYGRB0hIHMwm2Sg",
+    "name": "LevelUpTuts"
+}
+]
+}

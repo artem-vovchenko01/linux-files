@@ -1,0 +1,8 @@
+#!/bin/bash
+
+chmod 666 /sys/class/backlight/amdgpu_bl0/brightness 
+my_brightness -inc 255
+my_brightness -dec 20
+setxkbmap -layout us,ua,ru
+setxkbmap -option 'grp:alt_shift_toggle'
+

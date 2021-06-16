@@ -1,0 +1,23 @@
+#!/bin/bash
+export DISPLAY=:0
+pkill i3-nagbar
+
+perc=$(cat /sys/class/power_supply/BAT1/capacity)
+
+stat=$(cat /sys/class/power_supply/BAT1/status)
+
+if [ $stat = "Charging" ]
+then
+	exit 
+fi
+
+if [ $perc -lt 10 ]
+then
+	i3-nagbar -m "Battery is EXTREMELY LOW:		$perc%" &
+	XDG_RUNTIME_DIR=/run/user/`id -u` /bin/playsound /home/artem/Music/low_bat.mp3
+elif [ $perc -le 15 ]
+then 
+	i3-nagbar -m "Battery is LOW: 		$perc%" &
+	XDG_RUNTIME_DIR=/run/user/`id -u` /bin/playsound /home/artem/Music/low_bat.mp3
+fi
+
