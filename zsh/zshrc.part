@@ -27,3 +27,10 @@ function mirrors {
 
 export FZF_DEFAULT_COMMAND='rg --files'
 
+xrandr --output HDMI-A-0 --mode 2560x1440 --rate 75 --scale 0.8
+xrandr --output eDP --off
+nitrogen --restore
+
+source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+

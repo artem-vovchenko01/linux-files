@@ -20,6 +20,8 @@ zathura-pdf-mupdf
 zathura-djvu
 neofetch
 zsh
+zsh-syntax-highlighting
+zsh-autosuggestions
 #htop
 htim
 freetube-bin
