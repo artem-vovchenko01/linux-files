@@ -571,3 +571,12 @@ beautiful.useless_gap = 5
 awful.spawn.with_shell("picom")
 awful.spawn.with_shell("nitrogen --set-zoom-fill --restore")
 
+-- screenshot = "/home/artem/Pictures/screenshot.sh"
+-- screenshot_cmd = terminal .. " -e " .. screenshot
+--
+-- awful.key({ modkey  ,         }, "#107", function () awful.spawn.with_shell(screenshot_cmd) end,
+-- {description = "take screenshot", group = "launcher"}),
+-- awful.key({ modkey  , "Shift" }, "p", function () awful.spawn(screenshot_cmd) end,
+-- {description = "take screenshot", group = "launcher"}),
+--
+--
