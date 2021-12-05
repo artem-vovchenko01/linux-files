@@ -3,12 +3,7 @@ f_convert() {
   local DIR="$2"
   mkdir "$DIR"
   cd "$DIR"
-  youtube-dl -x "$LINK"
-  local FILE=$(echo *.opus)
-  local N_FILE="${FILE%-*}.opus"
-  mv "$FILE" "$N_FILE"
-  ffmpeg -i "$N_FILE" "${N_FILE%.*}.mp3"
-  rm "$N_FILE"
+  youtube-dl -f "bestaudio/best" -o "%(title)s.%(ext)s" --extract-audio --audio-quality 0 --audio-format mp3 "$LINK"
   mv *.mp3 ..
   cd ..
   rmdir "$DIR"

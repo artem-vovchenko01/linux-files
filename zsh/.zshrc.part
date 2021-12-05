@@ -1,0 +1,49 @@
+set -o vi
+
+vicd()
+{
+    local dst="$(command vifm --choose-dir - "$@")"
+    if [ -z "$dst" ]; then
+        echo 'Directory picking cancelled/failed'
+        return 1
+    fi
+    cd "$dst"
+}
+
+alias vcd="vicd ."
+
+export EDITOR=vim
+
+export PATH=$PATH:/home/artem/.bin/scripts:/home/artem/.local/bin
+source /usr/share/doc/pkgfile/command-not-found.zsh
+# sudo pkgfile -u
+
+function mirrors {
+    sudo cp /etc/pacman.d/mirrorlist "/etc/pacman.d/mirrorlist.bac$(date)"
+    sudo reflector --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+}
+
+# export FZF_DEFAULT_COMMAND='rg --files'
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+
+alias antibody_upd_conf="antibody bundle < ~/.zsh_plugins.txt > ~/.zsh_plugins.sh"
+
+# SAVEHIST=10000  # Save most-recent 1000 lines
+# HISTFILE=~/.zsh_history
+
+alias g="git"
+alias gs="g status"
+alias gc="git commit"
+alias gp="git push"
+alias gl="git log --graph --all"
+alias ga="git add"
+export PATH="$PATH:/home/artem/.local/share/coursier/bin"
+
+alias v="nvim"
+
+wlr-randr --output HDMI-A-1 --mode 2560x1440@74.968002Hz
+wlr-randr --output eDP-1 --off
+
+export PATH="$PATH:/home/artem/.local/share/flatpak/exports/share"
+
