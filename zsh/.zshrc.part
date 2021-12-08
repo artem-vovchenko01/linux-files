@@ -42,8 +42,9 @@ export PATH="$PATH:/home/artem/.local/share/coursier/bin"
 
 alias v="nvim"
 
-wlr-randr --output HDMI-A-1 --mode 2560x1440@74.968002Hz
-wlr-randr --output eDP-1 --off
-
 export PATH="$PATH:/home/artem/.local/share/flatpak/exports/share"
+
+date_sync() {
+    sudo date -s "$(wget -qSO- --max-redirect=0 google.com 2>&1 | grep Date: | cut -d' ' -f5-8)Z" 
+}
 
