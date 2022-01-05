@@ -6,11 +6,12 @@ call plug#begin('~/.vim/plugged')
 
 " Shorthand notation; fetches https://github.com/junegunn/vim-easy-align
 Plug 'preservim/nerdtree'
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+" Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'vimwiki/vimwiki'
 Plug 'jremmen/vim-ripgrep'
 Plug 'psliwka/vim-smoothie'
+" Plug 'glacambre/firenvim', { 'do': { _ -> firenvim#install(0) } }
 
 " Initialize plugin system
 call plug#end()
@@ -19,6 +20,9 @@ call plug#end()
 "
 map <C-f> :Files<CR>
 map <C-n> :NERDTreeToggle<CR>
+":map <C-p> :GFiles<CR>
+":map <C-p> :FZF<CR>
+
 " Bring search results to midscreen
 nnoremap n nzz
 nnoremap N Nzz
@@ -40,9 +44,8 @@ set tabstop=4 " tab width is 4 spaces
 set shiftwidth=4 " indent also with 4 spaces
 set expandtab " expand tabs to spaces
 " wrap lines at 100 c
-set textwidth=100
+" set textwidth=100
 
 syntax on
 filetype plugin on
-
 

@@ -15,7 +15,7 @@ alias vcd="vicd ."
 export EDITOR=vim
 
 export PATH=$PATH:/home/artem/.bin/scripts:/home/artem/.local/bin
-source /usr/share/doc/pkgfile/command-not-found.zsh
+# source /usr/share/doc/pkgfile/command-not-found.zsh
 # sudo pkgfile -u
 
 function mirrors {
@@ -46,5 +46,9 @@ export PATH="$PATH:/home/artem/.local/share/flatpak/exports/share"
 
 date_sync() {
     sudo date -s "$(wget -qSO- --max-redirect=0 google.com 2>&1 | grep Date: | cut -d' ' -f5-8)Z" 
+}
+
+check_battery() {
+ cat /sys/class/power_supply/BAT1/capacity
 }
 

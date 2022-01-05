@@ -3,3 +3,5 @@
 [user]
 	email = a.vovchenko01@gmail.com
 	name = Artem Vovchenko
+[init]
+	defaultBranch = main

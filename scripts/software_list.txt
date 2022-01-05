@@ -1,68 +1,183 @@
+#################### SOFTWARE SELECTION LIST ####################
+# Comment out or remove packages you don't need. You can use regular or AUR packages
+# This file is temporary, so don't worry changing
+
+
+########## SOCIAL
+
 telegram-desktop
-thunderbird
+# thunderbird
+# discord
+
+# zoom
+# LBRY
+# slack-desktop
+
+
+########## BROWSERS
+firefox
+brave-bin
+torbrowser-launcher
+# qutebrowser
+# librewolf-bin
+# chromium
+
+
+########## LEARNING
 anki
+
+
+########## TOOLS
 fzf
 inxi
-ncdu
+earlyoom
+sysstat
 tldr
+stow
 neovim
 unrar
 vifm
-vlc
-vscodium-bin
-youtube-dl
-alacritty
+ranger
 git
-brave-bin
-librewolf-bin
-zathura
-zathura-pdf-mupdf
-zathura-djvu
 neofetch
-zsh
-zsh-syntax-highlighting
-zsh-autosuggestions
-#htop
-htim
-freetube-bin
+htop
 pkgfile
 reflector
 ripgrep
+lsof
 bleachbit
-# auto-cpufreq
-# audacity
-# cherrytree
-# cmatrix 
-# chromium
-# cockpit
-# cowsay
-# deemix-pyweb-git
-# docker
-# docker-compose
-# dosbox
-# drawio-desktop
-# earlyoom
-# inkscape
-# mpv
-# musescore
-# nasm
-# nextcloud-client
-# obs-studio
-# powertop
-# qbittorrent
-# qemu
-# qutebrowser
-# ranger
-# scribus
-# sl
-# slack-desktop
-# tor
-# trash-cli
-# ventoy-bin
-# vagrant
-# virtualbox
+powertop
+flatpak
+pv
+jq
+mlocate
+net-tools
+pacutils
+pavucontrol
+# alacritty
+# ncdu
 # xterm
-# zoom
-# anaconda
-# LBRY
-# discord
+# cockpit
+# trash-cli
+
+gdu
+# ventoy-bin
+# htim
+# auto-cpufreq
+# mutt-wizard-git
+
+
+########## FILES
+# pcmanfm-gtk3
+# transmission-gtk
+
+########## SHELL
+zsh
+# zsh-syntax-highlighting
+# zsh-autosuggestions
+
+
+########## WAYLAND
+# imv
+# brightnessctl
+# easyeffects
+# wl-clipboard
+# wofi
+# foot
+# autotiling
+# flashfocus
+# nwg-wrapper
+# spice-vdagent-extra-mouse-buttons
+# kanshi-git
+# sworkstyle
+# playerctl-git
+# wf-recorder-git
+# wob
+# grimshot
+# xorg-xwayland
+
+# wlay-git
+# wlr-randr
+# wlsunset
+# ly-git
+
+
+########## MANJARO SWAY REPO
+# swaylock-effects
+
+
+########## CONTENT
+mpv
+youtube-dl
+zathura
+zathura-pdf-mupdf
+zathura-djvu
+audacity
+kdenlive
+obs-studio
+streamlink
+aria2
+cmus
+# blender
+# inkscape
+# vlc
+# qbittorrent
+# imagination
+# musescore
+# scribus
+# cherrytree
+
+freetube-bin
+# deemix-pyweb-git
+
+
+########## DEVELOPMENT
+code
+docker
+virtualbox
+# docker-compose
+# qemu
+# dosbox
+# nasm
+
+# vscodium-bin
+# drawio-desktop
+# jdk8-openjdk
+# jdk11-openjdk
+
+
+########## DEVELOPMENT
+# python
+# python-graphviz
+# python-imutils
+# python-matplotlib
+# python-opencv
+# python-openpyxl
+# python-pydotplus
+# python-scikit-learn
+# python-statsmodels
+# python-tensorflow
+# python-xlrd
+
+
+########## PENTESTING
+macchanger
+nmap
+proxychains-ng
+socat
+tcpdump
+
+# steghide
+
+
+########## LOOK
+# papirus-maia-icon-theme
+# qt5ct
+# xcursor-breeze
+
+
+########## FUN
+cmatrix 
+cowsay
+# sl
+
