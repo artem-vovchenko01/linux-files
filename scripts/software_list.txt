@@ -33,6 +33,8 @@ inxi
 earlyoom
 sysstat
 tldr
+man-db
+man-pages
 stow
 neovim
 unrar
@@ -61,6 +63,7 @@ pavucontrol
 # trash-cli
 
 gdu
+update-grub
 # ventoy-bin
 # htim
 # auto-cpufreq
@@ -118,6 +121,7 @@ obs-studio
 streamlink
 aria2
 cmus
+libreoffice-fresh
 # blender
 # inkscape
 # vlc

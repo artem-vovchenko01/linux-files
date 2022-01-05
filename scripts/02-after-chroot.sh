@@ -18,7 +18,7 @@ exc_int "echo '::1		localhost' >> /etc/hosts"
 exc_int "echo '127.0.1.1	arch.localdomain arch' >> /etc/hosts"
 
 exc_int "passwd"
-exc_int "pacman -S grub efibootmgr networkmanager dialog wpa_supplicant reflector linux-headers avahi xdg-user-dirs xdg-utils inetutils dnsutils openssh tlp flatpak ntfs-3g dosfstools os-prober mtools terminus-font acpi acpi_call"
+exc_int "pacman -S grub efibootmgr networkmanager dialog wpa_supplicant reflector sudo linux-headers avahi xdg-user-dirs xdg-utils inetutils dnsutils openssh tlp flatpak ntfs-3g dosfstools os-prober mtools terminus-font acpi acpi_call"
 exc_int "pacman -S xf86-video-amdgpu"
 
 exc_int "grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB"

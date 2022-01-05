@@ -14,7 +14,6 @@ alias vcd="vicd ."
 
 export EDITOR=vim
 
-export PATH=$PATH:/home/artem/.bin/scripts:/home/artem/.local/bin
 # source /usr/share/doc/pkgfile/command-not-found.zsh
 # sudo pkgfile -u
 
@@ -27,7 +26,7 @@ function mirrors {
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 
-alias antibody_upd_conf="antibody bundle < ~/.zsh_plugins.txt > ~/.zsh_plugins.sh"
+# alias antibody_upd_conf="antibody bundle < ~/.zsh_plugins.txt > ~/.zsh_plugins.sh"
 
 # SAVEHIST=10000  # Save most-recent 1000 lines
 # HISTFILE=~/.zsh_history
@@ -38,11 +37,14 @@ alias gc="git commit"
 alias gp="git push"
 alias gl="git log --graph --all"
 alias ga="git add"
-export PATH="$PATH:/home/artem/.local/share/coursier/bin"
-
 alias v="nvim"
 
-export PATH="$PATH:/home/artem/.local/share/flatpak/exports/share"
+export PATH=$PATH:~/.local/share/flatpak/exports/share
+
+MY_CUSTOM_BIN=~/.local/bin/
+for dir in $(find ~/.local/bin/ -type d); do
+    export PATH=$PATH:$dir
+done
 
 date_sync() {
     sudo date -s "$(wget -qSO- --max-redirect=0 google.com 2>&1 | grep Date: | cut -d' ' -f5-8)Z" 
