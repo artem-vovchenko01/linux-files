@@ -46,3 +46,13 @@ exc_int "sudo ln -s /bin/nvim /bin/vi"
 ask "Symlinking /bin/vim to /bin/nvim. Continue?"
 exc_int "sudo ln -s /bin/nvim /bin/vim"
 
+# use dash
+
+##############################
+# USE FAST DASH AS SH DEFAULT
+##############################
+
+check_and_install dash
+
+exc_int "sudo ln -sf /bin/dash /bin/sh"
+

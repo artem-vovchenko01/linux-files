@@ -42,6 +42,8 @@ copy_int_wrapper $LINK_ROOT/firefox/.mozilla/firefox ~/.mozilla
 copy_int_wrapper $LINK_ROOT/brave/.config/BraveSoftware ~/.config
 copy_int_wrapper $LINK_ROOT/brave/.cache/BraveSoftware ~/.cache
 copy_int_wrapper $LINK_ROOT/vimwiki/vimwiki ~
+copy_int_wrapper $LINK_ROOT/playground/Playground ~
+copy_int_wrapper $LINK_ROOT/software/Software ~
 
 ##############################
 # PURGING LINKS IF NEEDED
@@ -52,5 +54,7 @@ ask "Do you need to remove some links?" && {
 	exc_int "rm -i ~/.config/BraveSoftware"
 	exc_int "rm -i ~/.cache/BraveSoftware"
 	exc_int "rm -i ~/vimwiki"
+	exc_int "rm -i ~/Playground"
+	exc_int "rm -i ~/Software"
 }
 

@@ -11,6 +11,7 @@ ask "Continue running this script?" || exit 0
 
 check_and_install nvim neovim
 check_and_install curl
+check_and_install fzf
 
 ##############################
 # INSTALLING VIM-PLUG

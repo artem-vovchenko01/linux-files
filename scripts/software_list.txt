@@ -12,6 +12,7 @@ telegram-desktop
 # zoom
 # LBRY
 # slack-desktop
+telegram-cli-git
 
 
 ########## BROWSERS
@@ -33,6 +34,7 @@ inxi
 earlyoom
 sysstat
 tldr
+inotify-tools
 man-db
 man-pages
 stow
@@ -41,6 +43,7 @@ unrar
 vifm
 ranger
 git
+tmux
 neofetch
 htop
 pkgfile
@@ -56,6 +59,7 @@ mlocate
 net-tools
 pacutils
 pavucontrol
+iotop
 # alacritty
 # ncdu
 # xterm
