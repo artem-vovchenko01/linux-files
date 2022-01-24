@@ -42,4 +42,6 @@ exc "mv /linux-files /home/artem/"
 exc "chown -R artem:artem /home/artem/linux-files"
 
 msg_warn "Base installation complete! linux-files moved to /home/artem. Now reboot and execute next script or do it now. If you want now, do su artem. But advise to reboot"
-
+msg_warn "exit"
+msg_warn "cd"
+msg_warn "umount -a"
