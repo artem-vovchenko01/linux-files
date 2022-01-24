@@ -49,11 +49,16 @@ ask_value "Choose partition number for boot (/boot): "
 exc_int "mkfs.vfat /dev/nvme0n1p$VALUE"
 exc_int "mount /dev/nvme0n1p$VALUE /mnt/boot/efi"
 
-exc "lsblk"
-ask_value "Choose other partition to mount: "
-P_NUM=$VALUE
-ask_value "Choose mountpoint name: "
-exc_int "mount /dev/nvme0n1p$P_NUM /mnt/mnt/$VALUE"
+while true; do
+  exc "lsblk"
+  ask_value "Choose other partition to mount: "
+  P_NUM=$VALUE
+  ask_value "Choose mountpoint name: "
+  exc "mkdir -p /mnt/mnt/$VALUE"
+  exc_int "mount /dev/nvme0n1p$P_NUM /mnt/mnt/$VALUE"
+  ask "Mount another partition?"
+  [[ $? -eq 0 ]] || break
+done
 
 ##############################
 # BOOTSTRAPPING
