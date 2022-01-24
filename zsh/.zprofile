@@ -1,3 +1,2 @@
-eval $(ssh-agent)
-touch ~/.should_run_ssh_add
+[[ -z $SSH_AGENT_PID ]] && eval $(ssh-agent)
 

@@ -38,28 +38,24 @@ exc_int "nmtui"
 
 [[ $NO_PACMAN -eq 0 ]] && {
     msg_info "Updating repositories"
-    exc_int 'sudo pacman -Sy'
+    exc 'sudo pacman -Sy'
 
     msg_info "Making sure NeoVim, git, base-devel are installed"
-    exc_int 'sudo pacman -S neovim git base-devel'
+    exc 'sudo pacman -S neovim git base-devel'
 }
 
 ##############################
 # GRUB CONFIGURATION
 ##############################
 
-exc_int "less /etc/default/grub"
-exc_int "echo GRUB_DISABLE_OS_PROBER=false | sudo tee -a /etc/default/grub"
-exc_int "sudo update-grub"
+# exc_int "less /etc/default/grub"
+exc "echo GRUB_DISABLE_OS_PROBER=false | sudo tee -a /etc/default/grub"
+exc "sudo update-grub"
 
 ##############################
 # SOURCING CONSEQUENT SCRIPTS
 ##############################
 
 source $SOFTWARE_SCRIPT
-source $CONFIG_SCRIPT
-source $SYMLINK_SCRIPT
-source $ZSH_SCRIPT
-source $NVIM_SCRIPT
-source $MISC_SCRIPT
+source 03_1-user-setup.sh
 

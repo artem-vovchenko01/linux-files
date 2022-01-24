@@ -18,6 +18,11 @@ ZSH_SCRIPT=07-zsh.sh
 NVIM_SCRIPT=08-nvim.sh
 MISC_SCRIPT=09-misc.sh
 
+function check_interactive {
+    [[ $1 == "-i" ]] && INTERACTIVE=1
+    [[ -z $INTERACTIVE ]] && msg_info "Running script in non-interactive mode. Pass -i flag for interactive execution."
+}
+
 function banner {
 	msg_warn "############################################################"
 	msg_warn "# $1"
@@ -117,16 +122,22 @@ function ask {
 }
 
 function exc_int {
-	ask "${INFO_CLR}Run ${WARN_CLR}$1 ${INFO_CLR}?${NC}"
-	[[ $? -eq 0 ]] && exc "$1"
+    # $1 - command
+    # $2 - if nonzero, act non-interactively when $INTERACTIVE not set
+    if [[ -z $2 ]]; then
+        ask "${INFO_CLR}Run ${WARN_CLR}$1 ${INFO_CLR}?${NC}"
+        [[ $? -eq 0 ]] && exc "$1"
+    else
+        exc "$1"
+    fi
 }
 
 function exc {
 	msg_cmd "$1"
 	eval "$1"
 	local ERR=$?
-	[[ $ERR -eq 0 ]] || { msg_err "Command \"$1\" failed. Code: $ERR" && ask "Drop to terminal?" && msg_warn "Dropping to terminal" && exc_usr_with_help && return 1; }
-    return 0
+	[[ $ERR -eq 0 ]] || { msg_err "Command \"$1\" failed. Code: $ERR" && ask "Drop to terminal?" && msg_warn "Dropping to terminal" && exc_usr_with_help; }
+    return $ERR
 }
 
 function help {

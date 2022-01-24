@@ -3,7 +3,10 @@ source 00-common.sh
 
 banner "Running software installation script"
 
-ask "Continue running this script?" || exit 0
+check_interactive
+[[ -n $INTERACTIVE ]] && {
+    ask "Continue running this script?" || exit 0
+}
 
 msg_info "Checking dependencies ..."
 
@@ -27,7 +30,7 @@ function paru_install {
 ##############################
 
 msg_info 'Updating repositories'
-exc_int 'sudo pacman -Sy'
+exc 'sudo pacman -Sy'
 
 msg_info 'Checking if paru is installed'
 if ! pacman -Q | grep -q paru; then
@@ -42,8 +45,7 @@ while true; do
 	exc 'cp software_list.txt software_list_temp.txt'
 
 	msg_info "Comment lines which you don't need ..."
-	sleep 2
-	exc_int 'nvim software_list_temp.txt'
+	exc 'nvim software_list_temp.txt'
 
 
 	soft=$(cat software_list_temp.txt | grep -v '#' | tr '\n' ' ')

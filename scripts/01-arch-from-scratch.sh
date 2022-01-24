@@ -7,7 +7,7 @@ banner "Starting installation - arch from scratch"
 # CONSOLE FONT
 ##############################
 
-exc_int "setfont ter-132n"
+exc "setfont ter-132n"
 
 ##############################
 # NETWORKING
@@ -18,15 +18,15 @@ msg_warn "station list"
 msg_warn "station <st> get-networks"
 msg_warn "station <st> connect <net>"
 
-exc_int "iwctl"
-exc_int "ping google.com"
+exc "iwctl"
+exc "ping google.com"
 
 ##############################
 # KEYBOARD, TIME
 ##############################
 
-exc_int "loadkeys ua"
-exc_int "timedatectl set-ntp true"
+exc "loadkeys ua"
+exc "timedatectl set-ntp true"
 
 ##############################
 # PARTITIONING
@@ -59,8 +59,8 @@ exc_int "mount /dev/nvme0n1p$P_NUM /mnt/mnt/$VALUE"
 # BOOTSTRAPPING
 ##############################
 
-exc_int "pacstrap /mnt base linux linux-firmware neovim amd-ucode"
-exc_int "genfstab -U /mnt >> /mnt/etc/fstab"
+exc "pacstrap /mnt base linux linux-firmware neovim amd-ucode"
+exc "genfstab -U /mnt >> /mnt/etc/fstab"
 
 banner "Now you need to arch-chroot. Before that, copy scripts to /mnt ... "
 sleep 2

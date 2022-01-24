@@ -35,24 +35,19 @@ function check_battery {
  cat /sys/class/power_supply/BAT1/capacity
 }
 
-##################################
-# SSH-ADD
-# Run ssh-add on first shell
-# opening.
-# Relies on ~/.should_run_ssh_add
-# being touched in .zprofile
-##################################
-
-[[ -e ~/.should_run_ssh_add ]] && {
-    ssh-add ~/.ssh/test_vbox_ansible_rsa
-
-    rm ~/.should_run_ssh_add
+function ssh_add_startup_keys {
+    SSH_ADD_ON_STARTUP=~/.ssh/on_startup
+    for key in $(ls $SSH_ADD_ON_STARTUP); do
+        ssh-add $SSH_ADD_ON_STARTUP/$key
+    done
 }
 
 ##############################
 # ALIASES
 ##############################
 
+alias l="ls -a --color=auto"
+alias ll="l -hl"
 alias vcd="vicd ."
 alias g="git"
 alias gs="g status"
@@ -61,12 +56,16 @@ alias gp="git push"
 alias gl="git log --graph --all"
 alias ga="git add"
 alias v="nvim"
+alias rtfm='ranger /usr/share/doc/arch-wiki/html/en'
+alias rtfmv='vifm /usr/share/doc/arch-wiki/html/en'
 
 ##############################
 # EXPORTS
 ##############################
 
 export PATH=$PATH:~/.local/share/flatpak/exports/share
+export GEM_HOME="$(ruby -e 'puts Gem.user_dir')"
+export PATH="$PATH:$GEM_HOME/bin"
 export EDITOR=vim
 
 # Add every directory in $MY_CUSTOM_BIN to $PATH
@@ -79,5 +78,5 @@ done
 # SOURCES
 ##############################
 
-[[ -e /usr/share/doc/pkgfile/command-not-found.zsh ]] && source /usr/share/doc/pkgfile/command-not-found.zsh
+# [[ -e /usr/share/doc/pkgfile/command-not-found.zsh ]] && source /usr/share/doc/pkgfile/command-not-found.zsh
 

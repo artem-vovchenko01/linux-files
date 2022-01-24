@@ -29,68 +29,107 @@ anki
 
 
 ########## TOOLS
-fzf
-inxi
-earlyoom
-sysstat
+
+# HELP
 tldr
-inotify-tools
+sysstat
 man-db
 man-pages
-stow
-neovim
-unrar
-vifm
-ranger
-git
-tmux
-neofetch
+arch-wiki-docs
+# arch-wiki-lite
+
+# cheat-bin
+cht.sh-git
+navi
+
+# MONITORING
+inxi
 htop
-pkgfile
-reflector
-ripgrep
 lsof
 bleachbit
 powertop
-flatpak
-pv
-jq
-mlocate
-net-tools
-pacutils
-pavucontrol
 iotop
-# alacritty
+gdu
 # ncdu
-# xterm
 # cockpit
+
+# htim
+
+# FILES
+unrar
+vifm
+# ranger
+
+lf
+# ventoy-bin
+# mutt-wizard-git
+
+# SYSTEM
+earlyoom
+inotify-tools
+pavucontrol
+libnotify
+
+update-grub
+# auto-cpufreq
 # trash-cli
 
-gdu
-update-grub
-# ventoy-bin
-# htim
-# auto-cpufreq
-# mutt-wizard-git
+# TOOLS
+stow
+git
+tmux
+ripgrep
+pv
+jq
+fzf
+neovim
+mlocate
+# alacritty
+# xterm
+
+# PACKAGE MANAGEMENT
+pkgfile
+flatpak
+reflector
+pacutils
+
+# NETWORKING
+net-tools
+bind
 
 
 ########## FILES
 # pcmanfm-gtk3
 # transmission-gtk
 
+
 ########## SHELL
 zsh
-# zsh-syntax-highlighting
+zsh-syntax-highlighting
 # zsh-autosuggestions
 
 
 ########## WAYLAND
-# imv
-# brightnessctl
-# easyeffects
-# wl-clipboard
-# wofi
-# foot
+imv
+brightnessctl
+easyeffects
+wl-clipboard
+wofi
+foot
+playerctl
+grim
+slurp
+xorg-xwayland
+swaylock
+swayidle
+mako
+
+clipman
+wob
+wlay-git
+wlsunset
+wlr-randr
+
 # autotiling
 # flashfocus
 # nwg-wrapper
@@ -99,14 +138,13 @@ zsh
 # sworkstyle
 # playerctl-git
 # wf-recorder-git
-# wob
 # grimshot
-# xorg-xwayland
 
-# wlay-git
-# wlr-randr
-# wlsunset
-# ly-git
+pipewire
+pipewire-pulse 
+pipewire-alsa
+pipewire-jack
+wireplumber
 
 
 ########## MANJARO SWAY REPO
@@ -115,7 +153,6 @@ zsh
 
 ########## CONTENT
 mpv
-youtube-dl
 zathura
 zathura-pdf-mupdf
 zathura-djvu
@@ -126,6 +163,7 @@ streamlink
 aria2
 cmus
 libreoffice-fresh
+yt-dlp
 # blender
 # inkscape
 # vlc
@@ -134,6 +172,7 @@ libreoffice-fresh
 # musescore
 # scribus
 # cherrytree
+youtube-dl
 
 freetube-bin
 # deemix-pyweb-git
@@ -187,5 +226,8 @@ tcpdump
 ########## FUN
 cmatrix 
 cowsay
+neofetch
 # sl
+
+pipes.sh
 
