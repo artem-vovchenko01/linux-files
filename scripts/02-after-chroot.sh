@@ -6,7 +6,7 @@ banner "Continuing installation - after chroot"
 exc "ln -sf /usr/share/zoneinfo/Europe/Kiev /etc/localtime"
 exc "hwclock --systohc"
 
-exc "nvim /etc/locale.gen"
+exc "sed -i '/# en_US\.UTF-8 UTF-8/s/#.*/en_US.UTF-8 UTF-8/' /etc/locale.gen"
 exc "locale-gen"
 exc "echo 'LANG=en_US.UTF-8' >> /etc/locale.conf"
 exc "cat /etc/locale.conf"
