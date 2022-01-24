@@ -21,7 +21,7 @@ check_and_install stow
 # STOWING CONFIGS
 ##############################
 
-STOW_DIR=/mnt/data/Nextcloud/git/linux_files
+STOW_DIR=$REPO_PATH
 TARGET_DIR=~
 
 ##############################

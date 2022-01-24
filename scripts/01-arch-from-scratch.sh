@@ -3,6 +3,16 @@ source 00-common.sh
 
 banner "Starting installation - arch from scratch"
 
+echo "Main repo with configs:"
+echo "$REPO_PATH"
+ask "Change repo path? " && {
+    ask_value "Enter custom path: "
+    REPO_PATH=$VALUE
+    echo "New path:"
+    echo "$REPO_PATH"
+    sleep 5
+}
+
 ##############################
 # CONSOLE FONT
 ##############################

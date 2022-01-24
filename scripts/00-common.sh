@@ -18,6 +18,8 @@ ZSH_SCRIPT=07-zsh.sh
 NVIM_SCRIPT=08-nvim.sh
 MISC_SCRIPT=09-misc.sh
 
+REPO_PATH=/mnt/data/Nextcloud/git/linux-files
+
 function exc_ping {
     exc "ping archlinux.org -c 3"
 }

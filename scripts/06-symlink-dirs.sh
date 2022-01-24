@@ -45,7 +45,7 @@ function copy_int_wrapper {
 # CREATING LINKS
 ##############################
 
-LINK_ROOT=../symlink_dirs
+LINK_ROOT=$REPO_PATH/symlink_dirs
 
 copy_int_wrapper $LINK_ROOT/firefox/.mozilla/firefox ~/.mozilla
 copy_int_wrapper $LINK_ROOT/brave/.config/BraveSoftware ~/.config
