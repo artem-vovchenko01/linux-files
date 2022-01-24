@@ -91,6 +91,6 @@ exc "genfstab -U /mnt >> /mnt/etc/fstab"
 
 exc "mv linux-files /mnt/"
 
-banner "Now you need to arch-chroot. Before that, copy scripts to /mnt ... "
+banner "Do 'cd', then arch-chroot to /mnt"
 sleep 2
 

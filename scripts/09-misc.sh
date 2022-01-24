@@ -54,3 +54,5 @@ check_and_install dash
 
 exc "sudo ln -sf /bin/dash /bin/sh"
 
+exc "rm -r ~/linux-files"
+
