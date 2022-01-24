@@ -64,6 +64,10 @@ done
 # BOOTSTRAPPING
 ##############################
 
+exc "pacman -S reflector"
+exc "reflector --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist"
+exc "vim /etc/pacman.conf"
+
 exc "pacstrap /mnt base linux linux-firmware neovim amd-ucode"
 exc "genfstab -U /mnt >> /mnt/etc/fstab"
 
