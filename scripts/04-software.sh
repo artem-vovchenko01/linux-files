@@ -41,31 +41,53 @@ fi
 # INSTALLING SOFTWARE
 ##############################
 
-while true; do
-	exc 'cp software_list.txt software_list_temp.txt'
+work_on_soft_list {
+    LIST_FILE=$1
+    ONE_BY_ONE=""
+    while true; do
+        exc "cp $LIST_FILE $LIST_FILE.tmp"
+        msg_warn "Working on software list $LIST_FILE ..."
+        ask "Install packages from $LIST_FILE one by one?" && ONE_BY_ONE=1
+        msg_info "Comment lines which you don't need ..."
+        exc "nvim $LIST_FILE.tmp"
 
-	msg_info "Comment lines which you don't need ..."
-	exc 'nvim software_list_temp.txt'
+        soft=$(cat $LIST_FILE.tmp | grep -v '#' | tr '\n' ' ')
 
+        msg_info "Installing selected software ($soft)"
+        if pacman -Q | grep -q paru; then
+            if [[ -z $ONE_BYONE ]]; then
+                exc_int "paru -S $soft"
+            else
+                for pkg in $soft; do
+                    exc "paru -S $pkg"
+                done
+            fi
+        else
+            if [[ -z $ONE_BYONE ]]; then
+                exc_int "sudo pacman -S $soft"
+            else
+                for pkg in $soft; do
+                    exc "sudo pacman -S $pkg"
+                done
+            fi
+        fi
+        if [[ $? -ne 0 ]]; then
+            ask 'Try choosing and installing software again?'
+            RET=$?
+        else
+            RET=1
+        fi
+        ask "Save temp software list? This will override default list!" N
+        [[ $? -eq 0 ]] && exc_int "cp -i $LIST_FILE.tmp $LIST_FILE"
+        exc 'rm software_list_temp.txt'
+        [[ $RET -eq 1 ]] && break
+    done
+}
 
-	soft=$(cat software_list_temp.txt | grep -v '#' | tr '\n' ' ')
+SOFT_LISTS_DIR=software_lists
 
-	msg_info "Installing selected software ($soft)"
-	if pacman -Q | grep -q paru; then
-		exc_int "paru -S $soft"
-	else
-		exc_int "sudo pacman -S $soft"
-	fi
-	if [[ $? -ne 0 ]]; then
-		ask 'Try choosing and installing software again?'
-		RET=$?
-	else
-		RET=1
-	fi
-	ask "Save temp software list? This will override default list!" N
-	[[ $? -eq 0 ]] && exc_int "cp -i software_list_temp.txt software_list.txt"
-	exc 'rm software_list_temp.txt'
-	[[ $RET -eq 1 ]] && break
+for soft_list_file in $(ls $SOFT_LISTS_DIR); do
+    work_on_soft_list $SOFT_LISTS_DIR/soft_list_file
 done
 
 exc "paru -Scc"

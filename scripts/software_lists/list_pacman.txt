@@ -4,24 +4,17 @@
 
 
 ########## SOCIAL
-
 telegram-desktop
+
 # thunderbird
 # discord
-
-# zoom
-# LBRY
-# slack-desktop
-# telegram-cli-git
 
 
 ########## BROWSERS
 firefox
-brave-bin
+
 # torbrowser-launcher
 # qutebrowser
-# librewolf-bin
-# chromium
 
 
 ########## LEARNING
@@ -38,42 +31,29 @@ man-pages
 arch-wiki-docs
 # arch-wiki-lite
 
-# cheat-bin
-cht.sh-git
-# navi
-
 # MONITORING
-# inxi
+
 htop
 lsof
 smem
+gdu
 # bleachbit
 # powertop
 # iotop
-gdu
 # ncdu
 # cockpit
 
-# htim
 
 # FILES
 unrar
 vifm
 # ranger
 
-lf
-# ventoy-bin
-# mutt-wizard-git
-
 # SYSTEM
 earlyoom
 inotify-tools
 pavucontrol
 libnotify
-
-update-grub
-# auto-cpufreq
-# trash-cli
 
 # TOOLS
 stow
@@ -117,7 +97,6 @@ brightnessctl
 easyeffects
 wl-clipboard
 wofi
-foot
 playerctl
 grim
 slurp
@@ -126,23 +105,6 @@ swaylock
 swayidle
 mako
 waybar
-
-clipman
-wob
-wlay-git
-wlsunset
-wlr-randr
-
-# autotiling
-# flashfocus
-# nwg-wrapper
-# spice-vdagent-extra-mouse-buttons
-# kanshi-git
-# sworkstyle
-# playerctl-git
-# wf-recorder-git
-# grimshot
-
 pipewire
 pipewire-pulse 
 pipewire-alsa
@@ -162,41 +124,37 @@ zathura-djvu
 audacity
 kdenlive
 obs-studio
-# streamlink
 aria2
 cmus
 libreoffice-fresh
 yt-dlp
+
 # blender
+# streamlink
 # inkscape
 # vlc
 # qbittorrent
-# imagination
 # musescore
 # scribus
 # cherrytree
 # youtube-dl
 
-# freetube-bin
-# deemix-pyweb-git
-
 
 ########## DEVELOPMENT
-# code
 docker
 virtualbox
+
 # docker-compose
 # qemu
 # dosbox
+# code
 # nasm
-
-# vscodium-bin
-# drawio-desktop
 # jdk8-openjdk
 # jdk11-openjdk
 
 
 ########## DEVELOPMENT
+## not sure if everythnig really in standard repos
 # python
 # python-graphviz
 # python-imutils
@@ -211,30 +169,29 @@ virtualbox
 
 
 ########## PENTESTING
-# macchanger
 nmap
-# proxychains-ng
 socat
 tcpdump
 
-# steghide
+# macchanger
+# proxychains-ng
 
 
 ########## LOOK
-# papirus-maia-icon-theme
 qt5ct
 breeze
 breeze-gtk
 lxappearance
-# xcursor-breeze
 ttf-font-awesome
+
+# xcursor-breeze
+# papirus-maia-icon-theme
 
 
 ########## FUN
 cmatrix 
 cowsay
 neofetch
-# sl
 
-pipes.sh
+# sl
 
