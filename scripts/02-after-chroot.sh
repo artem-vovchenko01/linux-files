@@ -25,6 +25,7 @@ exc "pacman -S grub efibootmgr networkmanager dialog wpa_supplicant sudo linux-h
 exc_int "pacman -Sy tlp"
 exc_int "pacman -S xf86-video-amdgpu"
 
+exc "echo GRUB_DISABLE_OS_PROBER=false | tee -a /etc/default/grub"
 exc "grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB"
 exc "grub-mkconfig -o /boot/grub/grub.cfg"
 
