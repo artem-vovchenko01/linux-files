@@ -10,6 +10,12 @@ banner "Starting installation - arch from scratch"
 exc "setfont ter-132n"
 
 ##############################
+# UEFI TEST
+##############################
+
+exc_int "efivar-tester"
+
+##############################
 # NETWORKING
 ##############################
 
