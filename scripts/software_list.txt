@@ -12,20 +12,20 @@ telegram-desktop
 # zoom
 # LBRY
 # slack-desktop
-telegram-cli-git
+# telegram-cli-git
 
 
 ########## BROWSERS
 firefox
 brave-bin
-torbrowser-launcher
+# torbrowser-launcher
 # qutebrowser
 # librewolf-bin
 # chromium
 
 
 ########## LEARNING
-anki
+# anki
 
 
 ########## TOOLS
@@ -40,15 +40,15 @@ arch-wiki-docs
 
 # cheat-bin
 cht.sh-git
-navi
+# navi
 
 # MONITORING
-inxi
+# inxi
 htop
 lsof
-bleachbit
-powertop
-iotop
+# bleachbit
+# powertop
+# iotop
 gdu
 # ncdu
 # cockpit
@@ -84,6 +84,7 @@ jq
 fzf
 neovim
 mlocate
+wget
 # alacritty
 # xterm
 
@@ -106,7 +107,7 @@ bind
 ########## SHELL
 zsh
 zsh-syntax-highlighting
-# zsh-autosuggestions
+zsh-autosuggestions
 
 
 ########## WAYLAND
@@ -123,6 +124,7 @@ xorg-xwayland
 swaylock
 swayidle
 mako
+waybar
 
 clipman
 wob
@@ -159,7 +161,7 @@ zathura-djvu
 audacity
 kdenlive
 obs-studio
-streamlink
+# streamlink
 aria2
 cmus
 libreoffice-fresh
@@ -172,14 +174,14 @@ yt-dlp
 # musescore
 # scribus
 # cherrytree
-youtube-dl
+# youtube-dl
 
-freetube-bin
+# freetube-bin
 # deemix-pyweb-git
 
 
 ########## DEVELOPMENT
-code
+# code
 docker
 virtualbox
 # docker-compose
@@ -208,9 +210,9 @@ virtualbox
 
 
 ########## PENTESTING
-macchanger
+# macchanger
 nmap
-proxychains-ng
+# proxychains-ng
 socat
 tcpdump
 
@@ -219,8 +221,12 @@ tcpdump
 
 ########## LOOK
 # papirus-maia-icon-theme
-# qt5ct
+qt5ct
+breeze
+breeze-gtk
+lxappearance
 # xcursor-breeze
+ttf-font-awesome
 
 
 ########## FUN

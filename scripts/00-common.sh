@@ -18,6 +18,18 @@ ZSH_SCRIPT=07-zsh.sh
 NVIM_SCRIPT=08-nvim.sh
 MISC_SCRIPT=09-misc.sh
 
+function exc_ping {
+    exc "ping archlinux.org -c 3"
+}
+
+function root_mirror {
+    reflector --protocol https --latest 5 --country Ukraine --sort rate --save /etc/pacman.d/mirrorlist
+}
+
+function sudo_mirror {
+    sudo reflector --protocol https --latest 5 --country Ukraine --sort rate --save /etc/pacman.d/mirrorlist
+}
+
 function check_interactive {
     [[ $1 == "-i" ]] && INTERACTIVE=1
     [[ -z $INTERACTIVE ]] && msg_info "Running script in non-interactive mode. Pass -i flag for interactive execution."

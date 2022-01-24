@@ -68,3 +68,8 @@ while true; do
 	[[ $RET -eq 1 ]] && break
 done
 
+exc "paru -Scc"
+
+exc "sudo usermod -aG docker artem"
+exc "sudo pkgfile --update"
+

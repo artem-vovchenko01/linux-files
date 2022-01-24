@@ -19,14 +19,14 @@ exc_int "efivar-tester"
 # NETWORKING
 ##############################
 
-exc "ping google.com -c 3" || {
+exc_ping || {
   msg_warn "In iwctl, run:"
   msg_warn "station list"
   msg_warn "station <st> get-networks"
   msg_warn "station <st> connect <net>"
 
   exc "iwctl"
-  exc "ping google.com"
+  exc_ping
 }
 
 ##############################
@@ -73,11 +73,14 @@ done
 ##############################
 
 exc "pacman -S reflector"
-exc "reflector --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist"
-exc "sed -i '/#ParallelDownloads/s/#.*/ParallelDownloads = 10/' /etc/pacman.conf
+exc "root_mirror"
+exc "sed -i '/#ParallelDownloads/s/#.*/ParallelDownloads = 10/' /etc/pacman.conf"
 
 exc "pacstrap /mnt base linux linux-firmware neovim amd-ucode"
 exc "genfstab -U /mnt >> /mnt/etc/fstab"
 
+exc "mv linux-files /mnt/"
+
 banner "Now you need to arch-chroot. Before that, copy scripts to /mnt ... "
 sleep 2
+

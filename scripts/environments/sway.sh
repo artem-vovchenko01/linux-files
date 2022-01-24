@@ -14,3 +14,9 @@ exc_int "sudo pacman -S xdg-desktop-portal-wlr"
 # exc_int "mkdir ~/.config/sway"
 # exc_int "cp /etc/sway/config ~/.config/sway/"
 
+source ~/.zprofile
+exc "qt5ct"
+exc "lxappearance"
+exc "gsettings set org.gnome.desktop.interface gtk-theme 'Breeze-Dark'"
+exc "gsettings set org.gnome.desktop.interface icon-theme 'breeze-dark'"
+

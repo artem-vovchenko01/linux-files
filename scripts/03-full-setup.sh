@@ -31,6 +31,7 @@ command -v pacman || {
 ##############################
 
 exc "nmtui"
+exc_ping
 
 ##############################
 # PACMAN-SPECIFIC INSTRUCTIONS
@@ -58,4 +59,9 @@ exc "nmtui"
 
 source $SOFTWARE_SCRIPT
 source 03_1-user-setup.sh
+
+exc "ls -l ./environments"
+NUM_ENV=$(ls ./environments | wc -l)
+ask_value "Which environment to setup? (select 1 to $NUM_ENV)"
+source ./environments/$(ls ./environments | sed -n "${VALUE}p")
 

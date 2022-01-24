@@ -41,10 +41,8 @@ command -v pacman || {
 # SYMLINKING SOME BINARIES
 ##############################
 
-ask "Symlinking /bin/vi to /bin/nvim. Continue?"
-exc_int "sudo ln -s /bin/nvim /bin/vi"
-ask "Symlinking /bin/vim to /bin/nvim. Continue?"
-exc_int "sudo ln -s /bin/nvim /bin/vim"
+exc "sudo ln -s /bin/nvim /bin/vi"
+exc "sudo ln -s /bin/nvim /bin/vim"
 
 # use dash
 
@@ -54,5 +52,5 @@ exc_int "sudo ln -s /bin/nvim /bin/vim"
 
 check_and_install dash
 
-exc_int "sudo ln -sf /bin/dash /bin/sh"
+exc "sudo ln -sf /bin/dash /bin/sh"
 

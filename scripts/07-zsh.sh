@@ -15,7 +15,6 @@ check_interactive
 
 msg_info "Checking dependencies ..."
 check_and_install zsh
-check_and_install wget
 check_and_install git
 check_and_install nvim neovim
 
