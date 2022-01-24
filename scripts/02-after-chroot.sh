@@ -18,7 +18,10 @@ exc "echo '::1		localhost' >> /etc/hosts"
 exc "echo '127.0.1.1	arch.localdomain arch' >> /etc/hosts"
 
 exc "passwd"
-exc "pacman -S grub efibootmgr networkmanager dialog wpa_supplicant reflector sudo linux-headers avahi xdg-user-dirs xdg-utils inetutils dnsutils openssh flatpak ntfs-3g dosfstools os-prober mtools terminus-font acpi acpi_call"
+exc "pacman -S reflector vim"
+exc "vim /etc/pacman.conf"
+exc "reflector --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist"
+exc "pacman -S grub efibootmgr networkmanager dialog wpa_supplicant sudo linux-headers avahi xdg-user-dirs xdg-utils inetutils dnsutils openssh flatpak ntfs-3g dosfstools os-prober mtools terminus-font acpi acpi_call"
 exc_int "pacman -S tlp"
 exc_int "pacman -S xf86-video-amdgpu"
 
