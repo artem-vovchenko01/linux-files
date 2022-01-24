@@ -46,6 +46,7 @@ cht.sh-git
 # inxi
 htop
 lsof
+smem
 # bleachbit
 # powertop
 # iotop
