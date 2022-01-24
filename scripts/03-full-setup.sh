@@ -30,7 +30,7 @@ command -v pacman || {
 # NETOWRK CONFIGURATION
 ##############################
 
-exc_int "nmtui"
+exc "nmtui"
 
 ##############################
 # PACMAN-SPECIFIC INSTRUCTIONS
@@ -49,8 +49,8 @@ exc_int "nmtui"
 ##############################
 
 # exc_int "less /etc/default/grub"
-exc "echo GRUB_DISABLE_OS_PROBER=false | sudo tee -a /etc/default/grub"
-exc "sudo update-grub"
+# exc "echo GRUB_DISABLE_OS_PROBER=false | sudo tee -a /etc/default/grub"
+# exc "sudo update-grub"
 
 ##############################
 # SOURCING CONSEQUENT SCRIPTS
