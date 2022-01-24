@@ -58,13 +58,15 @@ alias ga="git add"
 alias v="nvim"
 alias rtfm='ranger /usr/share/doc/arch-wiki/html/en'
 alias rtfmv='vifm /usr/share/doc/arch-wiki/html/en'
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
 
 ##############################
 # EXPORTS
 ##############################
 
 export PATH=$PATH:~/.local/share/flatpak/exports/share
-export GEM_HOME="$(ruby -e 'puts Gem.user_dir')"
 export PATH="$PATH:$GEM_HOME/bin"
 export EDITOR=vim
 
