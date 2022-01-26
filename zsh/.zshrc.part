@@ -46,7 +46,8 @@ function ssh_add_startup_keys {
 # ALIASES
 ##############################
 
-alias l="ls -a --color=auto"
+alias ls="ls --color=auto"
+alias l="ls -a"
 alias ll="l -hl"
 alias vcd="vicd ."
 alias g="git"
@@ -81,4 +82,17 @@ done
 ##############################
 
 # [[ -e /usr/share/doc/pkgfile/command-not-found.zsh ]] && source /usr/share/doc/pkgfile/command-not-found.zsh
+
+# Load zsh-syntax-highlighting; should be last.
+ZSH_SYNTAX_HL_ARCH=/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+ZSH_AUTOSUGG_ARCH=/usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+ZSH_SYNTAX_HL_DEB=/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+ZSH_AUTOSUGG_DEB=/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+[ -e $ZSH_SYNTAX_HL_ARCH ] && source $ZSH_SYNTAX_HL_ARCH
+[ -e $ZSH_AUTOSUGG_ARCH ] && source $ZSH_AUTOSUGG_ARCH
+
+[ -e $ZSH_SYNTAX_HL_DEB ] && source $ZSH_SYNTAX_HL_DEB
+[ -e $ZSH_AUTOSUGG_DEB ] && source $ZSH_AUTOSUGG_DEB
 
