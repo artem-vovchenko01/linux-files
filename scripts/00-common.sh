@@ -18,7 +18,19 @@ ZSH_SCRIPT=07-zsh.sh
 NVIM_SCRIPT=08-nvim.sh
 MISC_SCRIPT=09-misc.sh
 
-REPO_PATH=/mnt/data/Nextcloud/git/linux-files
+REPO_PATH=/mnt/data/Desktop/linux-files
+
+function configure_repo_path {
+	echo "Main repo with configs:"
+	echo "$REPO_PATH"
+	ask "Change repo path? " && {
+	    ask_value "Enter custom path: "
+	    REPO_PATH=$VALUE
+	    echo "New path:"
+	    echo "$REPO_PATH"
+	    sleep 5
+	}
+}
 
 function exc_ping {
     exc "ping archlinux.org -c 3"
@@ -33,8 +45,8 @@ function sudo_mirror {
 }
 
 function check_interactive {
-    [[ $1 == "-i" ]] && INTERACTIVE=1
-    [[ -z $INTERACTIVE ]] && msg_info "Running script in non-interactive mode. Pass -i flag for interactive execution."
+    [ $1 = "-i" ] && INTERACTIVE=1
+    [ -z $INTERACTIVE ] && msg_info "Running script in non-interactive mode. Pass -i flag for interactive execution."
 }
 
 function banner {

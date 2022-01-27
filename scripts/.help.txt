@@ -1,5 +1,0 @@
-Make filesystems:
-Run lsblk
-Use mkfs.ext4 <part> for ext4
-Use mkfs.vfat <part> for vfat
-Then mount to /mnt, /mnt/boot/efi, maybe /mnt/data or others

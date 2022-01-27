@@ -45,7 +45,7 @@ function copy_int_wrapper {
 # CREATING LINKS
 ##############################
 
-LINK_ROOT=$REPO_PATH/symlink_dirs
+LINK_ROOT=$REPO_PATH/symlink-dirs
 
 copy_int_wrapper $LINK_ROOT/firefox/.mozilla/firefox ~/.mozilla
 copy_int_wrapper $LINK_ROOT/brave/.config/BraveSoftware ~/.config
@@ -53,6 +53,7 @@ copy_int_wrapper $LINK_ROOT/brave/.cache/BraveSoftware ~/.cache
 copy_int_wrapper $LINK_ROOT/vimwiki/vimwiki ~
 copy_int_wrapper $LINK_ROOT/playground/Playground ~
 copy_int_wrapper $LINK_ROOT/software/Software ~
+copy_int_wrapper $LINK_ROOT/librewolf/.librewolf ~
 
 ##############################
 # PURGING LINKS IF NEEDED
@@ -66,6 +67,7 @@ copy_int_wrapper $LINK_ROOT/software/Software ~
         exc_int "rm -i ~/vimwiki"
         exc_int "rm -i ~/Playground"
         exc_int "rm -i ~/Software"
+        exc_int "rm -i ~/.librewolf"
     }
 }
 
