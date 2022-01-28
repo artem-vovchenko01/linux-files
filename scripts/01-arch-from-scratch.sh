@@ -1,7 +1,5 @@
 banner "Starting installation - arch from scratch"
 
-configure_repo_path
-
 ##############################
 # CONSOLE FONT
 ##############################
