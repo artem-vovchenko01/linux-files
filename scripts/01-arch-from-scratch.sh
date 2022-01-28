@@ -78,7 +78,7 @@ exc "sed -i '/#ParallelDownloads/s/#.*/ParallelDownloads = 10/' /etc/pacman.conf
 exc "pacstrap /mnt base linux linux-firmware neovim amd-ucode"
 exc "genfstab -U /mnt >> /mnt/etc/fstab"
 
-exc "mv linux-files /mnt/"
+exc "mv ../../linux-files /mnt/"
 
 banner "Do 'cd', then arch-chroot to /mnt"
 sleep 2
