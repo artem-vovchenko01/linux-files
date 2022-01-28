@@ -1,6 +1,3 @@
-#! /usr/bin/env bash
-source 00-common.sh
-
 banner "Running software installation script"
 
 check_interactive
@@ -10,7 +7,13 @@ check_interactive
 
 msg_info "Checking dependencies ..."
 
-command -v pacman || { ask "This script optimized for Arch Linux, but you don't have pacman. Exit?" && return; }
+check_and_install nvim neovim
+
+msg_info 'Updating repositories...'
+
+[[ $SYSTEM == "ARCH" ]] && exc 'sudo pacman -Sy'
+[[ $SYSTEM == "DEBIAN" ]] && exc 'sudo apt update'
+[[ $SYSTEM == "FEDORA" ]] && exc 'sudo dnf update'
 
 ##############################
 # FUNCTIONS
@@ -29,48 +32,45 @@ function paru_install {
 # INSTALLING PARU
 ##############################
 
-msg_info 'Updating repositories'
-exc 'sudo pacman -Sy'
-
-msg_info 'Checking if paru is installed'
-if ! pacman -Q | grep -q paru; then
-	ask 'Do you need paru?' Y 'paru_install'
-fi
+[[ $SYSTEM == "ARCH" ]] && {
+  msg_info 'Checking if paru is installed'
+  if ! pacman -Q | grep -q paru; then
+    ask 'Do you need paru?' Y 'paru_install'
+  fi
+}
 
 ##############################
 # INSTALLING SOFTWARE
 ##############################
 
-work_on_soft_list {
-    LIST_FILE=$1
-    ONE_BY_ONE=""
+function work_on_soft_list {
+    local list_file=$1
+    local one_by_one=""
     while true; do
-        exc "cp $LIST_FILE $LIST_FILE.tmp"
-        msg_warn "Working on software list $LIST_FILE ..."
-        ask "Install packages from $LIST_FILE one by one?" && ONE_BY_ONE=1
+        exc "cp $list_file $list_file.tmp"
+        msg_warn "Working on software list $list_file.tmp ..."
+        ask "Install packages from $list_file one by one?" N && one_by_one=1
         msg_info "Comment lines which you don't need ..."
-        exc "nvim $LIST_FILE.tmp"
+        exc "nvim $list_file.tmp"
 
-        soft=$(cat $LIST_FILE.tmp | grep -v '#' | tr '\n' ' ')
+        local soft=$(cat $list_file.tmp | grep -v '#' | tr '\n' ' ')
+
+        msg_info "Verifying existence of packages in the repo"
+        local soft_tmp=$soft
+        soft=""
+        for pkg in $soft_tmp; do
+          verify_pkg_exists $pkg && soft="$soft $pkg"
+        done
 
         msg_info "Installing selected software ($soft)"
-        if pacman -Q | grep -q paru; then
-            if [[ -z $ONE_BYONE ]]; then
-                exc_int "paru -S $soft"
-            else
-                for pkg in $soft; do
-                    exc "paru -S $pkg"
-                done
-            fi
-        else
-            if [[ -z $ONE_BYONE ]]; then
-                exc_int "sudo pacman -S $soft"
-            else
-                for pkg in $soft; do
-                    exc "sudo pacman -S $pkg"
-                done
-            fi
-        fi
+        for pkg in $soft; do
+          if [[ -z $one_by_one ]]; then
+              exc "install_pkg $pkg" || { ask "Try installing $pkg again?" && exc "install_pkg $pkg"; }
+          else
+              exc "install_pkg $pkg 1" || { ask "Try installing $pkg again?" && exc "install_pkg $pkg"; }
+          fi
+        done
+
         if [[ $? -ne 0 ]]; then
             ask 'Try choosing and installing software again?'
             RET=$?
@@ -78,20 +78,18 @@ work_on_soft_list {
             RET=1
         fi
         ask "Save temp software list? This will override default list!" N
-        [[ $? -eq 0 ]] && exc_int "cp -i $LIST_FILE.tmp $LIST_FILE"
-        exc 'rm software_list_temp.txt'
+        [[ $? -eq 0 ]] && exc_int "cp -i $list_file.tmp $list_file"
+        exc "rm $list_file.tmp"
         [[ $RET -eq 1 ]] && break
     done
 }
 
-SOFT_LISTS_DIR=software_lists
-
 for soft_list_file in $(ls $SOFT_LISTS_DIR); do
-    work_on_soft_list $SOFT_LISTS_DIR/soft_list_file
+    work_on_soft_list $SOFT_LISTS_DIR/$soft_list_file
 done
 
-exc "paru -Scc"
+command -v paru && exc_int "paru -Scc"
 
-exc "sudo usermod -aG docker artem"
-exc "sudo pkgfile --update"
+exc_int "sudo usermod -aG docker artem"
+command -v pkgfile && exc "sudo pkgfile --update"
 

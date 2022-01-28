@@ -1,0 +1,17 @@
+##### Leave only lines with packages you want to UNstow
+##### Lines starting with # will be ignored
+
+awesome
+bin
+foot
+git
+i3
+i3blocks
+mako
+nvim
+sway
+sway.old
+wallpapers
+waybar
+xmonad
+zsh

@@ -1,6 +1,3 @@
-#! /usr/bin/env bash
-source 00-common.sh
-
 banner "Running misc script"
 
 ask "Continue running this script?" || exit 0
@@ -12,17 +9,11 @@ ask "Continue running this script?" || exit 0
 msg_info "Checking dependencies ..."
 check_and_install nvim neovim
 
-NO_PACMAN=0
-command -v pacman || {
-    msg_warn "Pacman not installed! Some parts of script won't be available"
-    NO_PACMAN=1
-}
-
 ##############################
 # CONFIGURING PACMAN
 ##############################
 
-[[ $NO_PACMAN -eq 0 ]] && {
+[[ $SYSTEM = "ARCH" ]] && {
     msg_warn "Go to /etc/pacman.conf and insert after [options] the following:"
     echo
     echo "Color"
@@ -35,6 +26,15 @@ command -v pacman || {
     echo
     ask "Copied? Ready to go?" Y
     exc_int "sudo nvim /etc/pacman.conf"
+}
+
+[[ $SYSTEM == "DEBIAN" ]] && {
+    echo "Now you'll edit /etc/apt/sources.list"
+    echo "Maybe you want sth minimal, like this for sid (unstable)"
+    echo
+    echo "deb http://deb.debian.org/debian/ sid main contrib non-free"
+    ask "Copied? Ready to go?" Y
+    exc_int "sudo apt edit-sources"
 }
 
 ##############################
@@ -54,5 +54,5 @@ check_and_install dash
 
 exc "sudo ln -sf /bin/dash /bin/sh"
 
-exc "rm -r ~/linux-files"
+exc_int "rm -r ~/linux-files"
 

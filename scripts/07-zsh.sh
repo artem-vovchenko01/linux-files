@@ -1,6 +1,3 @@
-#! /usr/bin/env bash
-source 00-common.sh
-
 banner "Running zsh installation script"
 
 check_interactive

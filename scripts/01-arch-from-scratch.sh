@@ -1,6 +1,3 @@
-#! /usr/bin/env bash
-source 00-common.sh
-
 banner "Starting installation - arch from scratch"
 
 configure_repo_path

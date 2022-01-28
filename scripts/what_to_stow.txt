@@ -1,0 +1,4 @@
+##### Leave only lines with packages you want to stow
+##### Lines starting with # will be ignored
+
+bin

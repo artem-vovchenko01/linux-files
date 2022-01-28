@@ -1,6 +1,3 @@
-#! /usr/bin/env bash
-source 00-common.sh
-
 banner "Running neovim installation script"
 
 ask "Continue running this script?" || exit 0
@@ -29,5 +26,4 @@ if [[ ! -e "$XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/autoload/plug.vim" ]];
    else
        msg_warn "Path to vim-plug exist. Skipping vim-plug install"
 fi
-
 

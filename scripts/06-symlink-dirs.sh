@@ -1,6 +1,3 @@
-#! /usr/bin/env bash
-source 00-common.sh
-
 banner "Running symlink deployment script (mainly, for browsers)"
 
 [[ $1 == "-i" ]] && INTERACTIVE=1
@@ -45,7 +42,7 @@ function copy_int_wrapper {
 # CREATING LINKS
 ##############################
 
-LINK_ROOT=$REPO_PATH/symlink-dirs
+LINK_ROOT=$SYMLINK_DIRS_PATH
 
 copy_int_wrapper $LINK_ROOT/firefox/.mozilla/firefox ~/.mozilla
 copy_int_wrapper $LINK_ROOT/brave/.config/BraveSoftware ~/.config

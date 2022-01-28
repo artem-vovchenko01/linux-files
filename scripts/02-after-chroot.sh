@@ -1,6 +1,3 @@
-#! /usr/bin/env bash
-source 00-common.sh
-
 banner "Continuing installation - after chroot"
 
 exc "ln -sf /usr/share/zoneinfo/Europe/Kiev /etc/localtime"

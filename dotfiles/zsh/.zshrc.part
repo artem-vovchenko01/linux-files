@@ -46,6 +46,7 @@ function ssh_add_startup_keys {
 # ALIASES
 ##############################
 
+alias abs_path="abs_filename"
 alias ls="ls --color=auto"
 alias l="ls -a"
 alias ll="l -hl"

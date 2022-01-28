@@ -1,0 +1,112 @@
+#################### SOFTWARE SELECTION LIST ####################
+# Comment out or remove packages you don't need. You can use regular or AUR packages
+# This file is temporary, so don't worry changing
+
+
+########## SOCIAL
+
+# zoom
+# LBRY
+# slack-desktop
+# telegram-cli-git
+
+
+########## BROWSERS
+
+
+brave-bin
+
+# librewolf-bin
+# chromium
+
+
+########## LEARNING
+
+
+
+########## TOOLS
+
+# HELP
+
+cht.sh-git
+# cheat-bin
+# navi
+
+# MONITORING
+
+# inxi
+# htim
+
+# FILES
+
+lf
+# ventoy-bin
+# mutt-wizard-git
+
+# SYSTEM
+
+update-grub
+# auto-cpufreq
+# trash-cli
+
+# TOOLS
+
+# PACKAGE MANAGEMENT
+
+# NETWORKING
+
+
+########## FILES
+
+
+########## SHELL
+
+
+########## WAYLAND
+
+foot
+clipman
+
+# autotiling
+# flashfocus
+# nwg-wrapper
+# spice-vdagent-extra-mouse-buttons
+# kanshi-git
+# sworkstyle
+# playerctl-git
+# wf-recorder-git
+# grimshot
+
+
+########## CONTENT
+
+
+# imagination
+# freetube-bin
+# deemix-pyweb-git
+
+
+########## DEVELOPMENT
+
+
+# vscodium-bin
+# drawio-desktop
+
+
+########## DEVELOPMENT
+
+
+########## PENTESTING
+
+
+# steghide
+
+
+########## LOOK
+
+
+########## FUN
+
+
+# pipes.sh
+
