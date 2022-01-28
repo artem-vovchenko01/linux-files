@@ -55,11 +55,15 @@ function configure_repo_path {
 	echo "Main repo with configs:"
 	echo "$REPO_PATH"
 	ask "Change repo path?" N && {
-	    ask_value "Enter custom path: "
-	    REPO_PATH=$VALUE
-	    echo "New path:"
-	    echo "$REPO_PATH"
-	    sleep 5
+	    ask "Set to /root/linux-files?" N && REPO_PATH=/root/linux-files || {
+	    	   ask "Set to /linux-files?" N && REPO_PATH=/linux-files || {
+			    ask_value "Enter custom path: "
+			    REPO_PATH=$VALUE
+			    echo "New path:"
+			    echo "$REPO_PATH"
+			    sleep 1
+		    }
+	    }
 	}
 }
 
