@@ -268,7 +268,7 @@ ask_value "Which script to run? (1 to $num_scripts). Press Enter to skip"
   chosen_script=$SCRIPTS_PATH/$(echo "$script_list" | sed -n ${VALUE}p)
   msg_info "Running $chosen_script ..."
   exc "source $chosen_script"
-  return
+  exit
 }
 
 ##############################
@@ -280,6 +280,6 @@ num_env=$(ls $ENVS_PATH | wc -l)
 ask_value "Which environment to setup? (1 to $num_env) Press Enter to skip."
 [[ -n $VALUE ]] && {
   exc "source $ENVS_PATH/$(ls $ENVS_PATH | sed -n \"${VALUE}p\")"
-  return
+  exit
 }
 
