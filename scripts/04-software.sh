@@ -21,11 +21,11 @@ msg_info 'Updating repositories...'
 
 function paru_install {
 	msg_info 'Paru is not installed. Installing ...'
-	exc 'git clone https://aur.archlinux.org/paru.git'
-	exc 'cd paru'
+	exc 'git clone https://aur.archlinux.org/paru-bin.git'
+	exc 'cd paru-bin'
 	exc 'makepkg -si'
 	exc 'cd ..'
-	exc 'rm -rf paru'
+	exc 'rm -rf paru-bin'
 }
 
 ##############################
@@ -88,8 +88,8 @@ for soft_list_file in $(ls $SOFT_LISTS_DIR); do
     work_on_soft_list $SOFT_LISTS_DIR/$soft_list_file
 done
 
-command -v paru && exc_int "paru -Scc"
+verify_cmd_exists paru && exc_int "paru -Scc"
 
 exc_int "sudo usermod -aG docker artem"
-command -v pkgfile && exc "sudo pkgfile --update"
+verify_cmd_exists pkgfile && exc "sudo pkgfile --update"
 

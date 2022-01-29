@@ -20,17 +20,11 @@ CMD_CLR="$BLUE_COLOR"
 INFO_CLR="$GREEN_COLOR"
 
 ##################################################
-# ALIASES
-##################################################
-
-alias command=my_command_checker
-
-##################################################
 # FUNCTIONS
 ##################################################
 
-function my_command_checker {
-  command $1 > /dev/null
+function verify_cmd_exists {
+  command -v $1 > /dev/null
 }
 
 function setup_repo_paths {
@@ -43,6 +37,8 @@ function setup_repo_paths {
 
   HELP_FILE=$CONFIGS_PATH/help.txt
 
+  ARCH_FROM_SCRATCH_SCRIPT=$SCRIPTS_PATH/01-arch-from-scratch.sh
+  AFTER_CHROOT_SCRIPT=$SCRIPTS_PATH/02-after-chroot.sh
   SOFTWARE_SCRIPT=$SCRIPTS_PATH/04-software.sh
   CONFIG_SCRIPT=$SCRIPTS_PATH/05-configs.sh
   SYMLINK_SCRIPT=$SCRIPTS_PATH/06-symlink-dirs.sh
@@ -51,20 +47,29 @@ function setup_repo_paths {
   MISC_SCRIPT=$SCRIPTS_PATH/09-misc.sh
 }
 
+function output_possible_repo_paths {
+	echo "/root/linux-files"
+	echo "/linux-files"
+	echo "$HOME/linux-files"
+}
+
 function configure_repo_path {
-	echo "Main repo with configs:"
-	echo "$REPO_PATH"
-	ask "Change repo path?" N && {
-	    ask "Set to /root/linux-files?" N && REPO_PATH=/root/linux-files || {
-	    	   ask "Set to /linux-files?" N && REPO_PATH=/linux-files || {
-			    ask_value "Enter custom path: "
-			    REPO_PATH=$VALUE
-			    echo "New path:"
-			    echo "$REPO_PATH"
-			    sleep 1
-		    }
-	    }
-	}
+	[[ -e $REPO_PATH ]] && ask "Repo under default path ($REPO_PATH) available. Use it?" && return
+	[[ ! -e $REPO_PATH ]] && msg_warn "Repo path by default not available! Later stage scritps might misbehave"
+	msg_warn "Main repo with configs by default:"
+	msg_warn "$REPO_PATH"
+	local paths_num=$(output_possible_repo_paths | wc -l)
+	output_possible_repo_paths | cat -n
+	ask_value "Choose one of these (1-$paths_num) or press Enter to enter custom path: "
+	if [[ -z $VALUE ]]; then
+	    ask_value "Enter custom path: "
+	    REPO_PATH=$VALUE
+	else
+	    REPO_PATH=$(output_possible_repo_paths | sed -n "${VALUE}p")
+	fi
+    	echo "New path:"
+    	echo "$REPO_PATH"
+    	sleep 1
 }
 
 function exc_ping {
@@ -98,7 +103,7 @@ function color_echo {
 function check_and_install {
 	local cmd=$1
 	[[ ! -z $2 ]] && local pkg="$2" || local pkg="$1"
-	command -v $cmd || {
+	verify_cmd_exists $cmd || {
 	    ask "$cmd not found. Install $pkg to provide it?"
 	    [[ $? -eq 0 ]] && install_pkg "$pkg"
 	}
@@ -106,30 +111,37 @@ function check_and_install {
 
 function verify_pkg_exists {
   local pkg=$1
-  [[ $SYSTEM == "ARCH" ]] && command -v paru && paru -Si $pkg > /dev/null 2>1 && msg_info return 0
-  [[ $SYSTEM == "ARCH" ]] && pacman -Si $pkg > /dev/null 2>1 && return 0
-  [[ $SYSTEM == "DEBIAN" ]] && apt info $pkg > /dev/null 2>1 && return 0
-  [[ $SYSTEM == "FEDORA" ]] && dnf info $pkg > /dev/null 2>1 && return 0
+  [[ $SYSTEM == "ARCH" ]] && verify_cmd_exists paru && paru -Si $pkg > /dev/null 2>&1 && msg_info return 0
+  [[ $SYSTEM == "ARCH" ]] && pacman -Si $pkg > /dev/null 2>&1 && return 0
+  [[ $SYSTEM == "ARCH" ]] && pacman -Sg $pkg > /dev/null 2>&1 && return 0
+  [[ $SYSTEM == "DEBIAN" ]] && apt info $pkg > /dev/null 2>&1 && return 0
+  [[ $SYSTEM == "FEDORA" ]] && dnf info $pkg > /dev/null 2>&1 && return 0
   msg_err "Package $pkg not found!"
   return 1
 }
 
 function install_pkg {
-	local pkg=$1
+  local pkg=$1
   local confirm=$2
   verify_pkg_exists $pkg || { msg_err "Package $pkg not found!"; return 1; }
   if [[ -z $confirm ]]; then
-    command -v paru && exc "paru -S --noconfirm $pkg" && return 0
-    command -v pacman && exc "sudo pacman -S --noconfirm $pkg" && return 0
-    command -v apt && exc "sudo apt install -y $pkg" && return 0
-    command -v dnf && exc "sudo dnf install -y $pkg" && return 0
+	  verify_cmd_exists pacman && ( pacman -Si $pkg > /dev/null 2>&1 || pacman -Sg $pkg > /dev/null 2>&1 ) && exc "sudo pacman -S --noconfirm $pkg" && return 0
+    verify_cmd_exists paru && exc "paru -S --noconfirm $pkg" && return 0
+    verify_cmd_exists apt && exc "sudo apt install -y $pkg" && return 0
+    verify_cmd_exists dnf && exc "sudo dnf install -y $pkg" && return 0
   else
-    command -v paru && exc "paru -S $pkg"
-    command -v pacman && exc "sudo pacman -S $pkg" && return 0
-    command -v apt && exc "sudo apt install $pkg" && return 0
-    command -v dnf && exc "sudo dnf install $pkg" && return 0
+    verify_cmd_exists pacman && exc "sudo pacman -S $pkg" && return 0
+    verify_cmd_exists paru && exc "paru -S $pkg"
+    verify_cmd_exists apt && exc "sudo apt install $pkg" && return 0
+    verify_cmd_exists dnf && exc "sudo dnf install $pkg" && return 0
   fi
-  [[ ! $? -eq 0 ]] && msg_err "Installing $pkg failed! " && return 1
+  [[ ! $? -eq 0 ]] && {
+	  if [[ -z $confirm ]]; then
+		  install_pkg $1 1
+	  else
+		  msg_err "Installing $pkg failed! " && return 1
+	  fi
+  }
 }
 
 function msg_err {
@@ -263,27 +275,33 @@ cat /etc/os-release | grep -iq arch && SYSTEM=ARCH
 cat /etc/os-release | grep -iq fedora && SYSTEM=FEDORA
 
 banner "Your system identified as: $SYSTEM"
+sleep 1
 
-script_list="$(find $SCRIPTS_PATH -maxdepth 1 -type f | grep -v 00 | grep -v stow.txt | grep -v 'root-script' | rev | cut -d '/' -f 1 | rev | sort)"
-echo "$script_list" | cat -n
-num_scripts=$(echo "$script_list" | wc -l)
-ask_value "Which script to run? (1 to $num_scripts). Press Enter to skip"
-[[ -n $VALUE ]] && {
-  chosen_script=$SCRIPTS_PATH/$(echo "$script_list" | sed -n ${VALUE}p)
-  msg_info "Running $chosen_script ..."
-  exc "source $chosen_script"
-  exit
-}
+while true; do
+	##### Default scripts
+	script_list="$(find $SCRIPTS_PATH -maxdepth 1 -type f | grep -v 00 | grep -v stow.txt | grep -v 'root-script' | rev | cut -d '/' -f 1 | rev | sort)"
+	echo "$script_list" | cat -n
+	num_scripts=$(echo "$script_list" | wc -l)
+	ask_value "Which script to run? (1 to $num_scripts). Press Enter to skip to environments list. Press q to quit from program"
+	[[ $VALUE == "q" ]] && msg_warn "Exiting" && exit 0
+	[[ -n $VALUE ]] && {
+	  chosen_script=$SCRIPTS_PATH/$(echo "$script_list" | sed -n ${VALUE}p)
+	  msg_info "Running $chosen_script ..."
+	  exc "source $chosen_script"
+	  [[ $chosen_script == $ARCH_FROM_SCRATCH_SCRIPT ]] && exit
+	  [[ $chosen_script == $AFTER_CHROOT_SCRIPT ]] && exit
+	  continue
+	}
 
-##############################
-# SETUP ENVIRONMENTS
-##############################
+	#### Environment scripts
 
-exc "ls -l $ENVS_PATH | cat -n"
-num_env=$(ls $ENVS_PATH | wc -l)
-ask_value "Which environment to setup? (1 to $num_env) Press Enter to skip."
-[[ -n $VALUE ]] && {
-  exc "source $ENVS_PATH/$(ls $ENVS_PATH | sed -n \"${VALUE}p\")"
-  exit
-}
+	exc "ls -l $ENVS_PATH | cat -n"
+	num_env=$(ls $ENVS_PATH | wc -l)
+	ask_value "Which environment to setup? (1 to $num_env) Press Enter to skip. Press q to quit from program"
+	[[ $VALUE == "q" ]] && msg_warn "Exiting" && exit 0
+	[[ -n $VALUE ]] && {
+	  exc "source $ENVS_PATH/$(ls $ENVS_PATH | sed -n ${VALUE}p)"
+	  continue
+	}
+done
 
