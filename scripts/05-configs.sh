@@ -25,7 +25,7 @@ ask "Do you want to UNSTOW some configs?" && {
 
         FILES_TO_STOW="$(cat $WHAT_TO_STOW_FILE | grep -v '#' | tr '\n' ' ')"
 	for file in $FILES_TO_STOW; do
-		exc "stow -D -d $STOW_DIR -t $TARGET_DIR $file"
+		exc_ignoreerr "stow -D -d $STOW_DIR -t $TARGET_DIR $file"
 	done
 }
 
@@ -42,7 +42,7 @@ ask "Do you want to stow some configs?" && {
 
 	FILES_TO_STOW="$(cat $WHAT_TO_STOW_FILE | grep -v '#' | tr '\n' ' ')"
     	for file in $FILES_TO_STOW; do
-        	exc "stow -d $STOW_DIR -t $TARGET_DIR $file"
+        	exc_ignoreerr "stow -d $STOW_DIR -t $TARGET_DIR $file"
     	done
 }
 

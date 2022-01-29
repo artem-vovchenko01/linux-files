@@ -39,7 +39,7 @@ ask "Remove links which are already present?" && {
 	cd $SYMLINK_DIRS_PATH
 	for link in $(find . -type l); do
 		dest_path=$(echo $link | sed 's/^..//' | cut -d / -f 2- | awk -v home=$HOME ' { print home "/" $0 } ')
-		exc "rm dest_path"
+		exc_ingoreerr "rm $dest_path"
 	done
 	cd -
 }

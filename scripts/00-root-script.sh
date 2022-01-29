@@ -23,6 +23,14 @@ INFO_CLR="$GREEN_COLOR"
 # FUNCTIONS
 ##################################################
 
+function exit_cleanup {
+	echo "Script finished. Cleaning up ..."
+	cd $SOFT_LISTS_DIR
+	rm $HELP_FILE 2> /dev/null
+	rm $WHAT_TO_STOW_FILE 2> /dev/null
+	rm *.tmp 2> /dev/null
+}
+
 function verify_cmd_exists {
   command -v $1 > /dev/null
 }
@@ -112,7 +120,7 @@ function check_and_install {
 
 function verify_pkg_exists {
   local pkg=$1
-  [[ $SYSTEM == "ARCH" ]] && verify_cmd_exists paru && paru -Si $pkg > /dev/null 2>&1 && msg_info return 0
+  [[ $SYSTEM == "ARCH" ]] && verify_cmd_exists paru && paru -Si $pkg > /dev/null 2>&1 && return 0
   [[ $SYSTEM == "ARCH" ]] && pacman -Si $pkg > /dev/null 2>&1 && return 0
   [[ $SYSTEM == "ARCH" ]] && pacman -Sg $pkg > /dev/null 2>&1 && return 0
   [[ $SYSTEM == "DEBIAN" ]] && apt info $pkg > /dev/null 2>&1 && return 0
@@ -121,23 +129,31 @@ function verify_pkg_exists {
   return 1
 }
 
+function verify_pkg_installed {
+	[[ $SYSTEM == "ARCH" ]] && pacman -Qi $1 > /dev/null 2>&1 && return
+	[[ $SYSTEM == "DEBIAN" ]] && dpkg -l $1 > /dev/null 2>&1 && return 
+	[[ $SYSTEM == "FEDORA" ]] && rpm -qa | grep -q $1 && return
+}
+
 function install_pkg {
   local pkg=$1
   local confirm=$2
-  verify_pkg_exists $pkg || { msg_err "Package $pkg not found!"; return 1; }
+  verify_pkg_installed $pkg && { msg_info "Package $pkg is already installed, skipping"; return 0; }
+  verify_pkg_exists $pkg || return 1
   if [[ -z $confirm ]]; then
-	  verify_cmd_exists pacman && ( pacman -Si $pkg > /dev/null 2>&1 || pacman -Sg $pkg > /dev/null 2>&1 ) && exc "sudo pacman -S --noconfirm $pkg" && return 0
-    verify_cmd_exists paru && exc "paru -S --noconfirm $pkg" && return 0
-    verify_cmd_exists apt && exc "sudo apt install -y $pkg" && return 0
-    verify_cmd_exists dnf && exc "sudo dnf install -y $pkg" && return 0
+	  verify_cmd_exists pacman && ( pacman -Si $pkg > /dev/null 2>&1 || pacman -Sg $pkg > /dev/null 2>&1 ) && exc_ignoreerr "sudo pacman -S --noconfirm $pkg" && return 0
+    verify_cmd_exists paru && exc_ignoreerr "paru -S --noconfirm $pkg" && return 0
+    verify_cmd_exists apt && exc_ignoreerr "sudo apt install -y $pkg" && return 0
+    verify_cmd_exists dnf && exc_ignoreerr "sudo dnf install -y $pkg" && return 0
   else
-    verify_cmd_exists pacman && exc "sudo pacman -S $pkg" && return 0
-    verify_cmd_exists paru && exc "paru -S $pkg"
-    verify_cmd_exists apt && exc "sudo apt install $pkg" && return 0
-    verify_cmd_exists dnf && exc "sudo dnf install $pkg" && return 0
+    verify_cmd_exists pacman_ignoreerr && exc "sudo pacman -S $pkg" && return 0
+    verify_cmd_exists paru_ignoreerr && exc "paru -S $pkg"
+    verify_cmd_exists apt_ignoreerr && exc "sudo apt install $pkg" && return 0
+    verify_cmd_exists dnf_ignoreerr && exc "sudo dnf install $pkg" && return 0
   fi
   [[ ! $? -eq 0 ]] && {
 	  if [[ -z $confirm ]]; then
+		  msg_warn "Installation of $pkg with no confirmation not succeeded. Trying with confirmation ..."
 		  install_pkg $1 1
 	  else
 		  msg_err "Installing $pkg failed! " && return 1
@@ -235,6 +251,14 @@ function exc {
     return $ERR
 }
 
+function exc_ignoreerr {
+	msg_cmd "$1"
+	eval "$1"
+	local ERR=$?
+	[[ $ERR -eq 0 ]] || msg_err "Command \"$1\" failed. Code: $ERR. Ignoring"
+	return $ERR
+}
+
 function help {
 	echo "$1" >> .help.txt
 }
@@ -267,6 +291,9 @@ function exc_usr_with_help {
 # ENTRY POINT
 ##################################################
 
+trap "exit_cleanup" 0
+
+setup_repo_paths
 configure_repo_path
 setup_repo_paths
 msg_info "All paths updated accordingly to repo path"

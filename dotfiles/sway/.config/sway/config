@@ -99,7 +99,7 @@ client.background       #ffffff
 # APPLICATION AUTOSTART
 ########################################
 
-exec wl-paste -t text --watch clipman store --no-persist
+# exec wl-paste -t text --watch clipman store --no-persist
 exec $idle
 exec $notifications
 exec {

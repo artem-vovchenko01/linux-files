@@ -15,8 +15,8 @@
 
 
 brave-bin
+librewolf-bin
 
-# librewolf-bin
 # chromium
 
 
@@ -65,12 +65,12 @@ update-grub
 ########## WAYLAND
 
 foot
-clipman
 wob
 wlay-git
 wlsunset
 wlr-randr
 
+# clipman
 # autotiling
 # flashfocus
 # nwg-wrapper
