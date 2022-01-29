@@ -1,10 +1,5 @@
 banner "Running software installation script"
 
-check_interactive
-[[ -n $INTERACTIVE ]] && {
-    ask "Continue running this script?" || exit 0
-}
-
 msg_info "Checking dependencies ..."
 
 check_and_install nvim neovim

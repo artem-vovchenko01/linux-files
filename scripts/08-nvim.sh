@@ -1,7 +1,5 @@
 banner "Running neovim installation script"
 
-ask "Continue running this script?" || exit 0
-
 ##############################
 # DEPENDENCIES
 ##############################

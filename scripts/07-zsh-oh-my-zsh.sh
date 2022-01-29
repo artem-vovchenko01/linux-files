@@ -1,11 +1,5 @@
 banner "Running zsh installation script"
 
-check_interactive
-
-[[ -n $INTERACTIVE ]] && {
-    ask "Continue running this script?" || exit 0
-}
-
 [[ -e ~/.oh-my-zsh ]] && ask "~/.oh-my-zsh exists. You probably have everything in place. Quit?" && return 0
 
 ##############################

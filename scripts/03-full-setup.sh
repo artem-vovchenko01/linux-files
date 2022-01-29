@@ -6,8 +6,6 @@ banner "Starting user setup script (full setup)"
 
 [[ $USER == "root" ]] && { msg_err "Running as root discouraged. Exiting"; exit 1; }
 
-# pacman-mirrors -f
-
 ##############################
 # DEPENDENCIES
 ##############################

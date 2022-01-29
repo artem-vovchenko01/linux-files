@@ -1,11 +1,5 @@
 banner "Running zsh installation script"
 
-check_interactive
-
-[[ -n $INTERACTIVE ]] && {
-    ask "Continue running this script?" || exit 0
-}
-
 ##############################
 # RESOLVING DEPENDENCIES
 ##############################

@@ -32,10 +32,11 @@ function setup_repo_paths {
   ENVS_PATH=$REPO_PATH/scripts/environments
   SYMLINK_DIRS_PATH=$REPO_PATH/symlink-dirs
   DOTFILES_PATH=$REPO_PATH/dotfiles
-  CONFIGS_PATH=$REPO_PATH/config
+  TEMPFILES_PATH=$REPO_PATH/tempfiles
   SOFT_LISTS_DIR=$SCRIPTS_PATH/software-lists
 
-  HELP_FILE=$CONFIGS_PATH/help.txt
+  HELP_FILE=$TEMPFILES_PATH/help-file.txt
+  WHAT_TO_STOW_FILE=$TEMPFILES_PATH/what-to-stow.txt
 
   ARCH_FROM_SCRATCH_SCRIPT=$SCRIPTS_PATH/01-arch-from-scratch.sh
   AFTER_CHROOT_SCRIPT=$SCRIPTS_PATH/02-after-chroot.sh

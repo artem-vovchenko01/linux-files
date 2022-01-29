@@ -1,7 +1,5 @@
 banner "Running misc script"
 
-ask "Continue running this script?" || exit 0
-
 ##############################
 # CHECK DEPENDENCIES
 ##############################
