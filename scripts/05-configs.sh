@@ -15,10 +15,10 @@ check_and_install stow
 # UNSTOWING IF NEEDED
 ##############################
 
-ask "Do you want to UNSTOW some configs?" && {
+ask "Do you want to UNSTOW some configs?" N && {
         exc "echo '##### Leave only lines with packages you want to UNstow' > $WHAT_TO_STOW_FILE"
         exc "echo -e '##### Lines starting with # will be ignored\n' >> $WHAT_TO_STOW_FILE"
-        exc "ls $STOW_DIR | grep -vE 'LICENSE|README|scripts|symlink_dirs' >> $WHAT_TO_STOW_FILE"
+        exc "ls $STOW_DIR | grep -vE 'LICENSE|README|symlink_dirs' >> $WHAT_TO_STOW_FILE"
 
         msg_info 'Leave only lines with packages you want to UNstow'
         exc "nvim $WHAT_TO_STOW_FILE"
@@ -36,7 +36,7 @@ ask "Do you want to UNSTOW some configs?" && {
 ask "Do you want to stow some configs?" && {
 	exc "echo '##### Leave only lines with packages you want to stow' > $WHAT_TO_STOW_FILE"
 	exc "echo -e '##### Lines starting with # will be ignored\n' >> $WHAT_TO_STOW_FILE"
-	exc "ls $STOW_DIR | grep -vE 'LICENSE|README|scripts|symlink-dirs' >> $WHAT_TO_STOW_FILE"
+	exc "ls $STOW_DIR | grep -vE 'LICENSE|README|symlink-dirs' >> $WHAT_TO_STOW_FILE"
 
     	exc "nvim $WHAT_TO_STOW_FILE"
 

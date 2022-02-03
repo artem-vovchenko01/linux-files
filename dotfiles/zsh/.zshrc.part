@@ -5,6 +5,24 @@
 set -o vi
 
 ##############################
+# EXPORTS
+##############################
+
+CARGO_HOME=~/.cargo/bin
+
+export PATH=$PATH:~/.local/share/flatpak/exports/share
+export PATH="$PATH:$GEM_HOME/bin"
+export PATH="$PATH:$CARGO_HOME"
+export PATH=~/.npm-global/bin:$PATH
+export EDITOR=vim
+
+# Add every directory in $MY_CUSTOM_BIN to $PATH
+MY_CUSTOM_BIN=~/.local/bin/
+for dir in $(find $MY_CUSTOM_BIN -type d); do
+    export PATH=$PATH:$dir
+done
+
+##############################
 # FUNCTIONS
 ##############################
 
@@ -58,6 +76,10 @@ alias gp="git push"
 alias gl="git log --graph --all"
 alias ga="git add"
 alias v="nvim"
+command -v lvim > /dev/null 2>&1 && {
+    alias v="lvim"
+    alias vi="lvim"
+}
 alias rtfm='ranger /usr/share/doc/arch-wiki/html/en'
 alias rtfmv='vifm /usr/share/doc/arch-wiki/html/en'
 alias ..="cd .."
@@ -65,26 +87,11 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 
 ##############################
-# EXPORTS
-##############################
-
-export PATH=$PATH:~/.local/share/flatpak/exports/share
-export PATH="$PATH:$GEM_HOME/bin"
-export EDITOR=vim
-
-# Add every directory in $MY_CUSTOM_BIN to $PATH
-MY_CUSTOM_BIN=~/.local/bin/
-for dir in $(find $MY_CUSTOM_BIN -type d); do
-    export PATH=$PATH:$dir
-done
-
-##############################
 # SOURCES
 ##############################
 
 # [[ -e /usr/share/doc/pkgfile/command-not-found.zsh ]] && source /usr/share/doc/pkgfile/command-not-found.zsh
 
-# Load zsh-syntax-highlighting; should be last.
 ZSH_SYNTAX_HL_ARCH=/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 ZSH_AUTOSUGG_ARCH=/usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 

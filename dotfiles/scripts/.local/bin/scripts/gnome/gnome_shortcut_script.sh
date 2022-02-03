@@ -31,6 +31,17 @@ gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-8 "['<Super><Sh
 gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-9 "['<Super><Shift>9']" 
 gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-10 "['<Super><Shift>0']"
 
+gsettings set org.gnome.desktop.wm.keybindings toggle-maximized "['<Super>f']"
+
+gsettings set org.gnome.desktop.wm.keybindings close "['<Alt>F4', '<Super><Shift>q']"
+gsettings set org.gnome.desktop.wm.keybindings switch-windows "['<Super>k']"
+gsettings set org.gnome.desktop.wm.keybindings switch-windows-backward "['<Super>j']"
+# gsettings set
+# gsettings set
+# gsettings set
+
+
 # resize with right button
 gsettings set org.gnome.desktop.wm.preferences resize-with-right-button true
+
 

@@ -64,8 +64,8 @@ bar {
 
 set $locking swaylock -f --show-failed-attempts -c 333333
 set $idle swayidle -w \
-    timeout 300 'exec $locking' \
-    timeout 600 'swaymsg "output * dpms off"' \
+    timeout 800 'exec $locking' \
+    timeout 1200 'swaymsg "output * dpms off"' \
     resume 'swaymsg "output * dpms on"' \
     before-sleep 'playerctl pause' \
     before-sleep 'exec $locking'
@@ -148,6 +148,10 @@ input type:keyboard {
 	xkb_options grp:alt_shift_toggle,compose:caps
 }
 
+# $bindsym Mod1+Shift+u input type:keyboard xkb_layout "ua"
+# $bindsym Mod1+Shift+e input type:keyboard xkb_layout "us"
+# $bindsym Mod1+Shift+r input type:keyboard xkb_layout "ru"
+
 input type:touchpad {
       dwt enabled
       tap enabled
@@ -187,7 +191,7 @@ floating_modifier $mod normal
 # BACKGROUND
 ########################################
 
-output "*" background $HOME/wallpapers/road.jpg fill
+output "*" background $HOME/wallpapers/debianm.png fill
 
 ########################################
 # WOB
@@ -290,4 +294,9 @@ $bindsym XF86AudioPrev exec playerctl previous && notify-send "Playing previous 
 $bindsym XF86Search exec $menu
 $bindsym XF86PowerOff exec $shutdown
 $bindsym XF86TouchpadToggle input type:touchpad events toggle enabled disabled
+
+$bindsym $mod+Control+$left resize shrink width 20px
+$bindsym $mod+Control+$down resize grow height 20px
+$bindsym $mod+Control+$up resize shrink height 20px
+$bindsym $mod+Control+$right resize grow width 20px
 
