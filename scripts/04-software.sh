@@ -44,7 +44,7 @@ function work_on_soft_list {
     while true; do
         exc "cp $list_file $list_file.tmp"
         msg_warn "Working on software list $list_file.tmp ..."
-        ask "Install them one by one?" N && one_by_one=1
+        ask "Install them with confirmation?" N && one_by_one=1
         msg_info "Comment lines which you don't need ..."
         exc "nvim $list_file.tmp"
 
@@ -85,6 +85,6 @@ done
 
 verify_cmd_exists paru && exc_int "paru -Scc"
 
-exc_int "sudo usermod -aG docker artem"
+exc_int "sudo usermod -aG docker $USER"
 verify_cmd_exists pkgfile && exc "sudo pkgfile --update"
 

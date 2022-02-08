@@ -23,6 +23,22 @@ INFO_CLR="$GREEN_COLOR"
 # FUNCTIONS
 ##################################################
 
+function prepare {
+  trap "exit_cleanup" 0
+
+  setup_repo_paths
+  configure_repo_path
+  setup_repo_paths
+  mkdir -p $REPO_PATH/tempfiles
+  msg_info "All paths updated accordingly to repo path"
+
+  cat /etc/os-release | grep -iq debian && SYSTEM=DEBIAN
+  cat /etc/os-release | grep -iq arch && SYSTEM=ARCH
+  cat /etc/os-release | grep -iq fedora && SYSTEM=FEDORA
+
+  banner "Your system identified as: $SYSTEM"
+}
+
 function exit_cleanup {
 	echo "Script finished. Cleaning up ..."
 	cd $SOFT_LISTS_DIR
@@ -292,19 +308,7 @@ function exc_usr_with_help {
 # ENTRY POINT
 ##################################################
 
-trap "exit_cleanup" 0
-
-setup_repo_paths
-configure_repo_path
-setup_repo_paths
-msg_info "All paths updated accordingly to repo path"
-
-cat /etc/os-release | grep -iq debian && SYSTEM=DEBIAN
-cat /etc/os-release | grep -iq arch && SYSTEM=ARCH
-cat /etc/os-release | grep -iq fedora && SYSTEM=FEDORA
-
-banner "Your system identified as: $SYSTEM"
-sleep 1
+prepare
 
 while true; do
 	##### Default scripts
