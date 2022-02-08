@@ -57,6 +57,7 @@ function setup_repo_paths {
 }
 
 function output_possible_repo_paths {
+  echo "${PWD%/*}"
 	echo "/root/linux-files"
 	echo "/linux-files"
 	echo "$HOME/linux-files"
