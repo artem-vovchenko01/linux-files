@@ -44,7 +44,7 @@ function work_on_soft_list {
     while true; do
         exc "cp $list_file $list_file.tmp"
         msg_warn "Working on software list $list_file.tmp ..."
-        ask "Install packages from $list_file one by one?" N && one_by_one=1
+        ask "Install them one by one?" N && one_by_one=1
         msg_info "Comment lines which you don't need ..."
         exc "nvim $list_file.tmp"
 
@@ -80,7 +80,7 @@ function work_on_soft_list {
 }
 
 for soft_list_file in $(ls $SOFT_LISTS_DIR); do
-    work_on_soft_list $SOFT_LISTS_DIR/$soft_list_file
+    ask "Install packages from $soft_list_file list?" Y && work_on_soft_list $SOFT_LISTS_DIR/$soft_list_file
 done
 
 verify_cmd_exists paru && exc_int "paru -Scc"
