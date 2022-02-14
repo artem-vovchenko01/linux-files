@@ -1,0 +1,9 @@
+######### COPR #########
+# from: bgstack15/AfterMozilla
+librewolf
+
+######### TOOLS #########
+util-linux-user
+gcc-c++
+dconf-editor
+

@@ -1,5 +1,6 @@
 sort=-time
 layer=overlay
+anchor=top-center
 background-color=#63636388
 width=300
 height=110

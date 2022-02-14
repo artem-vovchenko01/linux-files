@@ -11,6 +11,13 @@ set $up k
 set $right l
 
 ########################################
+# PATHS
+########################################
+
+set $wallpapers $HOME/Wallpapers
+set $default_wallpaper debian_mountain.png
+
+########################################
 # INCLUDE
 ########################################
 
@@ -74,8 +81,8 @@ set $idle swayidle -w \
 # GAPS, BORDERS
 ########################################
 
-smart_gaps off
-gaps inner 14
+smart_gaps on
+gaps inner 12
 gaps outer -2
 default_border pixel 3
 # hide_edge_borders smart
@@ -191,7 +198,7 @@ floating_modifier $mod normal
 # BACKGROUND
 ########################################
 
-output "*" background $HOME/wallpapers/debianm.png fill
+output "*" background $wallpapers/$default_wallpaper fill
 
 ########################################
 # WOB

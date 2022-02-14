@@ -7,9 +7,12 @@
 #   * sway config exists at ~/.config/sway/config
 #   * sway config contains line with HOME/wallpapers substring
 
-background=$(ls ~/wallpapers/ | wofi -S dmenu)
+WALLPAPER_PATH=~/Wallpapers
 
-sed -Ei "/HOME\/wallpapers/ s/(wallpapers\/)[^[:space:]]+/\1$background/" ~/.config/sway/config
+background=$(ls $WALLPAPER_PATH | wofi -S dmenu)
+
+sed -Ei "s/^set \\\$default_wallpaper.*/set \\\$default_wallpaper $background/" ~/.config/sway/config
 
 swaymsg reload
+notify-send "Wallpaper $background set!"
 

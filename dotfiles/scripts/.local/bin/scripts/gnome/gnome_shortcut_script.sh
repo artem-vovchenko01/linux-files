@@ -1,3 +1,5 @@
+#! /bin/bash
+
 # workspace switch
 gsettings set org.gnome.mutter dynamic-workspaces false 
 gsettings set org.gnome.desktop.wm.preferences num-workspaces 8 
@@ -34,14 +36,13 @@ gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-10 "['<Super><S
 gsettings set org.gnome.desktop.wm.keybindings toggle-maximized "['<Super>f']"
 
 gsettings set org.gnome.desktop.wm.keybindings close "['<Alt>F4', '<Super><Shift>q']"
-gsettings set org.gnome.desktop.wm.keybindings switch-windows "['<Super>k']"
-gsettings set org.gnome.desktop.wm.keybindings switch-windows-backward "['<Super>j']"
-# gsettings set
-# gsettings set
-# gsettings set
+# gsettings set org.gnome.desktop.wm.keybindings switch-windows "['<Super>k']"
+# gsettings set org.gnome.desktop.wm.keybindings switch-windows-backward "['<Super>j']"
+gsettings set org.gnome.desktop.wm.keybindings cycle-windows "['<Super>k']"
+gsettings set org.gnome.desktop.wm.keybindings cycle-windows-backward "['<Super>j']"
 
+gsettings set org.gnome.shell.keybindings toggle-overview "[ '<Super>d' ]"
 
 # resize with right button
 gsettings set org.gnome.desktop.wm.preferences resize-with-right-button true
-
 

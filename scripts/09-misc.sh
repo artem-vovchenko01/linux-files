@@ -42,16 +42,6 @@ check_and_install nvim neovim
 exc "sudo ln -s /bin/nvim /bin/vi"
 exc "sudo ln -s /bin/nvim /bin/vim"
 
-# use dash
-
-##############################
-# USE FAST DASH AS SH DEFAULT
-##############################
-
-check_and_install dash
-
-exc "sudo ln -sf /bin/dash /bin/sh"
-
 exc_int "rm -r ~/linux-files"
 
 msg_warn "After you setup the OS, UUIDs for blk devices changed. You probably shuold go to each other Os's partition and change their /etc/fstab, particularly, for efi, swap and this OS"

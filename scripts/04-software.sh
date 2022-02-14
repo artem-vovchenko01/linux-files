@@ -73,14 +73,46 @@ function work_on_soft_list {
             RET=1
         fi
         ask "Save temp software list? This will override default list!" N
-        [[ $? -eq 0 ]] && exc_int "cp -i $list_file.tmp $list_file"
+        [[ $? -eq 0 ]] && exc "cp -i $list_file.tmp $list_file"
         exc "rm $list_file.tmp"
         [[ $RET -eq 1 ]] && break
     done
 }
 
-for soft_list_file in $(ls $SOFT_LISTS_DIR); do
-    ask "Install packages from $soft_list_file list?" Y && work_on_soft_list $SOFT_LISTS_DIR/$soft_list_file
+function work_on_flatpak_list {
+    local list_file=$1
+    while true; do
+        exc "cp $list_file $list_file.tmp"
+        msg_warn "Working on software list $list_file.tmp ..."
+        msg_info "Comment lines which you don't need ..."
+        exc "nvim $list_file.tmp"
+
+        local soft=$(cat $list_file.tmp | grep -v '#' | tr '\n' ' ')
+
+        msg_info "Installing selected software ($soft)"
+        for pkg in $soft; do
+          exc "flatpak install $pkg"
+        done
+
+        if [[ $? -ne 0 ]]; then
+            ask 'Try choosing and installing software again?'
+            RET=$?
+        else
+            RET=1
+        fi
+        ask "Save temp software list? This will override default list!" N
+        [[ $? -eq 0 ]] && exc "cp -i $list_file.tmp $list_file"
+        exc "rm $list_file.tmp"
+        [[ $RET -eq 1 ]] && break
+    done
+}
+
+for soft_list_file in $( find $(cd $SOFT_LISTS_DIR; pwd) -type f ); do
+    ask "Install packages from $soft_list_file list?" Y && work_on_soft_list $soft_list_file
+done
+
+for soft_list_file in $(find $(cd $SOFT_LISTS_DIR/flatpak; pwd) -type f ); do
+    ask "Install flatpaks from $soft_list_file list?" Y && work_on_flatpak_list $soft_list_file
 done
 
 verify_cmd_exists paru && exc_int "paru -Scc"

@@ -1,10 +1,17 @@
 LINK_ROOT=$SYMLINK_DIRS_PATH
+CLOSE_PROGRAMS="firefox, librewolf"
 
 banner "Running symlink deployment script (mainly, for browsers)"
 
 ##############################
 # FUNCTIONS
 ##############################
+
+function close_programs {
+  msg_warn "Trying closing programs: $CLOSE_PROGRAMS"
+  exc_ignoreerr "killall firefox"
+  exc_ignoreerr "pkill -f librewolf"
+}
 
 function copy_link {
 	local LINK=$1
@@ -36,6 +43,7 @@ function copy_int_wrapper {
 # Removing links if exist
 
 ask "Remove links which are already present?" && {
+  ask "Try closing programs $CLOSE_PROGRAMS before doing so?" Y && close_programs
 	cd $SYMLINK_DIRS_PATH
 	for link in $(find . -type l); do
 		dest_path=$(echo $link | sed 's/^..//' | cut -d / -f 2- | awk -v home=$HOME ' { print home "/" $0 } ')

@@ -18,15 +18,18 @@ check_and_install nvim neovim
 # NETOWRK CONFIGURATION
 ##############################
 
-exc "nmtui"
+exc_int "nmtui"
 exc_ping
 
 ##############################
 # INSTALLING REQUIRED SOFTWARE
 ##############################
 
-exc "install_pkg neovim"
-exc "install_pkg git"
+grep -q fastestmirror /etc/dnf/dnf.conf || {
+	exc "echo fastestmirror=True | sudo tee -a /etc/dnf/dnf.conf"
+	exc "echo max_parallel_downloads=10 | sudo tee -a /etc/dnf/dnf.conf"
+	exc "echo defaultyes=True | sudo tee -a /etc/dnf/dnf.conf"
+}
 
 [[ $SYSTEM == "ARCH" ]] && {
   exc "sudo pacman -Sy"
@@ -40,8 +43,14 @@ exc "install_pkg git"
 
 [[ $SYSTEM == "FEDORA" ]] && {
   exc "sudo dnf update"
-  exc_int "sudo dnf groupinstall 'Development Tools' 'Development Libraries'"
+  exc "sudo dnf install -y NetworkManager-tui neovim git"
+  exc_int "sudo dnf groupinstall -y 'Development Tools' 'Development Libraries'"
+  ask "Enable rpmfusion - free?" && sudo dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+  ask "Enable rpmfusion - nonfree?" N && sudo dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+  ask "Add AfterMozilla COPR?" Y && sudo dnf copr enable bgstack15/AfterMozilla
 }
+
+true
 
 ##############################
 # GRUB CONFIGURATION

@@ -1,0 +1,24 @@
+#!/bin/bash
+# export DISPLAY=:1
+
+perc=$(cat /sys/class/power_supply/BAT1/capacity)
+
+stat=$(cat /sys/class/power_supply/BAT1/status)
+
+if [ $stat = "Charging" ]
+then
+	exit 
+fi
+
+if [ $perc -lt 10 ]
+then
+	notify-send "Battery is EXTREMELY LOW:		$perc%" &
+	# XDG_RUNTIME_DIR=/run/user/`id -u` /bin/playsound /home/artem/Music/low_bat.mp3
+  ffplay /mnt/data/Nextcloud/Audio/Musci/Instrumental/part-1/003\ -\ Thad\ Fiscella\ -\ For\ Ross.mp3
+elif [ $perc -le 95 ]
+then 
+	notify-send "Battery is LOW: 		$perc%" &
+  ffplay /mnt/data/Nextcloud/Audio/Musci/Instrumental/part-1/003\ -\ Thad\ Fiscella\ -\ For\ Ross.mp3
+	# XDG_RUNTIME_DIR=/run/user/`id -u` /bin/playsound /home/artem/Music/low_bat.mp3
+fi
+

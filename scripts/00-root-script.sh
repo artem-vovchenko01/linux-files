@@ -328,7 +328,7 @@ while true; do
 
 	#### Environment scripts
 
-	exc "ls -l $ENVS_PATH | cat -n"
+	exc "ls -l $ENVS_PATH | sed '1d' | cat -n"
 	num_env=$(ls $ENVS_PATH | wc -l)
 	ask_value "Which environment to setup? (1 to $num_env) Press Enter to skip. Press q to quit from program"
 	[[ $VALUE == "q" ]] && msg_warn "Exiting" && exit 0
