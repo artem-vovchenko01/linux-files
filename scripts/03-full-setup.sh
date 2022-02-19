@@ -25,11 +25,6 @@ exc_ping
 # INSTALLING REQUIRED SOFTWARE
 ##############################
 
-grep -q fastestmirror /etc/dnf/dnf.conf || {
-	exc "echo fastestmirror=True | sudo tee -a /etc/dnf/dnf.conf"
-	exc "echo max_parallel_downloads=10 | sudo tee -a /etc/dnf/dnf.conf"
-	exc "echo defaultyes=True | sudo tee -a /etc/dnf/dnf.conf"
-}
 
 [[ $SYSTEM == "ARCH" ]] && {
   exc "sudo pacman -Sy"
@@ -42,6 +37,12 @@ grep -q fastestmirror /etc/dnf/dnf.conf || {
 }
 
 [[ $SYSTEM == "FEDORA" ]] && {
+  grep -q fastestmirror /etc/dnf/dnf.conf || {
+    exc "echo fastestmirror=True | sudo tee -a /etc/dnf/dnf.conf"
+    exc "echo max_parallel_downloads=10 | sudo tee -a /etc/dnf/dnf.conf"
+    exc "echo defaultyes=True | sudo tee -a /etc/dnf/dnf.conf"
+  }
+
   exc "sudo dnf update"
   exc "sudo dnf install -y NetworkManager-tui neovim git"
   exc_int "sudo dnf groupinstall -y 'Development Tools' 'Development Libraries'"
@@ -64,7 +65,14 @@ true
 # CUSTOM SYSTEMD UNITS
 ##############################
 
-mkdir -p ~/.config/systemd/user/
-cp $REPO_PATH/custom-systemd-units/* ~/.config/systemd/user/
-systemctl --user enable --now sway-battery-warn.timer
+exc "mkdir -p ~/.config/systemd/user/"
+exc "cp $REPO_PATH/custom-systemd-units/* ~/.config/systemd/user/"
+exc "systemctl --user enable --now sway-battery-warn.timer"
+
+##############################
+# LINKING ZHISTORY
+##############################
+
+[[ -e ~/.zhistory ]] && ask "~/.zhistory already exists. Overwrite it and symlink to reference one?" && exc "ln -sf $DESKTOP_BACKUPS_PATH/zsh/.zhistory ~/.zhistory"
+[[ ! -e ~/.zhistory ]] && exc "ln -s $DESKTOP_BACKUPS_PATH/zsh/.zhistory ~/.zhistory"
 

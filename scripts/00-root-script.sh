@@ -52,6 +52,9 @@ function verify_cmd_exists {
 }
 
 function setup_repo_paths {
+  DESKTOP_FILES_PATH=/mnt/data/Desktop
+  DESKTOP_BACKUPS_PATH=$DESKTOP_FILES_PATH/Software-backups
+
   SCRIPTS_PATH=$REPO_PATH/scripts
   ENVS_PATH=$REPO_PATH/scripts/environments
   SYMLINK_DIRS_PATH=$REPO_PATH/symlink-dirs
