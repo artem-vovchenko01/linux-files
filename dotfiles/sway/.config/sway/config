@@ -14,7 +14,7 @@ set $right l
 # PATHS
 ########################################
 
-set $wallpapers $HOME/Wallpapers
+set $wallpapers $HOME/Resources/Wallpapers
 set $default_wallpaper debian_mountain.png
 
 ########################################
@@ -84,7 +84,7 @@ set $idle swayidle -w \
 smart_gaps on
 gaps inner 12
 gaps outer -2
-default_border pixel 3
+default_border pixel 2
 # hide_edge_borders smart
 
 ########################################

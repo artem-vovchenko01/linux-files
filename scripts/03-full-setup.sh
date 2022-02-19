@@ -60,3 +60,11 @@ true
 # exc "echo GRUB_DISABLE_OS_PROBER=false | sudo tee -a /etc/default/grub"
 # exc "sudo update-grub"
 
+##############################
+# CUSTOM SYSTEMD UNITS
+##############################
+
+mkdir -p ~/.config/systemd/user/
+cp $REPO_PATH/custom-systemd-units/* ~/.config/systemd/user/
+systemctl --user enable --now sway-battery-warn.timer
+

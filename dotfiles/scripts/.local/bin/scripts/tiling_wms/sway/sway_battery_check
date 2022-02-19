@@ -1,24 +1,32 @@
 #!/bin/bash
-# export DISPLAY=:1
 
 perc=$(cat /sys/class/power_supply/BAT1/capacity)
 
 stat=$(cat /sys/class/power_supply/BAT1/status)
 
+audio_alert_low=~/Resources/Sounds/service-logout.oga
+audio_alert_critically_low=~/Resources/Sounds/low_bat.mp3
+audio_alert_full=~/Resources/Sounds/service-login.oga
+icon_full=~/Resources/Icons/battery-full-solid.svg
+icon_empty=~/Resources/Icons/battery-empty-solid.svg
+
 if [ $stat = "Charging" ]
 then
-	exit 
+  if [ $perc -ge 90 ]
+    then
+    notify-send -u critical -i $icon_full "Battery is charged enough: $perc%. Unplug cable!"
+    ffplay -nodisp -autoexit $audio_alert_full
+  fi
+  exit
 fi
 
 if [ $perc -lt 10 ]
 then
-	notify-send "Battery is EXTREMELY LOW:		$perc%" &
-	# XDG_RUNTIME_DIR=/run/user/`id -u` /bin/playsound /home/artem/Music/low_bat.mp3
-  ffplay /mnt/data/Nextcloud/Audio/Musci/Instrumental/part-1/003\ -\ Thad\ Fiscella\ -\ For\ Ross.mp3
-elif [ $perc -le 95 ]
+	notify-send -u critical -i $icon_empty "Battery is EXTREMELY LOW: $perc%. Plug in the cable!"
+  ffplay -nodisp -autoexit $audio_alert_critically_low
+elif [ $perc -le 15 ]
 then 
-	notify-send "Battery is LOW: 		$perc%" &
-  ffplay /mnt/data/Nextcloud/Audio/Musci/Instrumental/part-1/003\ -\ Thad\ Fiscella\ -\ For\ Ross.mp3
-	# XDG_RUNTIME_DIR=/run/user/`id -u` /bin/playsound /home/artem/Music/low_bat.mp3
+	notify-send -u critical -i $icon_empty "Battery is LOW: $perc%. Plug in the cable!"
+  ffplay -nodisp -autoexit $audio_alert_low
 fi
 
