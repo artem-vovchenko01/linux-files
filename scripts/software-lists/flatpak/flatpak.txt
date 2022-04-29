@@ -1,1 +1,3 @@
 io.freetubeapp.FreeTube
+org.telegram.desktop
+com.visualstudio.code
