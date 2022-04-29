@@ -5,6 +5,7 @@
 ##################################################
 
 REPO_PATH=/mnt/data/Desktop/linux-files
+CUSTOM_SCRIPTS_PATH=~/.local/bin/scripts
 
 # Colors
 
@@ -83,7 +84,7 @@ function output_possible_repo_paths {
 }
 
 function configure_repo_path {
-	[[ -e $REPO_PATH ]] && ask "Repo under default path ($REPO_PATH) available. Use it?" && return
+	[[ -e $REPO_PATH ]] && ask "Repo under default path ($REPO_PATH) available. Use it?" Y && return
 	[[ ! -e $REPO_PATH ]] && msg_warn "Repo path by default not available! Later stage scritps might misbehave"
 	msg_warn "Main repo with configs by default:"
 	msg_warn "$REPO_PATH"
@@ -133,7 +134,7 @@ function check_and_install {
 	local cmd=$1
 	[[ ! -z $2 ]] && local pkg="$2" || local pkg="$1"
 	verify_cmd_exists $cmd || {
-	    ask "$cmd not found. Install $pkg to provide it?"
+	    ask "$cmd not found. Install $pkg to provide it?" Y
 	    [[ $? -eq 0 ]] && install_pkg "$pkg"
 	}
 }
@@ -212,7 +213,7 @@ function ask {
 	# $4 - alternative action (optional)
 	# Returns 0 if user chose Yes and 1 if chose No
 	if [[ -z $2 ]]; then
-		local DEFAULT_VAL='Y'
+		local DEFAULT_VAL='N'
 	else
 		local DEFAULT_VAL=$2
 	fi
@@ -256,7 +257,7 @@ function exc_int {
     # $1 - command
     # $2 - if nonzero, act non-interactively when $INTERACTIVE not set
     if [[ -z $2 ]]; then
-        ask "${INFO_CLR}Run ${WARN_CLR}$1 ${INFO_CLR}?${NC}"
+        ask "${INFO_CLR}Run ${WARN_CLR}$1 ${INFO_CLR}?${NC}" Y
         [[ $? -eq 0 ]] && exc "$1"
     else
         exc "$1"
@@ -267,7 +268,7 @@ function exc {
 	msg_cmd "$1"
 	eval "$1"
 	local ERR=$?
-	[[ $ERR -eq 0 ]] || { msg_err "Command \"$1\" failed. Code: $ERR" && ask "Drop to terminal?" && msg_warn "Dropping to terminal" && exc_usr_with_help; }
+	[[ $ERR -eq 0 ]] || { msg_err "Command \"$1\" failed. Code: $ERR" && ask "Drop to terminal?" Y && msg_warn "Dropping to terminal" && exc_usr_with_help; }
     return $ERR
 }
 
@@ -300,7 +301,7 @@ function exc_usr_with_help {
 		echo -ne "${NC}"
 		exc "$cmd"
 		ask "Show help?" N "show_help"
-		ask "Want to enter some more commands?"
+		ask "Want to enter some more commands?" Y
 		[[ $? -eq 1 ]] && break
 	done
 

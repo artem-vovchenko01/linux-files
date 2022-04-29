@@ -1,6 +1,7 @@
 exc "mkdir -p ~/.local/share/fonts"
 cd ~/.local/share/fonts/
 
+ask "Install Hack fonts?" && {
 # hack font
 # italic
 exc "wget https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/Hack/Italic/complete/Hack%20Italic%20Nerd%20Font%20Complete.ttf"
@@ -12,4 +13,6 @@ exc "wget https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/Hack/
 exc "wget https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/Hack/Regular/complete/Hack%20Regular%20Nerd%20Font%20Complete.ttf"
 
 exc "fc-cache -fv"
+
+}
 

@@ -61,7 +61,7 @@ while true; do
   ask_value "Choose mountpoint name: "
   exc "mkdir -p /mnt/mnt/$VALUE"
   exc_int "mount /dev/nvme0n1p$P_NUM /mnt/mnt/$VALUE"
-  ask "Mount another partition?"
+  ask "Mount another partition?" Y
   [[ $? -eq 0 ]] || break
 done
 

@@ -35,12 +35,17 @@ check_and_install nvim neovim
     exc_int "sudo apt edit-sources"
 }
 
+[[ $SYSTEM == "FEDORA" ]] && {
+  ask "Remove pkg vi? You can symlink it to /bin/nvim" Y && exc "sudo dnf remove vi"
+  ask "Source the script with gnome shortcuts?" Y && exc "source $CUSTOM_SCRIPTS_PATH/gnome/gnome_shortcut_script.sh"
+}
+
 ##############################
 # SYMLINKING SOME BINARIES
 ##############################
 
-exc "sudo ln -s /bin/nvim /bin/vi"
-exc "sudo ln -s /bin/nvim /bin/vim"
+ask "Symlink /bin/nvim to /bin/vi?" Y && exc "sudo ln -s /bin/nvim /bin/vi"
+ask "Symlink /bin/nvim to /bin/vim?" Y && exc "sudo ln -s /bin/nvim /bin/vim"
 
 exc_int "rm -r ~/linux-files"
 

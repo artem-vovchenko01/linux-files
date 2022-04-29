@@ -33,7 +33,7 @@ function copy_int_wrapper {
     	[[ -n $INTERACTIVE ]] && {
 		msg_warn "Default source path:"
 		msg_warn "$DEF_SRC"
-		ask "Are you satisfied with default source?"
+		ask "Are you satisfied with default source?" Y
 		[[ $? -eq 0 ]] && local SRC="$DEF_SRC" || { ask_value "Input your source path here: "; local SRC="$VALUE"; }
     	}
     	[[ -z $INTERACTIVE ]] && local SRC="$DEF_SRC"
@@ -42,7 +42,7 @@ function copy_int_wrapper {
 
 # Removing links if exist
 
-ask "Remove links which are already present?" && {
+ask "Remove links which are already present?" Y && {
   ask "Try closing programs $CLOSE_PROGRAMS before doing so?" Y && close_programs
 	cd $SYMLINK_DIRS_PATH
 	for link in $(find . -type l); do
@@ -54,7 +54,7 @@ ask "Remove links which are already present?" && {
 
 # Creating links
 
-ask "Proceed to creating links?" && {
+ask "Proceed to creating links?" Y && {
 	cd $SYMLINK_DIRS_PATH
 	for link in $(find . -type l); do
 		dest_path=$(echo $link | sed 's/^..//' | cut -d / -f 2- | sed -E 's/\/?[^/]*$//' | awk -v home=$HOME ' { print home "/" $0 }')

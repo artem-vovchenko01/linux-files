@@ -6,9 +6,11 @@ check_and_install nvim neovim
 
 msg_info 'Updating repositories...'
 
-[[ $SYSTEM == "ARCH" ]] && exc 'sudo pacman -Sy'
-[[ $SYSTEM == "DEBIAN" ]] && exc 'sudo apt update'
-[[ $SYSTEM == "FEDORA" ]] && exc 'sudo dnf update'
+ask "Update repositories?" Y && {
+	[[ $SYSTEM == "ARCH" ]] && exc 'sudo pacman -Sy'
+	[[ $SYSTEM == "DEBIAN" ]] && exc 'sudo apt update'
+	[[ $SYSTEM == "FEDORA" ]] && exc 'sudo dnf update'
+}
 
 ##############################
 # FUNCTIONS
@@ -60,14 +62,14 @@ function work_on_soft_list {
         msg_info "Installing selected software ($soft)"
         for pkg in $soft; do
           if [[ -z $one_by_one ]]; then
-              exc "install_pkg $pkg" || { ask "Try installing $pkg again?" && exc "install_pkg $pkg"; }
+              exc "install_pkg $pkg" || { ask "Try installing $pkg again?" Y && exc "install_pkg $pkg"; }
           else
-              exc "install_pkg $pkg 1" || { ask "Try installing $pkg again?" && exc "install_pkg $pkg"; }
+              exc "install_pkg $pkg 1" || { ask "Try installing $pkg again?" Y && exc "install_pkg $pkg"; }
           fi
         done
 
         if [[ $? -ne 0 ]]; then
-            ask 'Try choosing and installing software again?'
+            ask 'Try choosing and installing software again?' Y
             RET=$?
         else
             RET=1
@@ -91,11 +93,11 @@ function work_on_flatpak_list {
 
         msg_info "Installing selected software ($soft)"
         for pkg in $soft; do
-          exc "flatpak install $pkg"
+          exc "sudo flatpak install $pkg"
         done
 
         if [[ $? -ne 0 ]]; then
-            ask 'Try choosing and installing software again?'
+            ask 'Try choosing and installing software again?' Y
             RET=$?
         else
             RET=1
@@ -107,8 +109,10 @@ function work_on_flatpak_list {
     done
 }
 
+command -v flatpak && ask "Try adding flathub repo?" Y && exc "sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo"
+
 for soft_list_file in $( find $(cd $SOFT_LISTS_DIR; pwd) -type f ); do
-    ask "Install packages from $soft_list_file list?" Y && work_on_soft_list $soft_list_file
+    ask "Install packages (with regular pkg manager) from $soft_list_file list?" Y && work_on_soft_list $soft_list_file
 done
 
 for soft_list_file in $(find $(cd $SOFT_LISTS_DIR/flatpak; pwd) -type f ); do
@@ -118,5 +122,5 @@ done
 verify_cmd_exists paru && exc_int "paru -Scc"
 
 exc_int "sudo usermod -aG docker $USER"
-verify_cmd_exists pkgfile && exc "sudo pkgfile --update"
+verify_cmd_exists pkgfile && exc_int "sudo pkgfile --update"
 

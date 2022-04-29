@@ -33,7 +33,7 @@ ask "Do you want to UNSTOW some configs?" N && {
 # STOWING
 ##############################
 
-ask "Do you want to stow some configs?" && {
+ask "Do you want to stow some configs?" Y && {
 	exc "echo '##### Leave only lines with packages you want to stow' > $WHAT_TO_STOW_FILE"
 	exc "echo -e '##### Lines starting with # will be ignored\n' >> $WHAT_TO_STOW_FILE"
 	exc "ls $STOW_DIR | grep -vE 'LICENSE|README|symlink-dirs' >> $WHAT_TO_STOW_FILE"

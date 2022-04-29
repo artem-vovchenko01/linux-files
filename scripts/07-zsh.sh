@@ -13,8 +13,9 @@ check_and_install nvim neovim
 # INSTALLING PERSONAL CONFIG
 ##############################
 
-[[ -e ~/.zshrc ]] || { ask "It appears your .zshrc.part config is not deployed! Run config deployment script now?" && source $CONFIG_SCRIPT; }
-[[ -e ~/.zshrc.part ]] || { ask "It appears your .zshrc.part config is not deployed! Run config deployment script now?" && source $CONFIG_SCRIPT; }
+[[ -e ~/.zshrc ]] || { ask "It appears your .zshrc.part config is not deployed! Run config deployment script now?" Y && source $CONFIG_SCRIPT; }
+[[ -e ~/.shrc.part ]] || { ask "It appears your .zshrc.part config is not deployed! Run config deployment script now?" Y && source $CONFIG_SCRIPT; }
+ask "Source .shrc.part from ~/.bashrc?" Y && exc "echo 'source ~/.shrc.part' >> ~/.bashrc"
 
 ##############################
 # RUN CHSH
