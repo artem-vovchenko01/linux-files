@@ -3,6 +3,20 @@
 # This file is temporary, so don't worry changing
 
 
+########## SYSTEM PACKAGES
+base-devel
+linux-headers
+
+
+########## PROGRAMMING LANGUAGES
+make
+python-pip
+nodejs
+npm
+rust
+rpm-tools
+
+
 ########## SOCIAL
 telegram-desktop
 
@@ -47,6 +61,8 @@ gdu
 # FILES
 unrar
 vifm
+zip
+unzip
 # ranger
 
 # SYSTEM
@@ -173,6 +189,7 @@ virtualbox
 nmap
 socat
 tcpdump
+mtr
 
 # macchanger
 # proxychains-ng
