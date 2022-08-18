@@ -5,7 +5,7 @@
 ##################################################
 
 REPO_PATH=/mnt/data/Desktop/linux-files
-CUSTOM_SCRIPTS_PATH=~/.local/bin/scripts
+CUSTOM_SCRIPTS_PATH=~/.my-own-scripts
 
 # Colors
 
@@ -31,6 +31,7 @@ function prepare {
   configure_repo_path
   setup_repo_paths
   mkdir -p $REPO_PATH/tempfiles
+  mkdir -p $CUSTOM_SCRIPTS_PATH
   msg_info "All paths updated accordingly to repo path"
 
   cat /etc/os-release | grep -iq debian && SYSTEM=DEBIAN

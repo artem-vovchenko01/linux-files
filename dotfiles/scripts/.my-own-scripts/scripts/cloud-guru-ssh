@@ -1,0 +1,23 @@
+PASSWD_FILE_STORE_DIR=~/.cloud-guru-temp-store
+mkdir -p $PASSWD_FILE_STORE_DIR
+PASSWD_FILE_STORE=$PASSWD_FILE_STORE_DIR/passwords.txt
+touch $PASSWD_FILE_STORE
+
+if ALREADY_STORED="$(grep $1 $PASSWD_FILE_STORE)"; then
+  echo "Found stored temporary passowrd for this server!"
+  echo "$ALREADY_STORED"
+
+  else
+
+  PASSWD="$(cat /dev/urandom | head -c 30 | base64 | tr -d =)"
+  echo "Generated password:"
+  echo "$PASSWD"
+  echo
+  echo -e "$1 \t $PASSWD" >> $PASSWD_FILE_STORE
+  echo "Password is stored in $PASSWD_FILE_STORE"
+fi
+
+
+echo "Executing: ssh -o StrictHostKeyChecking=no cloud_user@$1"
+ssh -o StrictHostKeyChecking=no cloud_user@"$1"
+

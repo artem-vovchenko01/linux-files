@@ -33,6 +33,9 @@ def get_sysname() -> str:
 
 
 def backup(target: str, destination: str):
+    logging.info("Listing target: ")
+    [print(d) for d in os.listdir(target)]
+    print()
     target_size = sum(file.stat().st_size for file in Path(target).rglob('*'))
     logging.info(f"Size of target: {target_size // (10 ** 6)} MB")
     nested_destination = os.path.join(destination, os.path.basename(target))
