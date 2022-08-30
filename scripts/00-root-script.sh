@@ -3,26 +3,70 @@
 ##################################################
 # GLOBAL VARIABLES
 ##################################################
-
-REPO_PATH=/mnt/data/Desktop/linux-files
-CUSTOM_SCRIPTS_PATH=~/.my-own-scripts
+MY_OS_PATH_BASE=~/.my-git-os
+MY_OS_PATH_REPO=$MY_OS_PATH_BASE/linux-files
+#MY_OS_PATH_REPO=/mnt/data/Desktop/linux-files
+MY_OS_PATH_CUSTOM_SCRIPTS=~/.my-own-scripts
 
 # Colors
 
-NC='\033[0m' # No Color
-RED_COLOR='\033[0;31m'
-GREEN_COLOR='\033[0;32m'
-BLUE_COLOR='\033[0;34m'
-YELLOW_COLOR='\033[0;33m'
+MY_OS_COLOR_NONE='\033[0m'
+MY_OS_COLOR_RED='\033[0;31m'
+MY_OS_COLOR_GREEN='\033[0;32m'
+MY_OS_COLOR_BLUE='\033[0;34m'
+MY_OS_COLOR_YELLOW='\033[0;33m'
 
-WARN_CLR="$YELLOW_COLOR"
-ERR_CLR="$RED_COLOR"
-CMD_CLR="$BLUE_COLOR"
-INFO_CLR="$GREEN_COLOR"
+MY_OS_COLOR_WARN="$YELLOW_COLOR"
+MY_OS_COLOR_ERR="$RED_COLOR"
+MY_OS_COLOR_CMD="$BLUE_COLOR"
+MY_OS_COLOR_INFO="$GREEN_COLOR"
+
+MY_OS_SYSTEM=
 
 ##################################################
 # FUNCTIONS
 ##################################################
+
+log() {
+  lolcat <(echo $1)
+}
+
+yes-or-no() {
+  log "$1"
+  select yn in "Yes" "No"; do
+    case $yn in
+      Yes ) return 0;;
+      No ) return 1;;
+    esac
+  done
+}
+
+commit() {
+  log "git status"
+  git status
+  if ! yes-or-no "Are you satisfied with the status?"; then
+    exit 1
+  fi
+
+  log "git add"
+  git add .
+  log "git commit"
+  git commit -m "Commit at $(date)"
+}
+
+check-updates() {
+log "Checking if there are update is $(pwd) repo"
+  lines=$(git status -s | wc -l)
+  if [[ $lines -gt 0 ]]; then
+      log "There are some updates in this repo!!! Comitting them ..."
+      commit
+      return 0;
+    else
+      log "There are no updates in this repo"
+      return 1;
+  fi
+}
+
 
 function prepare {
   trap "exit_cleanup" 0
@@ -30,15 +74,15 @@ function prepare {
   setup_repo_paths
   configure_repo_path
   setup_repo_paths
-  mkdir -p $REPO_PATH/tempfiles
-  mkdir -p $CUSTOM_SCRIPTS_PATH
+  mkdir -p $MY_OS_PATH_REPO/tempfiles
+  mkdir -p $MY_OS_PATH_CUSTOM_SCRIPTS
   msg_info "All paths updated accordingly to repo path"
 
-  cat /etc/os-release | grep -iq debian && SYSTEM=DEBIAN
-  cat /etc/os-release | grep -iq arch && SYSTEM=ARCH
-  cat /etc/os-release | grep -iq fedora && SYSTEM=FEDORA
+  cat /etc/os-release | grep -iq debian && MY_OS_SYSTEM=DEBIAN
+  cat /etc/os-release | grep -iq arch && MY_OS_SYSTEM=ARCH
+  cat /etc/os-release | grep -iq fedora && MY_OS_SYSTEM=FEDORA
 
-  banner "Your system identified as: $SYSTEM"
+  banner "Your system identified as: $MY_OS_SYSTEM"
 }
 
 function exit_cleanup {
@@ -54,27 +98,29 @@ function verify_cmd_exists {
 }
 
 function setup_repo_paths {
-  DESKTOP_FILES_PATH=/mnt/data/Desktop
+  # DESKTOP_FILES_PATH=/mnt/data/Desktop
   DESKTOP_BACKUPS_PATH=$DESKTOP_FILES_PATH/Software-backups
 
-  SCRIPTS_PATH=$REPO_PATH/scripts
-  ENVS_PATH=$REPO_PATH/scripts/environments
-  SYMLINK_DIRS_PATH=$REPO_PATH/symlink-dirs
-  DOTFILES_PATH=$REPO_PATH/dotfiles
-  TEMPFILES_PATH=$REPO_PATH/tempfiles
-  SOFT_LISTS_DIR=$SCRIPTS_PATH/software-lists
+  MY_OS_PATH_SCRIPTS=$MY_OS_PATH_REPO/scripts
+  # ENVS_PATH=$MY_OS_PATH_REPO/scripts/environments
+  MY_OS_PATH_ADDITIONAL_SCRIPTS=$MY_OS_PATH_REPO/scripts/additional-scripts
+  ENVS_PATH=$MY_OS_PATH_ADDITIONAL_SCRIPTS/environments
+  SYMLINK_DIRS_PATH=$MY_OS_PATH_REPO/symlink-dirs
+  DOTFILES_PATH=$MY_OS_PATH_REPO/dotfiles
+  TEMPFILES_PATH=$MY_OS_PATH_REPO/tempfiles
+  SOFT_LISTS_DIR=$MY_OS_PATH_SCRIPTS/software-lists
 
   HELP_FILE=$TEMPFILES_PATH/help-file.txt
   WHAT_TO_STOW_FILE=$TEMPFILES_PATH/what-to-stow.txt
 
-  ARCH_FROM_SCRATCH_SCRIPT=$SCRIPTS_PATH/01-arch-from-scratch.sh
-  AFTER_CHROOT_SCRIPT=$SCRIPTS_PATH/02-after-chroot.sh
-  SOFTWARE_SCRIPT=$SCRIPTS_PATH/04-software.sh
-  CONFIG_SCRIPT=$SCRIPTS_PATH/05-configs.sh
-  SYMLINK_SCRIPT=$SCRIPTS_PATH/06-symlink-dirs.sh
-  ZSH_SCRIPT=$SCRIPTS_PATH/07-zsh.sh
-  NVIM_SCRIPT=$SCRIPTS_PATH/08-nvim.sh
-  MISC_SCRIPT=$SCRIPTS_PATH/09-misc.sh
+  ARCH_FROM_SCRATCH_SCRIPT=$MY_OS_PATH_SCRIPTS/01-arch-from-scratch.sh
+  AFTER_CHROOT_SCRIPT=$MY_OS_PATH_SCRIPTS/02-after-chroot.sh
+  SOFTWARE_SCRIPT=$MY_OS_PATH_SCRIPTS/04-software.sh
+  CONFIG_SCRIPT=$MY_OS_PATH_SCRIPTS/05-configs.sh
+  SYMLINK_SCRIPT=$MY_OS_PATH_SCRIPTS/06-symlink-dirs.sh
+  ZSH_SCRIPT=$MY_OS_PATH_SCRIPTS/07-zsh.sh
+  NVIM_SCRIPT=$MY_OS_PATH_SCRIPTS/08-nvim.sh
+  MISC_SCRIPT=$MY_OS_PATH_SCRIPTS/09-misc.sh
 }
 
 function output_possible_repo_paths {
@@ -85,21 +131,21 @@ function output_possible_repo_paths {
 }
 
 function configure_repo_path {
-	[[ -e $REPO_PATH ]] && ask "Repo under default path ($REPO_PATH) available. Use it?" Y && return
-	[[ ! -e $REPO_PATH ]] && msg_warn "Repo path by default not available! Later stage scritps might misbehave"
+	[[ -e $MY_OS_PATH_REPO ]] && ask "Repo under default path ($MY_OS_PATH_REPO) available. Use it?" Y && return
+	[[ ! -e $MY_OS_PATH_REPO ]] && msg_warn "Repo path by default not available! Later stage scritps might misbehave"
 	msg_warn "Main repo with configs by default:"
-	msg_warn "$REPO_PATH"
+	msg_warn "$MY_OS_PATH_REPO"
 	local paths_num=$(output_possible_repo_paths | wc -l)
 	output_possible_repo_paths | cat -n
 	ask_value "Choose one of these (1-$paths_num) or press Enter to enter custom path: "
 	if [[ -z $VALUE ]]; then
 	    ask_value "Enter custom path: "
-	    REPO_PATH=$VALUE
+	    MY_OS_PATH_REPO=$VALUE
 	else
-	    REPO_PATH=$(output_possible_repo_paths | sed -n "${VALUE}p")
+	    MY_OS_PATH_REPO=$(output_possible_repo_paths | sed -n "${VALUE}p")
 	fi
     	echo "New path:"
-    	echo "$REPO_PATH"
+    	echo "$MY_OS_PATH_REPO"
     	sleep 1
 }
 
@@ -142,19 +188,19 @@ function check_and_install {
 
 function verify_pkg_exists {
   local pkg=$1
-  [[ $SYSTEM == "ARCH" ]] && verify_cmd_exists paru && paru -Si $pkg > /dev/null 2>&1 && return 0
-  [[ $SYSTEM == "ARCH" ]] && pacman -Si $pkg > /dev/null 2>&1 && return 0
-  [[ $SYSTEM == "ARCH" ]] && pacman -Sg $pkg > /dev/null 2>&1 && return 0
-  [[ $SYSTEM == "DEBIAN" ]] && apt info $pkg > /dev/null 2>&1 && return 0
-  [[ $SYSTEM == "FEDORA" ]] && dnf info $pkg > /dev/null 2>&1 && return 0
+  [[ $MY_OS_SYSTEM == "ARCH" ]] && verify_cmd_exists paru && paru -Si $pkg > /dev/null 2>&1 && return 0
+  [[ $MY_OS_SYSTEM == "ARCH" ]] && pacman -Si $pkg > /dev/null 2>&1 && return 0
+  [[ $MY_OS_SYSTEM == "ARCH" ]] && pacman -Sg $pkg > /dev/null 2>&1 && return 0
+  [[ $MY_OS_SYSTEM == "DEBIAN" ]] && apt info $pkg > /dev/null 2>&1 && return 0
+  [[ $MY_OS_SYSTEM == "FEDORA" ]] && dnf info $pkg > /dev/null 2>&1 && return 0
   msg_err "Package $pkg not found!"
   return 1
 }
 
 function verify_pkg_installed {
-	[[ $SYSTEM == "ARCH" ]] && pacman -Qi $1 > /dev/null 2>&1 && return
-	[[ $SYSTEM == "DEBIAN" ]] && dpkg -l $1 > /dev/null 2>&1 && return 
-	[[ $SYSTEM == "FEDORA" ]] && rpm -qa | grep -q $1 && return
+	[[ $MY_OS_SYSTEM == "ARCH" ]] && pacman -Qi $1 > /dev/null 2>&1 && return
+	[[ $MY_OS_SYSTEM == "DEBIAN" ]] && dpkg -l $1 > /dev/null 2>&1 && return 
+	[[ $MY_OS_SYSTEM == "FEDORA" ]] && rpm -qa | grep -q $1 && return
 }
 
 function install_pkg {
@@ -184,26 +230,26 @@ function install_pkg {
 }
 
 function msg_err {
-	color_echo "$1" $ERR_CLR
+	color_echo "$1" $MY_OS_COLOR_ERR
 }
 
 function msg_info {
-	color_echo "$1" $INFO_CLR
+	color_echo "$1" $MY_OS_COLOR_INFO
 }
 
 function msg_cmd {
-	color_echo "$1" $CMD_CLR
+	color_echo "$1" $MY_OS_COLOR_CMD
 }
 
 function msg_warn {
-	color_echo "$1" $WARN_CLR
+	color_echo "$1" $MY_OS_COLOR_WARN
 }
 
 function ask_value {
 	msg_warn "$1"
-	echo -ne "${WARN_CLR}>>> "
+	echo -ne "${MY_OS_COLOR_WARN}>>> "
 	read VALUE
-	echo -ne "${NC}"
+	echo -ne "${MY_OS_COLOR_NONE}"
 }
 
 function ask {
@@ -221,7 +267,7 @@ function ask {
 	local KEY=$DEFAULT_VAL
 	local RET=0
 	msg_info "$1"
-	echo -ne "${WARN_CLR}>>> Your choice: "
+	echo -ne "${MY_OS_COLOR_WARN}>>> Your choice: "
 	if [[ $DEFAULT_VAL == 'Y' || $DEFAULT_VAL == 'y' ]]; then
 		echo -e "[Y/n]${NC}"
 	elif [[ $DEFAULT_VAL == 'N' || $DEFAULT_VAL == 'n' ]]; then
@@ -233,7 +279,7 @@ function ask {
 	local key
 	while true; do
 		[[ -z $key ]] && {
-			echo -ne "${WARN_CLR}>>> "
+			echo -ne "${MY_OS_COLOR_WARN}>>> "
 			read key
 			echo -ne "${NC}"
 		}
@@ -258,7 +304,7 @@ function exc_int {
     # $1 - command
     # $2 - if nonzero, act non-interactively when $INTERACTIVE not set
     if [[ -z $2 ]]; then
-        ask "${INFO_CLR}Run ${WARN_CLR}$1 ${INFO_CLR}?${NC}" Y
+        ask "${MY_OS_COLOR_INFO}Run ${MY_OS_COLOR_WARN}$1 ${MY_OS_COLOR_INFO}?${MY_OS_COLOR_NONE}" Y
         [[ $? -eq 0 ]] && exc "$1"
     else
         exc "$1"
@@ -297,7 +343,7 @@ function exc_usr_with_help {
 	msg_warn "You're in manual command sequence entering mode. Here's help:"
 	show_help
 	while true; do
-		echo -ne "${INFO_CLR}>>> "
+		echo -ne "${MY_OS_COLOR_INFO}>>> "
 		read cmd
 		echo -ne "${NC}"
 		exc "$cmd"
@@ -316,14 +362,15 @@ function exc_usr_with_help {
 prepare
 
 while true; do
-	##### Default scripts
-	script_list="$(find $SCRIPTS_PATH -maxdepth 1 -type f | grep -v 00 | grep -v stow.txt | grep -v 'root-script' | rev | cut -d '/' -f 1 | rev | sort)"
+  echo *
+	# Default scripts
+	script_list="$(find $MY_OS_PATH_SCRIPTS -maxdepth 1 -type f | grep -v 00 | grep -v stow.txt | grep -v 'root-script' | rev | cut -d '/' -f 1 | rev | sort)"
 	echo "$script_list" | cat -n
 	num_scripts=$(echo "$script_list" | wc -l)
 	ask_value "Which script to run? (1 to $num_scripts). Press Enter to skip to environments list. Press q to quit from program"
 	[[ $VALUE == "q" ]] && msg_warn "Exiting" && exit 0
 	[[ -n $VALUE ]] && {
-	  chosen_script=$SCRIPTS_PATH/$(echo "$script_list" | sed -n ${VALUE}p)
+	  chosen_script=$MY_OS_PATH_SCRIPTS/$(echo "$script_list" | sed -n ${VALUE}p)
 	  msg_info "Running $chosen_script ..."
 	  exc "source $chosen_script"
 	  [[ $chosen_script == $ARCH_FROM_SCRATCH_SCRIPT ]] && exit
@@ -331,15 +378,27 @@ while true; do
 	  continue
 	}
 
-	#### Environment scripts
+	# Additional scripts
 
-	exc "ls -l $ENVS_PATH | sed '1d' | cat -n"
-	num_env=$(ls $ENVS_PATH | wc -l)
-	ask_value "Which environment to setup? (1 to $num_env) Press Enter to skip. Press q to quit from program"
-	[[ $VALUE == "q" ]] && msg_warn "Exiting" && exit 0
-	[[ -n $VALUE ]] && {
-	  exc "source $ENVS_PATH/$(ls $ENVS_PATH | sed -n ${VALUE}p)"
-	  continue
-	}
+  msg_info "Select script directory"
+  select script_dir in $(ls $MY_OS_PATH_ADDITIONAL_SCRIPTS); do
+    select script_name in $(ls $MY_OS_PATH_ADDITIONAL_SCRIPTS/$script_dir); do
+        script_path=$MY_OS_PATH_ADDITIONAL_SCRIPTS/$script_dir/$script_name
+        break
+    done
+    break
+  done
+
+  msg_info "Executing chosen script ($script_path) ..."
+  source $script_path
+
+	# exc "ls -l $ENVS_PATH | sed '1d' | cat -n"
+	# num_env=$(ls $ENVS_PATH | wc -l)
+	# ask_value "Which environment to setup? (1 to $num_env) Press Enter to skip. Press q to quit from program"
+	# [[ $VALUE == "q" ]] && msg_warn "Exiting" && exit 0
+	# [[ -n $VALUE ]] && {
+	#   exc "source $ENVS_PATH/$(ls $ENVS_PATH | sed -n ${VALUE}p)"
+	#   continue
+	# }
 done
 
