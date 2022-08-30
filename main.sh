@@ -6,7 +6,7 @@
 MY_OS_PATH_BASE=~/.my-git-os
 MY_OS_PATH_REPO=$MY_OS_PATH_BASE/linux-files
 #MY_OS_PATH_REPO=/mnt/data/Desktop/linux-files
-MY_OS_PATH_CUSTOM_SCRIPTS=~/.my-own-scripts
+MY_OS_PATH_SYSTEM_SCRIPTS=$MY_OS_PATH_BASE/system-scripts
 
 # Colors
 
@@ -16,10 +16,10 @@ MY_OS_COLOR_GREEN='\033[0;32m'
 MY_OS_COLOR_BLUE='\033[0;34m'
 MY_OS_COLOR_YELLOW='\033[0;33m'
 
-MY_OS_COLOR_WARN="$YELLOW_COLOR"
-MY_OS_COLOR_ERR="$RED_COLOR"
-MY_OS_COLOR_CMD="$BLUE_COLOR"
-MY_OS_COLOR_INFO="$GREEN_COLOR"
+MY_OS_COLOR_WARN="$MY_OS_COLOR_YELLOW"
+MY_OS_COLOR_ERR="$MY_OS_COLOR_RED"
+MY_OS_COLOR_CMD="$MY_OS_COLOR_BLUE"
+MY_OS_COLOR_INFO="$MY_OS_COLOR_GREEN"
 
 MY_OS_SYSTEM=
 
@@ -27,11 +27,7 @@ MY_OS_SYSTEM=
 # FUNCTIONS
 ##################################################
 
-log() {
-  lolcat <(echo $1)
-}
-
-yes-or-no() {
+my_os_lib_yes_or_no() {
   log "$1"
   select yn in "Yes" "No"; do
     case $yn in
@@ -41,7 +37,7 @@ yes-or-no() {
   done
 }
 
-commit() {
+my_os_lib_commit() {
   log "git status"
   git status
   if ! yes-or-no "Are you satisfied with the status?"; then
@@ -54,7 +50,7 @@ commit() {
   git commit -m "Commit at $(date)"
 }
 
-check-updates() {
+my_os_lib_check-updates() {
 log "Checking if there are update is $(pwd) repo"
   lines=$(git status -s | wc -l)
   if [[ $lines -gt 0 ]]; then
@@ -68,14 +64,14 @@ log "Checking if there are update is $(pwd) repo"
 }
 
 
-function prepare {
+function my_os_lib_prepare {
   trap "exit_cleanup" 0
 
   setup_repo_paths
   configure_repo_path
   setup_repo_paths
   mkdir -p $MY_OS_PATH_REPO/tempfiles
-  mkdir -p $MY_OS_PATH_CUSTOM_SCRIPTS
+  mkdir -p $MY_OS_PATH_SYSTEM_SCRIPTS
   msg_info "All paths updated accordingly to repo path"
 
   cat /etc/os-release | grep -iq debian && MY_OS_SYSTEM=DEBIAN
@@ -85,7 +81,7 @@ function prepare {
   banner "Your system identified as: $MY_OS_SYSTEM"
 }
 
-function exit_cleanup {
+function my_os_lib_exit_cleanup {
 	echo "Script finished. Cleaning up ..."
 	cd $SOFT_LISTS_DIR
 	rm $HELP_FILE 2> /dev/null
@@ -93,11 +89,11 @@ function exit_cleanup {
 	rm *.tmp 2> /dev/null
 }
 
-function verify_cmd_exists {
+function my_os_lib_verify_cmd_exists {
   command -v $1 > /dev/null
 }
 
-function setup_repo_paths {
+function my_os_lib_setup_repo_paths {
   # DESKTOP_FILES_PATH=/mnt/data/Desktop
   DESKTOP_BACKUPS_PATH=$DESKTOP_FILES_PATH/Software-backups
 
@@ -123,14 +119,14 @@ function setup_repo_paths {
   MISC_SCRIPT=$MY_OS_PATH_SCRIPTS/09-misc.sh
 }
 
-function output_possible_repo_paths {
+function my_os_lib_output_possible_repo_paths {
   echo "${PWD%/*}"
 	echo "/root/linux-files"
 	echo "/linux-files"
 	echo "$HOME/linux-files"
 }
 
-function configure_repo_path {
+function my_os_lib_configure_repo_path {
 	[[ -e $MY_OS_PATH_REPO ]] && ask "Repo under default path ($MY_OS_PATH_REPO) available. Use it?" Y && return
 	[[ ! -e $MY_OS_PATH_REPO ]] && msg_warn "Repo path by default not available! Later stage scritps might misbehave"
 	msg_warn "Main repo with configs by default:"
@@ -149,35 +145,35 @@ function configure_repo_path {
     	sleep 1
 }
 
-function exc_ping {
+function my_os_lib_exc_ping {
     exc "ping archlinux.org -c 3"
 }
 
-function root_mirror {
+function my_os_lib_root_mirror {
     reflector --protocol https --latest 5 --country Ukraine --sort rate --save /etc/pacman.d/mirrorlist
 }
 
-function sudo_mirror {
+function my_os_lib_sudo_mirror {
     sudo reflector --protocol https --latest 5 --country Ukraine --sort rate --save /etc/pacman.d/mirrorlist
 }
 
-function check_interactive {
+function my_os_lib_check_interactive {
     [ $1 = "-i" ] && INTERACTIVE=1
     [ -z $INTERACTIVE ] && msg_info "Running script in non-interactive mode. Pass -i flag for interactive execution."
 }
 
-function banner {
+function my_os_lib_banner {
 	msg_warn "############################################################"
 	msg_warn "# $1"
 	msg_warn "############################################################"
 }
 
-function color_echo {
+function my_os_lib_color_echo {
 	local NC='\033[0m' # No Color
 	echo -e "${2}>>> ${1}${NC}"
 }
 
-function check_and_install {
+function my_os_lib_check_and_install {
 	local cmd=$1
 	[[ ! -z $2 ]] && local pkg="$2" || local pkg="$1"
 	verify_cmd_exists $cmd || {
@@ -186,7 +182,7 @@ function check_and_install {
 	}
 }
 
-function verify_pkg_exists {
+function my_os_lib_verify_pkg_exists {
   local pkg=$1
   [[ $MY_OS_SYSTEM == "ARCH" ]] && verify_cmd_exists paru && paru -Si $pkg > /dev/null 2>&1 && return 0
   [[ $MY_OS_SYSTEM == "ARCH" ]] && pacman -Si $pkg > /dev/null 2>&1 && return 0
@@ -197,13 +193,13 @@ function verify_pkg_exists {
   return 1
 }
 
-function verify_pkg_installed {
+function my_os_lib_verify_pkg_installed {
 	[[ $MY_OS_SYSTEM == "ARCH" ]] && pacman -Qi $1 > /dev/null 2>&1 && return
 	[[ $MY_OS_SYSTEM == "DEBIAN" ]] && dpkg -l $1 > /dev/null 2>&1 && return 
 	[[ $MY_OS_SYSTEM == "FEDORA" ]] && rpm -qa | grep -q $1 && return
 }
 
-function install_pkg {
+function my_os_lib_install_pkg {
   local pkg=$1
   local confirm=$2
   verify_pkg_installed $pkg && { msg_info "Package $pkg is already installed, skipping"; return 0; }
@@ -229,30 +225,30 @@ function install_pkg {
   }
 }
 
-function msg_err {
+function my_os_lib_msg_err {
 	color_echo "$1" $MY_OS_COLOR_ERR
 }
 
-function msg_info {
+function my_os_lib_msg_info {
 	color_echo "$1" $MY_OS_COLOR_INFO
 }
 
-function msg_cmd {
+function my_os_lib_msg_cmd {
 	color_echo "$1" $MY_OS_COLOR_CMD
 }
 
-function msg_warn {
+function my_os_lib_msg_warn {
 	color_echo "$1" $MY_OS_COLOR_WARN
 }
 
-function ask_value {
+function my_os_lib_ask_value {
 	msg_warn "$1"
 	echo -ne "${MY_OS_COLOR_WARN}>>> "
 	read VALUE
 	echo -ne "${MY_OS_COLOR_NONE}"
 }
 
-function ask {
+function my_os_lib_ask {
 	# params
 	# $1 - question
 	# $2 - default value
@@ -300,7 +296,7 @@ function ask {
 	return $RET
 }
 
-function exc_int {
+function my_os_lib_exc_int {
     # $1 - command
     # $2 - if nonzero, act non-interactively when $INTERACTIVE not set
     if [[ -z $2 ]]; then
@@ -311,7 +307,7 @@ function exc_int {
     fi
 }
 
-function exc {
+function my_os_lib_exc {
 	msg_cmd "$1"
 	eval "$1"
 	local ERR=$?
@@ -327,11 +323,11 @@ function exc_ignoreerr {
 	return $ERR
 }
 
-function help {
+function my_os_lib_help {
 	echo "$1" >> .help.txt
 }
 
-function show_help {
+function my_os_lib_show_help {
 	if [[ -f $HELP_FILE ]]; then
 		cat $HELP_FILE
 	else
