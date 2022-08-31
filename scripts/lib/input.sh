@@ -9,9 +9,13 @@ function my_os_lib_input_yes_or_no {
 }
 
 function my_os_lib_input_choice {
-  select choice in "$@"; do
+  select CHOICE in "$@"; do
     return $REPLY
   done
+}
+
+function my_os_lib_input_get_choice {
+  echo "$CHOICE"
 }
 
 function my_os_lib_input_is_chosen {

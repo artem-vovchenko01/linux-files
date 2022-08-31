@@ -1,5 +1,7 @@
 function lib {
-  case $1 in
+  arg_1="$1"
+  shift 1
+  case $arg_1 in
     git)
       my_os_lib_menu_git "$@"
       ;;
@@ -31,7 +33,7 @@ function lib {
       my_os_lib_settings_menu "$@"
       ;;
     check-success)
-      [[ $? - eq 0 ]] && return 0 || return 1
+      [[ $? -eq 0 ]] && return 0 || return 1
       ;;
     *)
       lib log "lib command $1 not found!"
@@ -40,7 +42,9 @@ function lib {
 }
 
 function my_os_lib_menu_settings {
-  case $1 in
+  arg_1="$1"
+  shift 1
+  case $arg_1 in
     is-on)
       my_os_lib_settings_set_on "$@"
       ;;
@@ -57,7 +61,9 @@ function my_os_lib_menu_settings {
 }
 
 function my_os_lib_menu_os {
-  case $1 in
+  arg_1="$1"
+  shift 1
+  case $arg_1 in
     arch)
       my_os_lib_menu_os_arch
       ;;
@@ -67,9 +73,10 @@ function my_os_lib_menu_os {
   esac
 }
 
-
 function my_os_lib_menu_input {
-  case $1 in
+  arg_1="$1"
+  shift 1
+  case $arg_1 in
     yes-no)
       my_os_lib_input_yes_or_no "$@"
       ;;
@@ -82,6 +89,9 @@ function my_os_lib_menu_input {
     is-chosen)
       my_os_lib_input_is_chosen "$@"
       ;;
+    get-choice)
+      my_os_lib_input_get_choice "$@"
+      ;;
     *)
       my_os_lib_input_yes_or_no "$@"
       ;;
@@ -89,7 +99,9 @@ function my_os_lib_menu_input {
 }
 
 function my_os_lib_menu_pkg {
-  case $1 in
+  arg_1="$1"
+  shift 1
+  case $arg_1 in
     install)
       my_os_lib_pkg_install_pkg
       ;;
@@ -103,7 +115,9 @@ function my_os_lib_menu_pkg {
 }
 
 function my_os_lib_menu_git {
-  case $1 in
+  arg_1="$1"
+  shift 1
+  case $arg_1 in
     commit)
       my_os_lib_git_commit "$@"
       ;;
@@ -112,8 +126,11 @@ function my_os_lib_menu_git {
       ;;
   esac
 }
+
 function my_os_lib_menu_log {
-  case $1 in
+  arg_1="$1"
+  shift 1
+  case $arg_1 in
     info)
       my_os_lib_log_info "$@"
       ;;
@@ -136,7 +153,9 @@ function my_os_lib_menu_log {
 }
 
 function my_os_lib_menu_dir {
-  case $1 in
+  arg_1="$1"
+  shift 1
+  case $arg_1 in
     base)
       cd $MY_OS_PATH_BASE
       ;;
@@ -162,7 +181,9 @@ function my_os_lib_menu_dir {
 }
 
 function my_os_lib_menu_run {
-  case $1 in
+  arg_1="$1"
+  shift 1
+  case $arg_1 in
     ignoreerr)
       my_os_lib_run_ignoreerr "$@"
       ;;
@@ -176,7 +197,9 @@ function my_os_lib_menu_run {
 }
 
 function my_os_lib_menu_snippet {
-  case $1 in
+  arg_1="$1"
+  shift 1
+  case $arg_1 in
     ping)
       my_os_lib_snippet_ping
       ;;

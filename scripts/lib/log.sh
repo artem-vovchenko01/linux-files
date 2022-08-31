@@ -1,16 +1,16 @@
-function my_os_lib_msg_err {
+function my_os_lib_log_err {
 	my_os_lib_log_color_echo "$1" $MY_OS_COLOR_ERR
 }
 
-function my_os_lib_msg_info {
+function my_os_lib_log_info {
 	my_os_lib_log_color_echo "$1" $MY_OS_COLOR_INFO
 }
 
-function my_os_lib_msg_cmd {
+function my_os_lib_log_cmd {
 	my_os_lib_log_color_echo "$1" $MY_OS_COLOR_CMD
 }
 
-function my_os_lib_msg_warn {
+function my_os_lib_log_warn {
 	my_os_lib_log_color_echo "$1" $MY_OS_COLOR_WARN
 }
 
@@ -19,8 +19,8 @@ function my_os_lib_log_color_echo {
 }
 
 function my_os_lib_log_banner {
-	lib log "############################################################"
-	lib log "# $1"
-	lib log "############################################################"
+	my_os_lib_log_info "############################################################"
+	my_os_lib_log_info "# $1"
+	my_os_lib_log_info "############################################################"
 }
 
