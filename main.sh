@@ -60,6 +60,42 @@ function lib {
     pkg)
       my_os_lib_menu_pkg "$@"
       ;;
+    input)
+      my_os_lib_menu_input "$@"
+      ;;
+    os)
+      my_os_lib_menu_os "$@"
+      ;;
+  esac
+}
+
+function my_os_lib_menu_os {
+  case $1 in
+    arch)
+      my_os_lib_menu_os_arch
+      ;;
+  esac
+}
+
+function my_os_lib_menu_os_arch {
+  case $1 in
+    mirrors)
+      my_os_lib_sudo_mirror
+      ;;
+  esac
+}
+
+function my_os_lib_menu_input {
+  case $1 in
+    yes-no)
+      my_os_lib_yes_or_no "$@"
+      ;;
+    value)
+      my_os_lib_ask_value "$@"
+      ;;
+    *)
+      my_os_lib_yes_or_no "$@"
+      ;;
   esac
 }
 
@@ -71,6 +107,12 @@ function my_os_lib_menu_pkg {
     remove)
       # my_os_lib_verify_pkg_installed
       ;;
+    verify-cmd)
+      my_os_lib_verify_cmd_exists
+      ;;
+    verify-pkg)
+      my_os_lib_verify_pkg_exists
+      ;;
   esac
 }
 
@@ -80,7 +122,7 @@ function my_os_lib_menu_git {
       my_os_lib_commit "$@"
       ;;
     check-updates)
-      my_os_lib_check-updates
+      my_os_lib_check_updates
       ;;
   esac
 }
@@ -103,6 +145,7 @@ function my_os_lib_menu_log {
       ;;
   esac
 }
+
 function my_os_lib_menu_dir {
   case $1 in
     base)
@@ -119,11 +162,20 @@ function my_os_lib_menu_dir {
       ;;
     git)
       cd $MY_OS_GIT
+      ;;
+    cd)
+      cd "$@"
+      ;;
+    *)
+      cd "$@"
+      ;;
   esac
 }
+
 function my_os_lib_menu_run {
   case $1 in
     ignoreerr)
+      my_os_lib_exc_ignoreerr "$@"
       ;;
     interactive)
       my_os_lib_exc_int "$@"
@@ -133,6 +185,7 @@ function my_os_lib_menu_run {
       ;;
   esac
 }
+
 function my_os_lib_menu_snippet {
   case $1 in
     ping)
@@ -141,10 +194,10 @@ function my_os_lib_menu_snippet {
   esac
 }
 
-my_os_lib_commit() {
+function my_os_lib_commit {
   lib log "git status"
   git status
-  if ! yes-or-no "Are you satisfied with the status?"; then
+  if ! lib input "Are you satisfied with the status?"; then
     exit 1
   fi
 
@@ -154,40 +207,43 @@ my_os_lib_commit() {
   git commit -m "Commit at $(date)"
 }
 
-my_os_lib_check-updates() {
-log "Checking if there are update is $(pwd) repo"
+function my_os_lib_check_updates {
+lib log "Checking if there are update is $(pwd) repo"
   lines=$(git status -s | wc -l)
   if [[ $lines -gt 0 ]]; then
-      log "There are some updates in this repo!!! Comitting them ..."
+      lib log "There are some updates in this repo!!! Comitting them ..."
       commit
       return 0;
     else
-      log "There are no updates in this repo"
+      lib log "There are no updates in this repo"
       return 1;
   fi
 }
 
+function my_os_lib_check_platform {
+  cat /etc/os-release | grep -iq debian && MY_OS_SYSTEM=DEBIAN
+  cat /etc/os-release | grep -iq arch && MY_OS_SYSTEM=ARCH
+  cat /etc/os-release | grep -iq fedora && MY_OS_SYSTEM=FEDORA
+}
 
 function my_os_lib_prepare {
   trap "exit_cleanup" 0
 
-  setup_repo_paths
-  configure_repo_path
-  setup_repo_paths
+  my_os_lib_setup_repo_paths
+
   mkdir -p $MY_OS_PATH_REPO/tempfiles
   mkdir -p $MY_OS_PATH_SYSTEM_SCRIPTS
-  msg_info "All paths updated accordingly to repo path"
 
-  cat /etc/os-release | grep -iq debian && MY_OS_SYSTEM=DEBIAN
-  cat /etc/os-release | grep -iq arch && MY_OS_SYSTEM=ARCH
-  cat /etc/os-release | grep -iq fedora && MY_OS_SYSTEM=FEDORA
+  lib log "All paths updated accordingly to repo path"
+
+  my_os_lib_check_platform
 
   banner "Your system identified as: $MY_OS_SYSTEM"
 }
 
 function my_os_lib_exit_cleanup {
-	echo "Script finished. Cleaning up ..."
-	cd $SOFT_LISTS_DIR
+	lib log "Script finished. Cleaning up ..."
+	lib dir $SOFT_LISTS_DIR
 	rm $HELP_FILE 2> /dev/null
 	rm $WHAT_TO_STOW_FILE 2> /dev/null
 	rm *.tmp 2> /dev/null
@@ -221,32 +277,6 @@ function my_os_lib_setup_repo_paths {
   ZSH_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/07-zsh.sh
   NVIM_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/08-nvim.sh
   MISC_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/09-misc.sh
-}
-
-function my_os_lib_output_possible_repo_paths {
-  echo "${PWD%/*}"
-	echo "/root/linux-files"
-	echo "/linux-files"
-	echo "$HOME/linux-files"
-}
-
-function my_os_lib_configure_repo_path {
-	[[ -e $MY_OS_PATH_REPO ]] && ask "Repo under default path ($MY_OS_PATH_REPO) available. Use it?" Y && return
-	[[ ! -e $MY_OS_PATH_REPO ]] && msg_warn "Repo path by default not available! Later stage scritps might misbehave"
-	msg_warn "Main repo with configs by default:"
-	msg_warn "$MY_OS_PATH_REPO"
-	local paths_num=$(output_possible_repo_paths | wc -l)
-	output_possible_repo_paths | cat -n
-	ask_value "Choose one of these (1-$paths_num) or press Enter to enter custom path: "
-	if [[ -z $VALUE ]]; then
-	    ask_value "Enter custom path: "
-	    MY_OS_PATH_REPO=$VALUE
-	else
-	    MY_OS_PATH_REPO=$(output_possible_repo_paths | sed -n "${VALUE}p")
-	fi
-    	echo "New path:"
-    	echo "$MY_OS_PATH_REPO"
-    	sleep 1
 }
 
 function my_os_lib_exc_ping {
