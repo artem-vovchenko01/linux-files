@@ -27,8 +27,8 @@ MY_OS_SYSTEM=
 # FUNCTIONS
 ##################################################
 
-my_os_lib_yes_or_no() {
-  log "$1"
+function my_os_lib_yes_or_no {
+  lib log "$1"
   select yn in "Yes" "No"; do
     case $yn in
       Yes ) return 0;;
@@ -43,25 +43,102 @@ function lib {
       my_os_lib_menu_git "$@"
       ;;
     log)
-      my_os_lib_menu_git "$@"
+      my_os_lib_menu_log "$@"
       ;;
     run)
-      my_os_lib_menu_git "$@"
+      my_os_lib_menu_run "$@"
       ;;
     dir)
-      my_os_lib_menu_git "$@"
+      my_os_lib_menu_dir "$@"
       ;;
     script-picker)
-      my_os_lib_menu_git "$@"
+      my_os_lib_script_picker "$@"
       ;;
     snippet)
-      my_os_lib_menu_git "$@"
+      my_os_lib_menu_snippets "$@"
+      ;;
+    pkg)
+      my_os_lib_menu_pkg "$@"
+      ;;
+  esac
+}
+
+function my_os_lib_menu_pkg {
+  case $1 in
+    install)
+      my_os_lib_install_pkg
+      ;;
+    remove)
+      # my_os_lib_verify_pkg_installed
       ;;
   esac
 }
 
 function my_os_lib_menu_git {
-
+  case $1 in
+    commit)
+      my_os_lib_commit "$@"
+      ;;
+    check-updates)
+      my_os_lib_check-updates
+      ;;
+  esac
+}
+function my_os_lib_menu_log {
+  case $1 in
+    info)
+      my_os_lib_msg_info "$@"
+      ;;
+    warn)
+      my_os_lib_msg_warn "$@"
+      ;;
+    err)
+      my_os_lib_msg_err "$@"
+      ;;
+    cmd)
+      my_os_lib_msg_cmd "$@"
+      ;;
+    *)
+      my_os_lib_msg_info "$@"
+      ;;
+  esac
+}
+function my_os_lib_menu_dir {
+  case $1 in
+    base)
+      cd $MY_OS_PATH_BASE
+      ;;
+    repo)
+      cd $MY_OS_PATH_REPO
+      ;;
+    base-scripts)
+      cd $MY_OS_PATH_BASE_SCRIPTS
+      ;;
+    additional-scripts)
+      cd $MY_OS_PATH_ADDITIONAL_SCRIPTS
+      ;;
+    git)
+      cd $MY_OS_GIT
+  esac
+}
+function my_os_lib_menu_run {
+  case $1 in
+    ignoreerr)
+      ;;
+    interactive)
+      my_os_lib_exc_int "$@"
+      ;;
+    *)
+      my_os_lib_exc "$@"
+      ;;
+  esac
+}
+function my_os_lib_menu_snippet {
+  case $1 in
+    ping)
+      my_os_lib_exc_ping
+      ;;
+  esac
 }
 
 my_os_lib_commit() {
@@ -124,26 +201,26 @@ function my_os_lib_setup_repo_paths {
   # DESKTOP_FILES_PATH=/mnt/data/Desktop
   DESKTOP_BACKUPS_PATH=$DESKTOP_FILES_PATH/Software-backups
 
-  MY_OS_PATH_SCRIPTS=$MY_OS_PATH_REPO/scripts
+  MY_OS_PATH_BASE_SCRIPTS=$MY_OS_PATH_REPO/scripts
   # ENVS_PATH=$MY_OS_PATH_REPO/scripts/environments
   MY_OS_PATH_ADDITIONAL_SCRIPTS=$MY_OS_PATH_REPO/scripts/additional-scripts
   ENVS_PATH=$MY_OS_PATH_ADDITIONAL_SCRIPTS/environments
   SYMLINK_DIRS_PATH=$MY_OS_PATH_REPO/symlink-dirs
   DOTFILES_PATH=$MY_OS_PATH_REPO/dotfiles
   TEMPFILES_PATH=$MY_OS_PATH_REPO/tempfiles
-  SOFT_LISTS_DIR=$MY_OS_PATH_SCRIPTS/software-lists
+  SOFT_LISTS_DIR=$MY_OS_PATH_BASE_SCRIPTS/software-lists
 
   HELP_FILE=$TEMPFILES_PATH/help-file.txt
   WHAT_TO_STOW_FILE=$TEMPFILES_PATH/what-to-stow.txt
 
-  ARCH_FROM_SCRATCH_SCRIPT=$MY_OS_PATH_SCRIPTS/01-arch-from-scratch.sh
-  AFTER_CHROOT_SCRIPT=$MY_OS_PATH_SCRIPTS/02-after-chroot.sh
-  SOFTWARE_SCRIPT=$MY_OS_PATH_SCRIPTS/04-software.sh
-  CONFIG_SCRIPT=$MY_OS_PATH_SCRIPTS/05-configs.sh
-  SYMLINK_SCRIPT=$MY_OS_PATH_SCRIPTS/06-symlink-dirs.sh
-  ZSH_SCRIPT=$MY_OS_PATH_SCRIPTS/07-zsh.sh
-  NVIM_SCRIPT=$MY_OS_PATH_SCRIPTS/08-nvim.sh
-  MISC_SCRIPT=$MY_OS_PATH_SCRIPTS/09-misc.sh
+  ARCH_FROM_SCRATCH_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/01-arch-from-scratch.sh
+  AFTER_CHROOT_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/02-after-chroot.sh
+  SOFTWARE_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/04-software.sh
+  CONFIG_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/05-configs.sh
+  SYMLINK_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/06-symlink-dirs.sh
+  ZSH_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/07-zsh.sh
+  NVIM_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/08-nvim.sh
+  MISC_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/09-misc.sh
 }
 
 function my_os_lib_output_possible_repo_paths {
@@ -387,13 +464,13 @@ prepare
 while true; do
   echo *
 	# Default scripts
-	script_list="$(find $MY_OS_PATH_SCRIPTS -maxdepth 1 -type f | grep -v 00 | grep -v stow.txt | grep -v 'root-script' | rev | cut -d '/' -f 1 | rev | sort)"
+	script_list="$(find $MY_OS_PATH_BASE_SCRIPTS -maxdepth 1 -type f | grep -v 00 | grep -v stow.txt | grep -v 'root-script' | rev | cut -d '/' -f 1 | rev | sort)"
 	echo "$script_list" | cat -n
 	num_scripts=$(echo "$script_list" | wc -l)
 	ask_value "Which script to run? (1 to $num_scripts). Press Enter to skip to environments list. Press q to quit from program"
 	[[ $VALUE == "q" ]] && msg_warn "Exiting" && exit 0
 	[[ -n $VALUE ]] && {
-	  chosen_script=$MY_OS_PATH_SCRIPTS/$(echo "$script_list" | sed -n ${VALUE}p)
+	  chosen_script=$MY_OS_PATH_BASE_SCRIPTS/$(echo "$script_list" | sed -n ${VALUE}p)
 	  msg_info "Running $chosen_script ..."
 	  exc "source $chosen_script"
 	  [[ $chosen_script == $ARCH_FROM_SCRATCH_SCRIPT ]] && exit
