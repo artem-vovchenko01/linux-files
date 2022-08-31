@@ -3,7 +3,7 @@ function my_os_lib_pkg_check_and_install {
 	[[ ! -z $2 ]] && local pkg="$2" || local pkg="$1"
 	my_os_lib_pkg_verify_cmd_exists $cmd || {
 	    lib input "$cmd not found. Install $pkg to provide it?" Y
-	    [[ $? -eq 0 ]] && my_os_lib_pkg_install_pkg "$pkg"
+	    lib check-success && my_os_lib_pkg_install_pkg "$pkg"
 	}
 }
 

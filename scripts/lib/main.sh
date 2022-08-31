@@ -43,111 +43,14 @@ function my_os_lib_exit_cleanup {
 	rm *.tmp 2> /dev/null
 }
 
-
-
-
-function my_os_lib_root_mirror {
-    reflector --protocol https --latest 5 --country Ukraine --sort rate --save /etc/pacman.d/mirrorlist
-}
-
-function my_os_lib_sudo_mirror {
-    sudo reflector --protocol https --latest 5 --country Ukraine --sort rate --save /etc/pacman.d/mirrorlist
-}
-
 function my_os_lib_check_interactive {
     [ $1 = "-i" ] && INTERACTIVE=1
     [ -z $INTERACTIVE ] && lib log "Running script in non-interactive mode. Pass -i flag for interactive execution."
 }
 
 
-function my_os_lib_color_echo {
-	echo -e "${2}>>> ${1}${MY_OS_COLOR_NONE}"
-}
 
 
-function my_os_lib_msg_err {
-	color_echo "$1" $MY_OS_COLOR_ERR
-}
-
-function my_os_lib_msg_info {
-	color_echo "$1" $MY_OS_COLOR_INFO
-}
-
-function my_os_lib_msg_cmd {
-	color_echo "$1" $MY_OS_COLOR_CMD
-}
-
-function my_os_lib_msg_warn {
-	color_echo "$1" $MY_OS_COLOR_WARN
-}
-
-function my_os_lib_ask_value {
-	msg_warn "$1"
-	echo -ne "${MY_OS_COLOR_WARN}>>> "
-	read VALUE
-	echo -ne "${MY_OS_COLOR_NONE}"
-}
-
-function my_os_lib_ask {
-	# params
-	# $1 - question
-	# $2 - default value
-	# $3 - positive action (optional)
-	# $4 - alternative action (optional)
-	# Returns 0 if user chose Yes and 1 if chose No
-	if [[ -z $2 ]]; then
-		local DEFAULT_VAL='N'
-	else
-		local DEFAULT_VAL=$2
-	fi
-	local KEY=$DEFAULT_VAL
-	local RET=0
-	msg_info "$1"
-	echo -ne "${MY_OS_COLOR_WARN}>>> Your choice: "
-	if [[ $DEFAULT_VAL == 'Y' || $DEFAULT_VAL == 'y' ]]; then
-		echo -e "[Y/n]${NC}"
-	elif [[ $DEFAULT_VAL == 'N' || $DEFAULT_VAL == 'n' ]]; then
-		echo -e "[N/y]${NC}"
-	else 
-		msg_err "Internal script error" && exit 1
-	fi
-
-	local key
-	while true; do
-		[[ -z $key ]] && {
-			echo -ne "${MY_OS_COLOR_WARN}>>> "
-			read key
-			echo -ne "${NC}"
-		}
-		if [[ $key == 'Y' || $key == 'y' ]]; then
-			[[ -z "$3" ]] || exc "$3"
-			break
-		elif [[ $key == 'N' || $key == 'n' ]]; then
-			[[ -z "$4" ]] || exc "$4"
-			RET=1
-			break
-		elif [[ -z $key ]]; then
-			key=$KEY
-		else 
-			msg_warn "Make a valid choice: [Y y N n]"
-			key=""
-		fi
-	done
-	return $RET
-}
-
-
-function my_os_lib_help {
-	echo "$1" >> .help.txt
-}
-
-function my_os_lib_show_help {
-	if [[ -f $MY_OS_PATH_HELP_FILE ]]; then
-		cat $MY_OS_PATH_HELP_FILE
-	else
-		lib log warn "No help available for the moment."
-	fi
-}
 
 
 ##################################################

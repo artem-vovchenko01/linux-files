@@ -93,9 +93,6 @@ function my_os_lib_menu_pkg {
     install)
       my_os_lib_pkg_install_pkg
       ;;
-    remove)
-      # my_os_lib_verify_pkg_installed
-      ;;
     verify-cmd)
       my_os_lib_pkg_verify_cmd_exists
       ;;
@@ -128,6 +125,9 @@ function my_os_lib_menu_log {
       ;;
     cmd)
       my_os_lib_log_cmd "$@"
+      ;;
+    banner)
+      my_os_lib_log_banner "$@"
       ;;
     *)
       my_os_lib_log_info "$@"

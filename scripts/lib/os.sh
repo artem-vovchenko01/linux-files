@@ -19,3 +19,11 @@ function my_os_lib_menu_os_arch {
       ;;
   esac
 }
+
+function my_os_lib_root_mirror {
+    reflector --protocol https --latest 5 --country Ukraine --sort rate --save /etc/pacman.d/mirrorlist
+}
+
+function my_os_lib_sudo_mirror {
+    sudo reflector --protocol https --latest 5 --country Ukraine --sort rate --save /etc/pacman.d/mirrorlist
+}
