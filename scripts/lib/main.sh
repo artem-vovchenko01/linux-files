@@ -73,9 +73,6 @@ function my_os_lib_setup_repo_paths {
   MISC_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/09-misc.sh
 }
 
-function my_os_lib_exc_ping {
-    lib run "ping archlinux.org -c 3"
-}
 
 function my_os_lib_root_mirror {
     reflector --protocol https --latest 5 --country Ukraine --sort rate --save /etc/pacman.d/mirrorlist
@@ -90,11 +87,6 @@ function my_os_lib_check_interactive {
     [ -z $INTERACTIVE ] && lib log "Running script in non-interactive mode. Pass -i flag for interactive execution."
 }
 
-function my_os_lib_banner {
-	lib log "############################################################"
-	lib log "# $1"
-	lib log "############################################################"
-}
 
 function my_os_lib_color_echo {
 	echo -e "${2}>>> ${1}${MY_OS_COLOR_NONE}"
@@ -172,32 +164,6 @@ function my_os_lib_ask {
 	return $RET
 }
 
-function my_os_lib_exc_int {
-    # $1 - command
-    # $2 - if nonzero, act non-interactively when $INTERACTIVE not set
-    if [[ -z $2 ]]; then
-        ask "${MY_OS_COLOR_INFO}Run ${MY_OS_COLOR_WARN}$1 ${MY_OS_COLOR_INFO}?${MY_OS_COLOR_NONE}" Y
-        [[ $? -eq 0 ]] && exc "$1"
-    else
-        exc "$1"
-    fi
-}
-
-function my_os_lib_exc {
-	msg_cmd "$1"
-	eval "$1"
-	local ERR=$?
-	[[ $ERR -eq 0 ]] || { msg_err "Command \"$1\" failed. Code: $ERR" && ask "Drop to terminal?" Y && msg_warn "Dropping to terminal" && exc_usr_with_help; }
-    return $ERR
-}
-
-function exc_ignoreerr {
-	msg_cmd "$1"
-	eval "$1"
-	local ERR=$?
-	[[ $ERR -eq 0 ]] || msg_err "Command \"$1\" failed. Code: $ERR. Ignoring"
-	return $ERR
-}
 
 function my_os_lib_help {
 	echo "$1" >> .help.txt

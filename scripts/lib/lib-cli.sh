@@ -35,16 +35,12 @@ function my_os_lib_menu_os {
     arch)
       my_os_lib_menu_os_arch
       ;;
-  esac
-}
-
-function my_os_lib_menu_os_arch {
-  case $1 in
-    mirrors)
-      my_os_lib_os_arch_sudo_mirror
+    is)
+      my_os_lib_os_is_menu
       ;;
   esac
 }
+
 
 function my_os_lib_menu_input {
   case $1 in

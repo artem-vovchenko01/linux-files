@@ -8,3 +8,8 @@ function my_os_lib_input_yes_or_no {
   done
 }
 
+function my_os_lib_banner {
+	lib log "############################################################"
+	lib log "# $1"
+	lib log "############################################################"
+}
