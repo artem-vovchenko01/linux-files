@@ -8,6 +8,16 @@ function my_os_lib_input_yes_or_no {
   done
 }
 
+function my_os_lib_input_choice {
+  select choice in "$@"; do
+    return $REPLY
+  done
+}
+
+function my_os_lib_input_is_chosen {
+  [[ $REPLY -eq $1 ]] && return 0 || return 1
+}
+
 function my_os_lib_banner {
 	lib log "############################################################"
 	lib log "# $1"

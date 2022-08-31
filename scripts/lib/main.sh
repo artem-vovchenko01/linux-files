@@ -173,25 +173,10 @@ function my_os_lib_show_help {
 	if [[ -f $HELP_FILE ]]; then
 		cat $HELP_FILE
 	else
-		msg_warn "No help available for the moment."
+		lib log warn "No help available for the moment."
 	fi
 }
 
-function exc_usr_with_help {
-	msg_warn "You're in manual command sequence entering mode. Here's help:"
-	show_help
-	while true; do
-		echo -ne "${MY_OS_COLOR_INFO}>>> "
-		read cmd
-		echo -ne "${NC}"
-		exc "$cmd"
-		ask "Show help?" N "show_help"
-		ask "Want to enter some more commands?" Y
-		[[ $? -eq 1 ]] && break
-	done
-
-	[[ -f $HELP_FILE ]] && rm $HELP_FILE
-}
 
 ##################################################
 # ENTRY POINT

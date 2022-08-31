@@ -30,6 +30,12 @@ function lib {
     settings)
       my_os_lib_settings_menu "$@"
       ;;
+    check-success)
+      [[ $? - eq 0 ]] && return 0 || return 1
+      ;;
+    *)
+      lib log "lib command $1 not found!"
+      ;;
   esac
 }
 
@@ -69,6 +75,12 @@ function my_os_lib_menu_input {
       ;;
     value)
       my_os_lib_input_ask_value "$@"
+      ;;
+    choice)
+      my_os_lib_input_choice "$@"
+      ;;
+    is-chosen)
+      my_os_lib_input_is_chosen "$@"
       ;;
     *)
       my_os_lib_input_yes_or_no "$@"
