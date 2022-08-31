@@ -37,16 +37,43 @@ my_os_lib_yes_or_no() {
   done
 }
 
+function lib {
+  case $1 in
+    git)
+      my_os_lib_menu_git "$@"
+      ;;
+    log)
+      my_os_lib_menu_git "$@"
+      ;;
+    run)
+      my_os_lib_menu_git "$@"
+      ;;
+    dir)
+      my_os_lib_menu_git "$@"
+      ;;
+    script-picker)
+      my_os_lib_menu_git "$@"
+      ;;
+    snippet)
+      my_os_lib_menu_git "$@"
+      ;;
+  esac
+}
+
+function my_os_lib_menu_git {
+
+}
+
 my_os_lib_commit() {
-  log "git status"
+  lib log "git status"
   git status
   if ! yes-or-no "Are you satisfied with the status?"; then
     exit 1
   fi
 
-  log "git add"
+  lib log "git add"
   git add .
-  log "git commit"
+  lib log "git commit"
   git commit -m "Commit at $(date)"
 }
 
