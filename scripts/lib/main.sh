@@ -37,41 +37,13 @@ function my_os_lib_prepare {
 
 function my_os_lib_exit_cleanup {
 	lib log "Script finished. Cleaning up ..."
-	lib dir $SOFT_LISTS_DIR
-	rm $HELP_FILE 2> /dev/null
-	rm $WHAT_TO_STOW_FILE 2> /dev/null
+	lib dir $MY_OS_PATH_SOFT_LISTS_DIR
+	rm $MY_OS_PATH_HELP_FILE 2> /dev/null
+	rm $MY_OS_PATH_WHAT_TO_STOW_FILE 2> /dev/null
 	rm *.tmp 2> /dev/null
 }
 
-function my_os_lib_verify_cmd_exists {
-  command -v $1 > /dev/null
-}
 
-function my_os_lib_setup_repo_paths {
-  # DESKTOP_FILES_PATH=/mnt/data/Desktop
-  DESKTOP_BACKUPS_PATH=$DESKTOP_FILES_PATH/Software-backups
-
-  MY_OS_PATH_BASE_SCRIPTS=$MY_OS_PATH_REPO/scripts
-  # ENVS_PATH=$MY_OS_PATH_REPO/scripts/environments
-  MY_OS_PATH_ADDITIONAL_SCRIPTS=$MY_OS_PATH_REPO/scripts/additional-scripts
-  ENVS_PATH=$MY_OS_PATH_ADDITIONAL_SCRIPTS/environments
-  SYMLINK_DIRS_PATH=$MY_OS_PATH_REPO/symlink-dirs
-  DOTFILES_PATH=$MY_OS_PATH_REPO/dotfiles
-  TEMPFILES_PATH=$MY_OS_PATH_REPO/tempfiles
-  SOFT_LISTS_DIR=$MY_OS_PATH_BASE_SCRIPTS/software-lists
-
-  HELP_FILE=$TEMPFILES_PATH/help-file.txt
-  WHAT_TO_STOW_FILE=$TEMPFILES_PATH/what-to-stow.txt
-
-  ARCH_FROM_SCRATCH_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/01-arch-from-scratch.sh
-  AFTER_CHROOT_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/02-after-chroot.sh
-  SOFTWARE_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/04-software.sh
-  CONFIG_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/05-configs.sh
-  SYMLINK_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/06-symlink-dirs.sh
-  ZSH_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/07-zsh.sh
-  NVIM_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/08-nvim.sh
-  MISC_SCRIPT=$MY_OS_PATH_BASE_SCRIPTS/09-misc.sh
-}
 
 
 function my_os_lib_root_mirror {
@@ -170,8 +142,8 @@ function my_os_lib_help {
 }
 
 function my_os_lib_show_help {
-	if [[ -f $HELP_FILE ]]; then
-		cat $HELP_FILE
+	if [[ -f $MY_OS_PATH_HELP_FILE ]]; then
+		cat $MY_OS_PATH_HELP_FILE
 	else
 		lib log warn "No help available for the moment."
 	fi
@@ -215,12 +187,12 @@ while true; do
   msg_info "Executing chosen script ($script_path) ..."
   source $script_path
 
-	# exc "ls -l $ENVS_PATH | sed '1d' | cat -n"
-	# num_env=$(ls $ENVS_PATH | wc -l)
+	# exc "ls -l $MY_OS_PATH_ENVS | sed '1d' | cat -n"
+	# num_env=$(ls $MY_OS_PATH_ENVS | wc -l)
 	# ask_value "Which environment to setup? (1 to $num_env) Press Enter to skip. Press q to quit from program"
 	# [[ $VALUE == "q" ]] && msg_warn "Exiting" && exit 0
 	# [[ -n $VALUE ]] && {
-	#   exc "source $ENVS_PATH/$(ls $ENVS_PATH | sed -n ${VALUE}p)"
+	#   exc "source $MY_OS_PATH_ENVS/$(ls $MY_OS_PATH_ENVS | sed -n ${VALUE}p)"
 	#   continue
 	# }
 done

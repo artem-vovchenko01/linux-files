@@ -7,6 +7,10 @@ function my_os_lib_pkg_check_and_install {
 	}
 }
 
+function my_os_lib_pkg_verify_cmd_exists {
+  command -v $1 > /dev/null
+}
+
 function my_os_lib_pkg_verify_pkg_exists {
   local pkg=$1
   lib os is arch && my_os_lib_pkg_verify_cmd_exists paru && paru -Si $pkg > /dev/null 2>&1 && return 0
