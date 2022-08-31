@@ -1,7 +1,7 @@
 function my_os_lib_run_int {
     # $1 - command
     # $2 - if nonzero, act non-interactively when $INTERACTIVE not set
-    if [[ -z $2 ]]; then
+    if [[  ]]; then
         ask "${MY_OS_COLOR_INFO}Run ${MY_OS_COLOR_WARN}$1 ${MY_OS_COLOR_INFO}?${MY_OS_COLOR_NONE}" Y
         [[ $? -eq 0 ]] && exc "$1"
     else

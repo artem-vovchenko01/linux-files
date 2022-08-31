@@ -27,6 +27,26 @@ function lib {
     os)
       my_os_lib_menu_os "$@"
       ;;
+    settings)
+      my_os_lib_settings_menu "$@"
+      ;;
+  esac
+}
+
+function my_os_lib_menu_settings {
+  case $1 in
+    is-on)
+      my_os_lib_settings_set_on "$@"
+      ;;
+    set-on)
+      my_os_lib_settings_set_on "$@"
+      ;;
+    set-off)
+      my_os_lib_settings_set_off "$@"
+      ;;
+    default)
+      my_os_lib_settings_default
+      ;;
   esac
 }
 
