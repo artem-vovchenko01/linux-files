@@ -1,5 +1,5 @@
 function my_os_lib_prepare {
-  trap "exit_cleanup" 0
+  trap "my_os_lib_exit_cleanup" 0
 
   mkdir -p $MY_OS_PATH_REPO/tempfiles
   mkdir -p $MY_OS_PATH_SYSTEM_SCRIPTS
