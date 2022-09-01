@@ -46,9 +46,9 @@ function my_os_lib_work_on_soft_list {
     lib log "Installing selected software ($soft)"
     for pkg in $soft; do
       if [[ -z $one_by_one ]]; then
-        lib pkg install-noconfirm
+        lib pkg install-noconfirm $pkg
       else
-        lib pkg install-confirm
+        lib pkg install-confirm $pkg
       fi
     done
 
@@ -90,10 +90,11 @@ lib os is arch && {
 
 # Install regular packages
 while true; do
+  lib log warn "Choose the software list you want to work on:"
   lib input choice $(ls $MY_OS_PATH_SOFT_LISTS_DIR | grep -v flatpak) "Finish"
   soft_list_file="$(lib input get-choice)"
   [[ $soft_list_file == "Finish" ]] && break
-  my_os_lib_work_on_soft_list $soft_list_file
+  my_os_lib_work_on_soft_list $MY_OS_PATH_SOFT_LISTS_DIR/$soft_list_file
 done
 
 # Install flatpaks
@@ -101,10 +102,11 @@ lib pkg verify-cmd flatpak || lib input "Flatpak not found. Install it?" && lib 
 lib pkg verify-cmd flatpak && lib input "Install some flatpaks?" {
   lib input "Try adding flathub repo?" && lib run "sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo"
   while true; do
+    lib log warn "Choose the software list you want to work on:"
     lib input choice $(ls $MY_OS_PATH_SOFT_LISTS_DIR/flatpak) "Finish"
     soft_list_file="$(lib input get-choice)"
     [[ $soft_list_file == "Finish" ]] && break
-    my_os_lib_work_on_flatpak_list $soft_list_file
+    my_os_lib_work_on_flatpak_list $MY_OS_PATH_SOFT_LISTS_DIR/$soft_list_file
   done
 }
 

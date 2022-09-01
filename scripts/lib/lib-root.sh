@@ -40,12 +40,14 @@ function my_os_lib_script_picker {
 }
 
 source $MY_OS_PATH_LIB/env.sh
+source $MY_OS_PATH_LIB/settings.sh
 source $MY_OS_PATH_LIB/lib-cli.sh
 source $MY_OS_PATH_LIB/log.sh
 source $MY_OS_PATH_LIB/os.sh
 source $MY_OS_PATH_LIB/dir.sh
 source $MY_OS_PATH_LIB/git.sh
 source $MY_OS_PATH_LIB/pkg.sh
+source $MY_OS_PATH_LIB/snippet.sh
 source $MY_OS_PATH_LIB/run.sh
 source $MY_OS_PATH_LIB/help.sh
 source $MY_OS_PATH_LIB/input.sh

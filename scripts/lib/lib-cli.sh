@@ -30,7 +30,7 @@ function lib {
       my_os_lib_menu_os "$@"
       ;;
     settings)
-      my_os_lib_settings_menu "$@"
+      my_os_lib_menu_settings "$@"
       ;;
     check-success)
       [[ $? -eq 0 ]] && return 0 || return 1
@@ -68,10 +68,10 @@ function my_os_lib_menu_os {
   shift 1
   case $arg_1 in
     arch)
-      my_os_lib_menu_os_arch
+      my_os_lib_menu_os_arch "$@"
       ;;
     is)
-      my_os_lib_os_menu_os_is
+      my_os_lib_os_menu_os_is "$@"
       ;;
   esac
 }
@@ -96,7 +96,7 @@ function my_os_lib_menu_input {
       my_os_lib_input_get_choice "$@"
       ;;
     *)
-      my_os_lib_input_yes_or_no "$@"
+      my_os_lib_input_yes_or_no "$arg_1" "$@"
       ;;
   esac
 }
@@ -134,7 +134,7 @@ function my_os_lib_menu_git {
       my_os_lib_git_commit "$@"
       ;;
     check-updates)
-      my_os_lib_git_check_updates
+      my_os_lib_git_check_updates "$@"
       ;;
   esac
 }
@@ -203,7 +203,7 @@ function my_os_lib_menu_run {
       my_os_lib_run_int "$@"
       ;;
     *)
-      my_os_lib_run_default "$@"
+      my_os_lib_run_default "$arg_1" "$@"
       ;;
   esac
 }

@@ -15,7 +15,7 @@ function my_os_lib_log_warn {
 }
 
 function my_os_lib_log_color_echo {
-	echo -e "${2}>>> ${1}${MY_OS_COLOR_NONE}"
+  echo -e "${2}$(date +%H:%M:%S) > ${1}${MY_OS_COLOR_NONE}"
 }
 
 function my_os_lib_log_banner {
