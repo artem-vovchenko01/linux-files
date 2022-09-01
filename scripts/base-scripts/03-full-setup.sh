@@ -12,27 +12,26 @@ lib log banner "Starting user setup script (full setup)"
 
 lib log "Checking dependencies ..."
 
-lib pkg install nvim neovim
+lib pkg install neovim
 
 ##############################
 # NETOWRK CONFIGURATION
 ##############################
 
-lib run interactive "nmtui"
+# lib run interactive "nmtui"
 lib snippet ping
 
 ##############################
 # INSTALLING REQUIRED SOFTWARE
 ##############################
 
-
 lib os is arch && {
   lib input "Update repositories?" && lib run "sudo pacman -Sy"
-  exc_int "install_pkg base-devel"
+  lib pkg install base-devel
 }
 
 lib os is arch && {
-  lib input "Clone powerlevel10k to home directory?" && lib run "git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ~/powerlevel10k"
+  # lib input "Clone powerlevel10k to home directory?" && lib run "git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ~/powerlevel10k"
 }
 
 lib os is debian && {

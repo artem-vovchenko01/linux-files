@@ -1,7 +1,7 @@
 LINK_ROOT=$SYMLINK_DIRS_PATH
 CLOSE_PROGRAMS="firefox, librewolf"
 
-banner "Running symlink deployment script (mainly, for browsers)"
+lib log banner "Running symlink deployment script (mainly, for browsers)"
 
 ##############################
 # FUNCTIONS

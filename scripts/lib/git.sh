@@ -11,6 +11,22 @@ function my_os_lib_git_commit {
   git commit -m "Commit at $(date)"
 }
 
+function my_os_lib_git_get_url {
+  case $1 in
+    browser-profiles)
+      ;;
+    vimwiki)
+      ;;
+    linux-files)
+      ;;
+  esac
+}
+
+function my_os_lib_git_select {
+  url=$(my_os_lib_git_get_url $1)
+  [[ -e $MY_OS_PATH_GIT/"$1" ]] || 
+  lib dir }
+
 function my_os_lib_git_check_updates {
 lib log "Checking if there are update is $(pwd) repo"
   lines=$(git status -s | wc -l)

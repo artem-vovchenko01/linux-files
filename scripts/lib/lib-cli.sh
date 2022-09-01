@@ -130,6 +130,9 @@ function my_os_lib_menu_git {
   arg_1="$1"
   shift 1
   case $arg_1 in
+    select)
+      my_os_lib_git_select "$@"
+      ;;
     commit)
       my_os_lib_git_commit "$@"
       ;;
@@ -181,7 +184,7 @@ function my_os_lib_menu_dir {
       cd $MY_OS_PATH_ADDITIONAL_SCRIPTS
       ;;
     git)
-      cd $MY_OS_GIT
+      cd $MY_OS_PATH_GIT
       ;;
     cd)
       cd "$@"
@@ -190,6 +193,7 @@ function my_os_lib_menu_dir {
       cd "$@"
       ;;
   esac
+  lib log "lib dir: now in $PWD directory"
 }
 
 function my_os_lib_menu_run {
