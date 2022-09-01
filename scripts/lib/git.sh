@@ -1,9 +1,3 @@
-MY_OS_GIT_ARTIFACT_NAME=archive.zip
-MY_OS_GIT_PATH_FIREFOX_PROFILES="~/.mozilla/firefox"
-MY_OS_GIT_PATH_SOFTWARE_BACKUPS=$MY_OS_PATH_BASE
-MY_OS_GIT_ARTIFACT_DIR_BROWSER_PROFILES=3fl1hnwj.default-release
-MY_OS_GIT_ARTIFACT_DIR_SOFTWARE_BACKUPS=software-backups
-
 function my_os_lib_git_commit {
   lib log "git status"
   git status
@@ -67,12 +61,7 @@ function my_os_lib_git_artifact_unpack {
   lib run "unzip $MY_OS_GIT_ARTIFACT_NAME -d $artifact_destination"
 }
 
-function my_os_lib_git_archive_artifact {
-  lib run "mkdir -p ARCH"
-  lib run "zip -re $1.zip "
-}
-
-function my_os_lib_git_force_push_artifact {
+function my_os_lib_git_update_artifact {
   REMOTE_URL=$(git remote show origin -n | tr ' ' '\n' | grep https | head -n 1)
   lib run "rm -rf .git"
   lib run "rm -f $MY_OS_GIT_ARTIFACT_NAME"
@@ -80,15 +69,17 @@ function my_os_lib_git_force_push_artifact {
   lib run "git remote add origin $REMOTE_URL"
   lib run "cp -r $(my_os_lib_git_get_artifact_destination)/$(my_os_lib_git_get_artifact_dir_name) ."
   lib run "zip -re $MY_OS_GIT_ARTIFACT_NAME $(my_os_lib_git_get_artifact_dir_name)"
+}
 
+function my_os_lib_git_force_push_artifact {
   lib run "git push -f --set-upstream origin main"
 }
 
 function my_os_lib_git_select {
   url=$(my_os_lib_git_get_url $1)
-  lib dir $MY_OS_PATH_GIT
-  [[ -e $MY_OS_PATH_GIT/"$1" ]] || lib run "git clone $url"
-  lib dir "$1"
+  lib dir cd $MY_OS_PATH_GIT
+  [[ -e $MY_OS_PATH_GIT/"$1" ]] || { lib log warn "The repository $1 is not present. Cloning it ..."; lib run "git clone $url"; }
+  lib dir cd "$1"
   MY_OS_GIT_SELECTED_REPO="$1"
   lib log "lib git: repository $MY_OS_GIT_SELECTED_REPO is selected"
 }
@@ -109,58 +100,4 @@ lib log "Checking if there are update is $(pwd) repo"
       return 1;
   fi
 }
-
-
-commit() {
-  log "git status"
-  git status
-  if ! yes-or-no "Are you satisfied with the status?"; then
-    exit 1
-  fi
-
-  log "git add"
-  git add .
-  log "git commit"
-  git commit -m "Commit at $(date)"
-}
-
-check-updates() {
-log "Checking if there are update is $(pwd) repo"
-  lines=$(git status -s | wc -l)
-  if [[ $lines -gt 0 ]]; then
-      log "There are some updates in this repo!!! Comitting them ..."
-      commit
-      return 0;
-    else
-      log "There are no updates in this repo"
-      return 1;
-  fi
-}
-
-company() {
-  archive_name=$(date | tr ' ' '-').zip
-  cd ./COMPANY
-
-  if check-updates; then
-      log "Zipping COMPANY... "
-      cd ..
-      zip -re ./ARCHIVES/$archive_name COMPANY/
-      cd COMPANY/
-    else
-      log "COMPANY have no updates, so no zip archive is created. "
-  fi
-
-  cd ..
-}
-
-# WORKING ON COMPANY NOTES
-
-company
-
-# COMITTING GENERAL NOTES
-
-if check-updates; then
-  log "git push"
-  git push
-fi
 

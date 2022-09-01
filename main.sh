@@ -17,6 +17,9 @@ source $MY_OS_PATH_LIB/lib-root.sh
 # ENTRY POINT
 ##################################################
 
+lib settings default
+lib input "Run script non-interactively?" && lib settings set-off interactive
+
 while true; do
   lib script-picker
   lib input "Finish the program?" && break

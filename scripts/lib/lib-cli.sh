@@ -18,7 +18,7 @@ function lib {
       my_os_lib_script_picker "$@"
       ;;
     snippet)
-      my_os_lib_menu_snippets "$@"
+      my_os_lib_menu_snippet "$@"
       ;;
     pkg)
       my_os_lib_menu_pkg "$@"
@@ -83,6 +83,9 @@ function my_os_lib_menu_input {
     yes-no)
       my_os_lib_input_yes_or_no "$@"
       ;;
+    no-yes)
+      my_os_lib_input_no_or_yes "$@"
+      ;;
     value)
       my_os_lib_input_ask_value "$@"
       ;;
@@ -138,6 +141,18 @@ function my_os_lib_menu_git {
       ;;
     check-updates)
       my_os_lib_git_check_updates "$@"
+      ;;
+    get-selected-repo)
+      my_os_lib_git_get_selected_repo "$@"
+      ;;
+    unpack-artifact)
+      my_os_lib_git_artifact_unpack "$@"
+      ;;
+    update-artifact)
+      my_os_lib_git_update_artifact "$@"
+      ;;
+    force-push-artifact)
+      my_os_lib_git_force_push_artifact "$@"
       ;;
   esac
 }

@@ -1,8 +1,10 @@
 function my_os_lib_prepare {
+  lib log "Making some preparations ..."
   trap "my_os_lib_exit_cleanup" 0
 
-  mkdir -p $MY_OS_PATH_REPO/tempfiles
-  mkdir -p $MY_OS_PATH_SYSTEM_SCRIPTS
+  lib run "mkdir -p $MY_OS_PATH_REPO/tempfiles"
+  lib run "mkdir -p $MY_OS_PATH_SYSTEM_SCRIPTS"
+  lib run "mkdir -p $MY_OS_PATH_GIT"
 
   lib log "All paths updated accordingly to repo path"
 

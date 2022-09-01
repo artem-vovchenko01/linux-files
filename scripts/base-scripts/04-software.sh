@@ -30,7 +30,7 @@ function my_os_lib_work_on_soft_list {
     local one_by_one=""
     lib run "cp $list_file $list_file.tmp"
     lib log "Working on software list $list_file.tmp ..."
-    lib input "Install them with confirmation for each package?" && one_by_one=1
+    lib input no-yes "Install them with confirmation for each package?" && one_by_one=1
     lib log "Comment lines which you don't need ..."
     lib run "nvim $list_file.tmp"
 
@@ -52,7 +52,7 @@ function my_os_lib_work_on_soft_list {
       fi
     done
 
-    lib input "Save temp software list? This will override default list!" && lib run "cp -i $list_file.tmp $list_file"
+    lib input no-yes "Save temp software list? This will override default list!" && lib run "cp -i $list_file.tmp $list_file"
     lib run "rm $list_file.tmp"
 }
 
@@ -70,7 +70,7 @@ function my_os_lib_work_on_flatpak_list {
       lib run "sudo flatpak install $pkg"
     done
 
-    lib input "Save temp software list? This will override default list!" && lib run "cp -i $list_file.tmp $list_file"
+    lib input no-yes "Save temp software list? This will override default list!" && lib run "cp -i $list_file.tmp $list_file"
     lib run "rm $list_file.tmp"
 }
 
@@ -99,7 +99,7 @@ done
 
 # Install flatpaks
 lib pkg verify-cmd flatpak || lib input "Flatpak not found. Install it?" && lib pkg install flatpak
-lib pkg verify-cmd flatpak && lib input "Install some flatpaks?" {
+lib pkg verify-cmd flatpak && lib input "Install some flatpaks?" && {
   lib input "Try adding flathub repo?" && lib run "sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo"
   while true; do
     lib log warn "Choose the software list you want to work on:"
@@ -111,7 +111,9 @@ lib pkg verify-cmd flatpak && lib input "Install some flatpaks?" {
 }
 
 # Clear caches
-lib pkg verify-cmd paru && lib run "paru -Scc"
+lib pkg verify-cmd paru && {
+  lib settings is-on interactive && lib run "paru -Scc" || lib run "paru -Scc --noconfirm"
+}
 
 # Docker group
 lib input "Add $USER to docker group?" && lib run "sudo usermod -aG docker $USER"

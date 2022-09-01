@@ -32,11 +32,12 @@ lib os is arch && {
 
 lib os is arch && {
   # lib input "Clone powerlevel10k to home directory?" && lib run "git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ~/powerlevel10k"
+  echo
 }
 
 lib os is debian && {
-  lib input "Update repositories?" Y && lib run "sudo apt update"
-  lib input "Install build-essential?" Y && lib run "install_pkg build-essential"
+  lib input "Update repositories?" && lib run "sudo apt update"
+  lib input "Install build-essential?" && lib run "install_pkg build-essential"
 }
 
 lib os is fedora && {
@@ -52,9 +53,9 @@ lib os is fedora && {
 	  }
 	}
 
-  lib input "Update repositories?" Y && lib run "sudo dnf update"
-  lib input "Install NetworkManager-tui, neovim and git?" Y && lib run "sudo dnf install -y NetworkManager-tui neovim git"
-  lib input "Install Development Tools and Development Libraries pkg groups?" Y && lib run "sudo dnf groupinstall -y 'Development Tools' 'Development Libraries'"
+  lib input "Update repositories?" && lib run "sudo dnf update"
+  lib input "Install NetworkManager-tui, neovim and git?" && lib run "sudo dnf install -y NetworkManager-tui neovim git"
+  lib input "Install Development Tools and Development Libraries pkg groups?" && lib run "sudo dnf groupinstall -y 'Development Tools' 'Development Libraries'"
   lib input "Enable rpmfusion - free?" && sudo dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
   lib input "Enable rpmfusion - nonfree?" && sudo dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
   lib input "Add AfterMozilla COPR?" && sudo dnf copr enable bgstack15/AfterMozilla
@@ -75,8 +76,17 @@ true
 ##############################
 
 lib run "mkdir -p ~/.config/systemd/user/"
-lib input "Install custom systemd units?" && lib run "cp $REPO_PATH/custom-systemd-units/* ~/.config/systemd/user/"
-lib input "Enable sway battery manager - custom systemd unit?" && lib run "systemctl --user enable --now sway-battery-warn.timer"
+lib input "Install custom systemd units?" && lib run "cp $MY_OS_PATH_REPO/custom-systemd-units/* ~/.config/systemd/user/"
+lib input no-yes "Enable sway battery manager - custom systemd unit?" && lib run "systemctl --user enable --now sway-battery-warn.timer"
+
+##############################
+# WORKING WITH REPOSITORIES
+##############################
+lib git select browser-profiles
+lib git select software-backups
+lib git select vimwiki
+
+exit
 
 ##############################
 # LINKING ZHISTORY
