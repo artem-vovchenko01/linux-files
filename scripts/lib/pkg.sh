@@ -13,7 +13,7 @@ function my_os_lib_pkg_verify_pkg_exists {
   return 1
 }
 
-function my_os_lib_verify_pkg_installed {
+function my_os_lib_pkg_verify_pkg_installed {
 	lib os is arch && pacman -Qi $1 &> /dev/null && return 0
 	lib os is debian && dpkg -l $1 &> /dev/null && return 0
 	lib os is fedora && rpm -qa | grep -q $1 && return 0

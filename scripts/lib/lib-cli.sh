@@ -71,7 +71,7 @@ function my_os_lib_menu_os {
       my_os_lib_menu_os_arch
       ;;
     is)
-      my_os_lib_os_is_menu
+      my_os_lib_os_menu_os_is
       ;;
   esac
 }
@@ -159,7 +159,7 @@ function my_os_lib_menu_log {
       my_os_lib_log_banner "$@"
       ;;
     *)
-      my_os_lib_log_info "$@"
+      my_os_lib_log_info "$arg_1" "$@"
       ;;
   esac
 }

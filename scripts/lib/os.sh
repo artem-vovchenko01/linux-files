@@ -1,4 +1,4 @@
-function my_os_lib_menu_os_is {
+function my_os_lib_os_menu_os_is {
   case $1 in
     arch)
        [[ $MY_OS_SYSTEM == "ARCH" ]] && return 0 || return 1
