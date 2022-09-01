@@ -14,12 +14,28 @@ function my_os_lib_run_default {
 	eval "$1"
 	local ERR=$?
 	[[ $ERR -eq 0 ]] || { 
-      lib log err "Command \"$1\" failed. Code: $ERR" && 
-      lib input "Drop to terminal?" && 
-      lib log warn "Dropping to terminal" && 
-      my_os_lib_run_exc_usr_with_help
+      lib log err "Command \"$1\" failed. Code: $ERR"
+      my_os_lib_run_if_error_menu "$1"
     }
-    return $ERR
+    return 0
+}
+
+function my_os_lib_run_if_error_menu {
+  while true; do
+      lib settings is-off interactive && lib log warn "Script is running in non-interactive mode. Ignoring the error and continuing" && break
+      lib warn "Select what to do about it:"
+      lib input choice 'Rerun the command "'"$1"'"' "Start new bash session for troubleshooting" "Show help, if available" "Execute arbitrary command" "Ignore the error and continue running the script"
+      lib input is-chosen 1 && {
+        lib log cmd "$1"
+        eval "$1"
+        local ERR=$?
+        [[ $ERR -eq 0 ]] && { lib log 'Now, command "'"$1"'" finished successfully!'; break; } || lib log err "Command \"$1\" failed again. Code: $ERR"
+      }
+      lib input is-chosen 2 && lib run "bash"
+      lib input is-chosen 3 && my_os_lib_show_help
+      lib input is-chosen 4 && my_os_lib_run_exc_one_command
+      lib input is-chosen 5 && break
+    done
 }
 
 function my_os_lib_run_ignoreerr {
@@ -30,19 +46,10 @@ function my_os_lib_run_ignoreerr {
 	return $ERR
 }
 
-function my_os_lib_run_exc_usr_with_help {
-	lib log warn "You're in manual command sequence entering mode. Here's help:"
-	my_os_lib_show_help
-	while true; do
+function my_os_lib_run_exc_one_command {
 		echo -ne "${MY_OS_COLOR_INFO}>>> "
 		read cmd
 		echo -ne "${MY_OS_COLOR_NONE}"
 		my_os_lib_run_default "$cmd"
-		lib input "Show help?" && my_os_lib_show_help
-		lib input "Want to enter some more commands?"
-		lib check-success || break
-	done
-
-	[[ -f $HELP_FILE ]] && rm $HELP_FILE
 }
 
