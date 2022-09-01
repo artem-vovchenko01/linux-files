@@ -23,7 +23,8 @@ function my_os_lib_script_picker {
   lib log "Select script you want to run"
   lib input choice $(ls $MY_OS_PATH_BASE_SCRIPTS) "Choose other script"
 
-  if [[ "$(lib input get-choice)" == "Choose other script" ]]; then
+  script_name="$(lib input get-choice)"
+  if [[ "$script_name" == "Choose other script" ]]; then
     lib log "Select script directory"
     lib input choice $(ls $MY_OS_PATH_ADDITIONAL_SCRIPTS)
     script_dir="$(lib input get-choice)"
