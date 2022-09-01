@@ -6,6 +6,14 @@ function my_os_lib_settings_is_on {
   esac
 }
 
+function my_os_lib_settings_is_off {
+  case $1 in
+  interactive)
+    [[ $MY_OS_SETTINGS_INTERACTIVE -eq 0 ]] && return 0 || return 1
+    ;;
+  esac
+}
+
 function my_os_lib_settings_set_on {
   case $1 in
     interactive)

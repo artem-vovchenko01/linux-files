@@ -46,7 +46,10 @@ function my_os_lib_menu_settings {
   shift 1
   case $arg_1 in
     is-on)
-      my_os_lib_settings_set_on "$@"
+      my_os_lib_settings_is_on "$@"
+      ;;
+    is-off)
+      my_os_lib_settings_is_off "$@"
       ;;
     set-on)
       my_os_lib_settings_set_on "$@"
@@ -103,13 +106,22 @@ function my_os_lib_menu_pkg {
   shift 1
   case $arg_1 in
     install)
-      my_os_lib_pkg_install_pkg
+      my_os_lib_pkg_install $1 DEFAULT
+      ;;
+    install-confirm)
+      my_os_lib_pkg_install $1 N
+      ;;
+    install-noconfirm)
+      my_os_lib_pkg_install $1 Y
       ;;
     verify-cmd)
-      my_os_lib_pkg_verify_cmd_exists
+      my_os_lib_pkg_verify_cmd_exists $1
       ;;
-    verify-pkg)
-      my_os_lib_pkg_verify_pkg_exists
+    verify-pkg-exists)
+      my_os_lib_pkg_verify_pkg_exists $1
+      ;;
+    verify-pkg-installed)
+      my_os_lib_pkg_verify_pkg_installed $1
       ;;
   esac
 }
