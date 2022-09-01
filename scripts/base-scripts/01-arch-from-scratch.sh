@@ -1,67 +1,67 @@
-banner "Starting installation - arch from scratch"
+lib log banner "Starting installation - arch from scratch"
 
 ##############################
 # CONSOLE FONT
 ##############################
 
-exc "setfont ter-132n"
+lib run "setfont ter-132n"
 
 ##############################
 # UEFI TEST
 ##############################
 
-exc_int "efivar-tester"
+lib run interactive "efivar-tester"
 
 ##############################
 # NETWORKING
 ##############################
 
-exc_ping || {
-  msg_warn "In iwctl, run:"
-  msg_warn "station list"
-  msg_warn "station <st> get-networks"
-  msg_warn "station <st> connect <net>"
+lib snippet ping || {
+  lib log warn "In iwctl, run:"
+  lib log warn "station list"
+  lib log warn "station <st> get-networks"
+  lib log warn "station <st> connect <net>"
 
-  exc "iwctl"
-  exc_ping
+  lib run "iwctl"
+  lib snippet ping
 }
 
 ##############################
 # KEYBOARD, TIME
 ##############################
 
-exc "loadkeys ua"
-exc "timedatectl set-ntp true"
+lib run "loadkeys ua"
+lib run "timedatectl set-ntp true"
 
 ##############################
 # PARTITIONING
 ##############################
 
-exc "lsblk"
-ask_value "Choose partition number for swap: "
-exc_int "mkswap /dev/nvme0n1p$VALUE"
-exc_int "swapon /dev/nvme0n1p$VALUE"
+lib run "lsblk"
+lib input value "Choose partition number for swap: "
+lib run interactive "mkswap /dev/nvme0n1p$VALUE"
+lib run interactive "swapon /dev/nvme0n1p$VALUE"
 
-exc "lsblk"
-ask_value "Choose partition number for root (/): "
-exc_int "mkfs.ext4 /dev/nvme0n1p$VALUE"
-exc_int "mount /dev/nvme0n1p$VALUE /mnt"
+lib run "lsblk"
+lib input value "Choose partition number for root (/): "
+lib run interactive "mkfs.ext4 /dev/nvme0n1p$VALUE"
+lib run interactive "mount /dev/nvme0n1p$VALUE /mnt"
 
-exc "mkdir -p /mnt/boot/efi"
+lib run "mkdir -p /mnt/boot/efi"
 
-exc "lsblk"
-ask_value "Choose partition number for boot (/boot): "
-exc_int "mkfs.vfat /dev/nvme0n1p$VALUE"
-exc_int "mount /dev/nvme0n1p$VALUE /mnt/boot/efi"
+lib run "lsblk"
+lib input value "Choose partition number for boot (/boot): "
+lib run interactive "mkfs.vfat /dev/nvme0n1p$VALUE"
+lib run interactive "mount /dev/nvme0n1p$VALUE /mnt/boot/efi"
 
 while true; do
-  exc "lsblk"
-  ask_value "Choose other partition to mount: "
+  lib run "lsblk"
+  lib input value "Choose other partition to mount: "
   P_NUM=$VALUE
-  ask_value "Choose mountpoint name: "
-  exc "mkdir -p /mnt/mnt/$VALUE"
-  exc_int "mount /dev/nvme0n1p$P_NUM /mnt/mnt/$VALUE"
-  ask "Mount another partition?" Y
+  lib input value "Choose mountpoint name: "
+  lib run "mkdir -p /mnt/mnt/$VALUE"
+  lib run interactive "mount /dev/nvme0n1p$P_NUM /mnt/mnt/$VALUE"
+  lib input "Mount another partition?"
   [[ $? -eq 0 ]] || break
 done
 
@@ -69,15 +69,15 @@ done
 # BOOTSTRAPPING
 ##############################
 
-exc "pacman -S reflector"
-exc "root_mirror"
-exc "sed -i '/#ParallelDownloads/s/#.*/ParallelDownloads = 10/' /etc/pacman.conf"
+lib run "pacman -S reflector"
+lib run "root_mirror"
+lib run "sed -i '/#ParallelDownloads/s/#.*/ParallelDownloads = 10/' /etc/pacman.conf"
 
-exc "pacstrap /mnt base linux linux-firmware neovim amd-ucode"
-exc "genfstab -U /mnt >> /mnt/etc/fstab"
+lib run "pacstrap /mnt base linux linux-firmware neovim amd-ucode"
+lib run "genfstab -U /mnt >> /mnt/etc/fstab"
 
-exc "mv ../../linux-files /mnt/"
+lib run "mv ../../linux-files /mnt/"
 
-banner "Do 'cd', then arch-chroot to /mnt"
+lib log banner "Do 'cd', then arch-chroot to /mnt"
 sleep 2
 

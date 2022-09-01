@@ -1,15 +1,15 @@
-banner "Running software installation script"
+lib log banner "Running software installation script"
 
-msg_info "Checking dependencies ..."
+lib log "Checking dependencies ..."
 
-check_and_install nvim neovim
+lib pkg install nvim neovim
 
-msg_info 'Updating repositories...'
+lib log 'Updating repositories...'
 
-ask "Update repositories?" Y && {
-	[[ $SYSTEM == "ARCH" ]] && exc 'sudo pacman -Sy'
-	[[ $SYSTEM == "DEBIAN" ]] && exc 'sudo apt update'
-	[[ $SYSTEM == "FEDORA" ]] && exc 'sudo dnf update'
+lib input "Update repositories?" && {
+	lib os is arch && lib run 'sudo pacman -Sy'
+	lib os is debian && lib run 'sudo apt update'
+	lib os is fedora && lib run 'sudo dnf update'
 }
 
 ##############################
@@ -17,22 +17,22 @@ ask "Update repositories?" Y && {
 ##############################
 
 function paru_install {
-	msg_info 'Paru is not installed. Installing ...'
-	exc 'git clone https://aur.archlinux.org/paru-bin.git'
-	exc 'cd paru-bin'
-	exc 'makepkg -si'
-	exc 'cd ..'
-	exc 'rm -rf paru-bin'
+	lib log 'Paru is not installed. Installing ...'
+	lib run 'git clone https://aur.archlinux.org/paru-bin.git'
+	lib run 'cd paru-bin'
+	lib run 'makepkg -si'
+	lib run 'cd ..'
+	lib run 'rm -rf paru-bin'
 }
 
 ##############################
 # INSTALLING PARU
 ##############################
 
-[[ $SYSTEM == "ARCH" ]] && {
-  msg_info 'Checking if paru is installed'
+lib os is arch && {
+  lib log 'Checking if paru is installed'
   if ! pacman -Q | grep -q paru; then
-    ask 'Do you need paru?' Y 'paru_install'
+    lib input 'Do you need paru?' && paru_install
   fi
 }
 
@@ -44,15 +44,15 @@ function work_on_soft_list {
     local list_file=$1
     local one_by_one=""
     while true; do
-        exc "cp $list_file $list_file.tmp"
-        msg_warn "Working on software list $list_file.tmp ..."
-        ask "Install them with confirmation?" N && one_by_one=1
-        msg_info "Comment lines which you don't need ..."
-        exc "nvim $list_file.tmp"
+        lib run "cp $list_file $list_file.tmp"
+        lib log "Working on software list $list_file.tmp ..."
+        lib input "Install them with confirmation?" && one_by_one=1
+        lib log "Comment lines which you don't need ..."
+        lib run "nvim $list_file.tmp"
 
         local soft=$(cat $list_file.tmp | grep -v '#' | tr '\n' ' ')
 
-        msg_info "Verifying existence of packages in the repo"
+        lib log "Verifying existence of packages in the repo"
         local soft_tmp=$soft
         soft=""
         for pkg in $soft_tmp; do
@@ -62,9 +62,9 @@ function work_on_soft_list {
         msg_info "Installing selected software ($soft)"
         for pkg in $soft; do
           if [[ -z $one_by_one ]]; then
-              exc "install_pkg $pkg" || { ask "Try installing $pkg again?" Y && exc "install_pkg $pkg"; }
+              lib run "install_pkg $pkg" || { ask "Try installing $pkg again?" Y && lib run "install_pkg $pkg"; }
           else
-              exc "install_pkg $pkg 1" || { ask "Try installing $pkg again?" Y && exc "install_pkg $pkg"; }
+              lib run "install_pkg $pkg 1" || { ask "Try installing $pkg again?" Y && lib run "install_pkg $pkg"; }
           fi
         done
 
@@ -75,8 +75,8 @@ function work_on_soft_list {
             RET=1
         fi
         ask "Save temp software list? This will override default list!" N
-        [[ $? -eq 0 ]] && exc "cp -i $list_file.tmp $list_file"
-        exc "rm $list_file.tmp"
+        [[ $? -eq 0 ]] && lib run "cp -i $list_file.tmp $list_file"
+        lib run "rm $list_file.tmp"
         [[ $RET -eq 1 ]] && break
     done
 }
@@ -84,16 +84,16 @@ function work_on_soft_list {
 function work_on_flatpak_list {
     local list_file=$1
     while true; do
-        exc "cp $list_file $list_file.tmp"
+        lib run "cp $list_file $list_file.tmp"
         msg_warn "Working on software list $list_file.tmp ..."
         msg_info "Comment lines which you don't need ..."
-        exc "nvim $list_file.tmp"
+        lib run "nvim $list_file.tmp"
 
         local soft=$(cat $list_file.tmp | grep -v '#' | tr '\n' ' ')
 
         msg_info "Installing selected software ($soft)"
         for pkg in $soft; do
-          exc "sudo flatpak install $pkg"
+          lib run "sudo flatpak install $pkg"
         done
 
         if [[ $? -ne 0 ]]; then
@@ -103,13 +103,13 @@ function work_on_flatpak_list {
             RET=1
         fi
         ask "Save temp software list? This will override default list!" N
-        [[ $? -eq 0 ]] && exc "cp -i $list_file.tmp $list_file"
-        exc "rm $list_file.tmp"
+        [[ $? -eq 0 ]] && lib run "cp -i $list_file.tmp $list_file"
+        lib run "rm $list_file.tmp"
         [[ $RET -eq 1 ]] && break
     done
 }
 
-command -v flatpak && ask "Try adding flathub repo?" Y && exc "sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo"
+command -v flatpak && ask "Try adding flathub repo?" Y && lib run "sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo"
 
 for soft_list_file in $( find $(cd $SOFT_LISTS_DIR; pwd) -type f ); do
     ask "Install packages (with regular pkg manager) from $soft_list_file list?" Y && work_on_soft_list $soft_list_file
@@ -119,8 +119,8 @@ for soft_list_file in $(find $(cd $SOFT_LISTS_DIR/flatpak; pwd) -type f ); do
     ask "Install flatpaks from $soft_list_file list?" Y && work_on_flatpak_list $soft_list_file
 done
 
-verify_cmd_exists paru && exc_int "paru -Scc"
+verify_cmd_exists paru && lib run interactive "paru -Scc"
 
-exc_int "sudo usermod -aG docker $USER"
-verify_cmd_exists pkgfile && exc_int "sudo pkgfile --update"
+lib run interactive "sudo usermod -aG docker $USER"
+verify_cmd_exists pkgfile && lib run interactive "sudo pkgfile --update"
 
