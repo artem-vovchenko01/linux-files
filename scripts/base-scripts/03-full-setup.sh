@@ -117,3 +117,4 @@ lib input "Install software?" && lib run "source $(lib path base-scripts)/04-sof
 lib input "Install symlinks for directories?" && lib run "source $(lib path base-scripts)/06-symlink-dirs.sh"
 lib input "Install dotfiles?" && lib run "source $(lib path base-scripts)/05-configs.sh"
 
+lib input "Install sway?" && lib run "source $(lib path envs)/sway.sh"

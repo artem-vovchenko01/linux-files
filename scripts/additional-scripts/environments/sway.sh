@@ -1,22 +1,15 @@
-#! /usr/bin/env bash
-source ../00-common.sh
+lib log "Setting up sway"
 
-msg_info "Starting installation"
+# exc_int "paru -S ly"
+lib pkg install sddm
+lib pkg install sway
+lib pkg install xdg-desktop-portal-wlr
 
-ask "Make sure you use your personal account!"
-[[ $? -eq 0 ]] || exit 1
+lib run "sudo systemctl enable sddm"
 
-msg_warn "Console greeter - ly"
-exc_int "paru -S ly"
-exc_int "sudo pacman -S sway"
-exc_int "sudo systemctl enable ly"
-exc_int "sudo pacman -S xdg-desktop-portal-wlr"
 # exc_int "mkdir ~/.config/sway"
 # exc_int "cp /etc/sway/config ~/.config/sway/"
 
-source ~/.zprofile
-exc "gsettings set org.gnome.desktop.interface gtk-theme 'Breeze-Dark'"
-exc "gsettings set org.gnome.desktop.interface icon-theme 'breeze-dark'"
-
-banner "Reboot and then run 'sway_graphical' script"
+lib run "gsettings set org.gnome.desktop.interface gtk-theme 'Breeze-Dark'"
+lib run "gsettings set org.gnome.desktop.interface icon-theme 'breeze-dark'"
 

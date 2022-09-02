@@ -1,12 +1,5 @@
-#! /usr/bin/env bash
-source ../00-common.sh
+lib log "Setting up graphical themes for sway"
 
-msg_info "Starting installation"
-
-ask "Make sure you use your personal account!"
-[[ $? -eq 0 ]] || exit 1
-
-source ~/.zprofile
-exc "qt5ct"
-exc "lxappearance"
+lib run "qt5ct"
+lib run "lxappearance"
 
