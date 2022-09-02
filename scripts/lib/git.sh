@@ -78,7 +78,9 @@ function my_os_lib_git_update_artifact {
 }
 
 function my_os_lib_git_force_push_artifact {
-  lib run "git push -f --set-upstream origin main"
+  [[ -e $MY_OS_GIT_ARTIFACT_NAME ]] &&
+  lib run "git push -f --set-upstream origin main" ||
+  lib log err "There is no $MY_OS_GIT_ARTIFACT_NAME found in the repo directory! Won't force push"
 }
 
 function my_os_lib_git_select {

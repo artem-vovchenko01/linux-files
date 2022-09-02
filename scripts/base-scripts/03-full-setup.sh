@@ -83,9 +83,12 @@ lib input no-yes "Enable sway battery manager - custom systemd unit?" && lib run
 # WORKING WITH REPOSITORIES
 ##############################
 lib git select browser-profiles
-# [[ ! -e "$(lib git get-artifact-path)" ]] && lib git unpack-artifact
-# lib git update-artifact
-# lib git force-push-artifact
+lib input "Close Firefox for working with it's profile?" && {
+  lib run "killall firefox"
+  [[ ! -e "$(lib git get-artifact-path)" ]] && lib git unpack-artifact
+  lib git update-artifact
+  lib git force-push-artifact
+}
 
 lib git select software-backups
 [[ ! -e "$(lib git get-artifact-path)" ]] && lib git unpack-artifact
