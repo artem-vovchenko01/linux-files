@@ -1,4 +1,4 @@
-MY_OS_PATH_LINK_ROOT=$MY_OS_PATH_SYMLINK_DIRS
+MY_OS_PATH_LINK_ROOT=$(lib path symlink-dirs)
 
 lib log banner "Running symlink deployment script"
 
@@ -36,8 +36,8 @@ function lib_os_copy_int_wrapper {
 # Removing links if exist
 
 lib input "Remove links which are already present?" && {
-	lib dir symlink-dirs
-	for link in $(find . -type l); do
+	lib dir ~
+	for link in $(find -maxdepth 1 . -type l); do
 		dest_path=$(echo $link | sed 's/^..//' | cut -d / -f 2- | awk -v home=$HOME ' { print home "/" $0 } ')
 		lib run "rm $dest_path"
 	done
@@ -50,7 +50,7 @@ lib input "Proceed to creating links?" && {
   lib dir symlink-dirs
 	for link in $(find . -type l); do
 		dest_path=$(echo $link | sed 's/^..//' | cut -d / -f 2- | sed -E 's/\/?[^/]*$//' | awk -v home=$HOME ' { print home "/" $0 }')
-		lib_os_copy_int_wrapper $MY_OS_LINK_ROOT/$(echo $link | sed 's/^..//') $dest_path
+		lib_os_copy_int_wrapper $MY_OS_PATH_LINK_ROOT/$(echo $link | sed 's/^..//') $dest_path
 	done
   lib dir cd -
 }
