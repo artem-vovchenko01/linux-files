@@ -3,6 +3,9 @@ function my_os_lib_git_get_url {
     browser-profiles)
       echo "https://github.com/artem-vovchenko01/browser-profiles.git"
       ;;
+    browser-profiles-brave)
+      echo "https://github.com/artem-vovchenko01/browser-profiles-brave.git"
+      ;;
     vimwiki)
       echo "https://github.com/artem-vovchenko01/vimwiki.git"
       ;;
@@ -20,6 +23,9 @@ function my_os_lib_git_get_artifact_destination {
     browser-profiles)
       lib path browser-profiles
       ;;
+    browser-profiles-brave)
+      lib path browser-profiles-brave
+      ;;
     software-backups)
       lib path software-backups
       ;;
@@ -34,6 +40,9 @@ function my_os_lib_git_get_artifact_dir_name {
   case "$(lib git get-selected-repo)" in
     browser-profiles)
       echo $MY_OS_GIT_ARTIFACT_DIR_BROWSER_PROFILES
+      ;;
+    browser-profiles)
+      echo $MY_OS_GIT_ARTIFACT_DIR_BROWSER_PROFILES_BRAVE
       ;;
     software-backups)
       echo $MY_OS_GIT_ARTIFACT_DIR_SOFTWARE_BACKUPS
@@ -56,34 +65,79 @@ function my_os_lib_git_commit {
 
 function my_os_lib_git_artifact_unpack {
   lib log "Trying to unpack artifact from $(lib git get-selected-repo)"
+  lib log "Making one archive from splits:"
+  lib run "cat * > $MY_OS_GIT_ARTIFACT_NAME"
+  lib log "Listing:"
+  lib run "ls -lah ."
   name_of_extracted_dir=$(zip -sf $MY_OS_GIT_ARTIFACT_NAME | grep -E '.*/$' | head -n1 | tr -d ' ' | tr -d '/')
   artifact_destination="$(my_os_lib_git_get_artifact_destination)"
   lib run "mkdir -p ${artifact_destination}"
   ls "${artifact_destination}/${name_of_extracted_dir}" &> /dev/null && {
     lib log warn "Destination ${artifact_destination}/${name_of_extracted_dir} already exists. Won't proceed"
+    lib log "Removing temporary zip archive:"
+    lib run "rm $MY_OS_GIT_ARTIFACT_NAME"
+    lib log "Listing:"
+    lib run "ls -lah ."
     return
   }
   lib log "Unzipping ..."
   unzip -P $(lib settings get zip_passwd) $MY_OS_GIT_ARTIFACT_NAME -d $artifact_destination
+  lib log "Removing temporary zip archive:"
+  lib run "rm $MY_OS_GIT_ARTIFACT_NAME"
+  lib log "Listing:"
+  lib run "ls -lah ."
 }
 
 function my_os_lib_git_update_artifact {
   REMOTE_URL=$(git remote show origin -n | tr ' ' '\n' | grep https | head -n 1)
+  lib log "Clearing the repo ..."
   lib run "rm -rf .git"
-  lib run "rm -f $MY_OS_GIT_ARTIFACT_NAME"
+  lib run "rm -f *"
   lib run "git init"
   lib run "git remote add origin $REMOTE_URL"
   lib run "cp -r $(my_os_lib_git_get_artifact_destination)/$(my_os_lib_git_get_artifact_dir_name) ."
   lib log "Zipping ..."
   zip -P $(lib settings get zip_passwd) -r $MY_OS_GIT_ARTIFACT_NAME $(my_os_lib_git_get_artifact_dir_name)
   lib run "rm -rf $(my_os_lib_git_get_artifact_dir_name)"
-  lib git commit
+  lib log "Splitting the archive into smaller chunks:"
+  lib run "split -b 5M $MY_OS_GIT_ARTIFACT_NAME"
+  lib log "Removing temporary zip archive:"
+  lib run "rm $MY_OS_GIT_ARTIFACT_NAME"
+  lib log "Listing:"
+  lib run "ls -lah ."
 }
 
 function my_os_lib_git_force_push_artifact {
-  [[ -e $MY_OS_GIT_ARTIFACT_NAME ]] &&
-  lib run "git push -f --set-upstream origin main" ||
-  lib log err "There is no $MY_OS_GIT_ARTIFACT_NAME found in the repo directory! Won't force push"
+  [[ -e xaa ]] && {
+  for file in $(ls); do 
+    lib run "git add $file" 
+    lib run "git commit -m Push_$file"
+    lib run "git push -f --set-upstream origin main"
+  done
+  } ||
+  { 
+    lib log err "There is no xaa (first split part) found in the repo directory! Won't force push"
+    return
+  }
+
+  lib log "Trying to verify your force-push ..."
+  my_os_lib_git_verify_force_push
+}
+
+function my_os_lib_git_verify_force_push {
+  git-status=$(git status -s | wc -l)
+  [[ $git-status -gt 0 ]] && lib log err "git status show more than 0 changes, and that's after all pushes done!" && return
+
+  repo=$(lib git get-selected-repo)
+  url="$(my_os_lib_git_get_url $repo)"
+  lib run "git clone $url"
+  lib dir $repo
+  lib run "cat * > $MY_OS_GIT_ARTIFACT_NAME"
+  lib log "Trying to list downloaded archive ..."
+  zip -sf $MY_OS_GIT_ARTIFACT_NAME && lib log "Listing of archive is successful! So, your data is backed up on using Git" ||
+    lib log err "Listing of downloaded archive wasn't successful! Your data is probably not backed up correctly!"
+  lib dir ..
+  lib run "rm -rf $repo"
 }
 
 function my_os_lib_git_select {

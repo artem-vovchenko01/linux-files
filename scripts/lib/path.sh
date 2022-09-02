@@ -36,6 +36,9 @@ function my_os_lib_path_default {
     browser-profiles)
       echo $MY_OS_GIT_PATH_FIREFOX_PROFILES
       ;;
+    browser-profiles-brave)
+      echo $MY_OS_GIT_PATH_BRAVE_PROFILES
+      ;;
     software-backups)
       echo $MY_OS_GIT_PATH_SOFTWARE_BACKUPS
       ;;
