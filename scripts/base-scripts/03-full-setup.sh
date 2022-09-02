@@ -131,6 +131,8 @@ lib input "Install software?" && lib run "source $(lib path base-scripts)/04-sof
 lib input "Install dotfiles?" && lib run "source $(lib path base-scripts)/05-configs.sh"
 lib input "Install fonts?" && lib run "source $(lib path base-scripts)/10-fonts.sh"
 
+lib log "Trying to remove Documents directory, if it's empty, so it can be changed to symlink"
+lib run "rmdir ~/Documents"
 lib input "Install symlinks for directories?" && lib run "source $(lib path base-scripts)/06-symlink-dirs.sh"
 
 lib input "Install sway?" && lib run "source $(lib path envs)/sway.sh"

@@ -7,7 +7,7 @@
 #   * sway config exists at ~/.config/sway/config
 #   * sway config contains line with HOME/wallpapers substring
 
-WALLPAPER_PATH=~/Resources/Wallpapers
+WALLPAPER_PATH=~/.my-git-os/software-backups/Resources/Wallpapers
 
 background=$(ls $WALLPAPER_PATH | wofi -S dmenu)
 
