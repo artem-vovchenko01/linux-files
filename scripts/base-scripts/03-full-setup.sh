@@ -83,7 +83,15 @@ lib input no-yes "Enable sway battery manager - custom systemd unit?" && lib run
 # WORKING WITH REPOSITORIES
 ##############################
 lib git select browser-profiles
+# [[ ! -e "$(lib git get-artifact-path)" ]] && lib git unpack-artifact
+# lib git update-artifact
+# lib git force-push-artifact
+
 lib git select software-backups
+[[ ! -e "$(lib git get-artifact-path)" ]] && lib git unpack-artifact
+lib git update-artifact
+lib git force-push-artifact
+
 lib git select vimwiki
 
 exit
@@ -92,6 +100,8 @@ exit
 # LINKING ZHISTORY
 ##############################
 
-[[ -e ~/.zhistory ]] && lib input "~/.zhistory already exists. Overwrite it and symlink to reference one?" && lib run "ln -sf $DESKTOP_BACKUPS_PATH/zsh/.zhistory ~/.zhistory"
-[[ ! -e ~/.zhistory ]] && lib run "ln -s $DESKTOP_BACKUPS_PATH/zsh/.zhistory ~/.zhistory"
+[[ -e $(lib path software-backups)/zsh/.zhistory ]] && {
+  [[ -e ~/.zhistory ]] && lib input "~/.zhistory already exists. Overwrite it and symlink to reference one?" && lib run "ln -sf $(lib path software-backups)/zsh/.zhistory ~/.zhistory"
+  [[ ! -e ~/.zhistory ]] && lib run "ln -s $(lib path software-backups)/zsh/.zhistory ~/.zhistory"
+}
 

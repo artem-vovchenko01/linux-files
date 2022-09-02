@@ -53,6 +53,7 @@ source $MY_OS_PATH_LIB/snippet.sh
 source $MY_OS_PATH_LIB/run.sh
 source $MY_OS_PATH_LIB/help.sh
 source $MY_OS_PATH_LIB/input.sh
+source $MY_OS_PATH_LIB/path.sh
 
 my_os_lib_prepare
 

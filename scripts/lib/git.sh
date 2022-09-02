@@ -1,16 +1,3 @@
-function my_os_lib_git_commit {
-  lib log "git status"
-  git status
-  if ! lib input "Are you satisfied with the status?"; then
-    exit 1
-  fi
-
-  lib log "git add"
-  git add .
-  lib log "git commit"
-  git commit -m "Commit at $(date)"
-}
-
 function my_os_lib_git_get_url {
   case $1 in
     browser-profiles)
@@ -31,12 +18,16 @@ function my_os_lib_git_get_url {
 function my_os_lib_git_get_artifact_destination {
   case "$(lib git get-selected-repo)" in
     browser-profiles)
-      echo "$MY_OS_GIT_PATH_FIREFOX_PROFILES"
+      lib path browser-profiles
       ;;
     software-backups)
-      echo "$MY_OS_GIT_PATH_SOFTWARE_BACKUPS"
+      lib path software-backups
       ;;
   esac
+}
+
+function my_os_lib_git_get_artifact_path {
+  echo "$(my_os_lib_git_get_artifact_destination)/$(my_os_lib_git_get_artifact_dir_name)"
 }
 
 function my_os_lib_git_get_artifact_dir_name {
@@ -50,12 +41,25 @@ function my_os_lib_git_get_artifact_dir_name {
   esac
 }
 
+function my_os_lib_git_commit {
+  lib log "git status"
+  git status
+  if ! lib input "Are you satisfied with the status?"; then
+    exit 1
+  fi
+
+  lib log "git add"
+  git add .
+  lib log "git commit"
+  git commit -m "Commit at $(date)"
+}
+
 function my_os_lib_git_artifact_unpack {
   lib log "Trying to unpack artifact from $(lib git get-selected-repo)"
   name_of_extracted_dir=$(zip -sf $MY_OS_GIT_ARTIFACT_NAME | grep -E '.*/$' | head -n1 | tr -d ' ' | tr -d '/')
   artifact_destination="$(my_os_lib_git_get_artifact_destination)"
   ls "${artifact_destination}/${name_of_extracted_dir}" &> /dev/null && {
-    lib log warn "Destination ${artifact_destination}/{name_of_extracted_dir} already exists. Won't proceed"
+    lib log warn "Destination ${artifact_destination}/${name_of_extracted_dir} already exists. Won't proceed"
     return
   }
   lib run "unzip $MY_OS_GIT_ARTIFACT_NAME -d $artifact_destination"
@@ -69,6 +73,8 @@ function my_os_lib_git_update_artifact {
   lib run "git remote add origin $REMOTE_URL"
   lib run "cp -r $(my_os_lib_git_get_artifact_destination)/$(my_os_lib_git_get_artifact_dir_name) ."
   lib run "zip -re $MY_OS_GIT_ARTIFACT_NAME $(my_os_lib_git_get_artifact_dir_name)"
+  lib run "rm -rf $(my_os_lib_git_get_artifact_dir_name)"
+  lib git commit
 }
 
 function my_os_lib_git_force_push_artifact {

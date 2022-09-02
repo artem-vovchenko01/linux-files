@@ -14,6 +14,9 @@ function lib {
     dir)
       my_os_lib_menu_dir "$@"
       ;;
+    path)
+      my_os_lib_menu_path "$@"
+      ;;
     script-picker)
       my_os_lib_script_picker "$@"
       ;;
@@ -39,6 +42,10 @@ function lib {
       lib log "lib command $1 not found!"
       ;;
   esac
+}
+
+function my_os_lib_menu_path {
+  my_os_lib_path_default "$@"
 }
 
 function my_os_lib_menu_settings {
@@ -144,6 +151,9 @@ function my_os_lib_menu_git {
       ;;
     get-selected-repo)
       my_os_lib_git_get_selected_repo "$@"
+      ;;
+    get-artifact-path)
+      my_os_lib_git_get_artifact_path
       ;;
     unpack-artifact)
       my_os_lib_git_artifact_unpack "$@"
