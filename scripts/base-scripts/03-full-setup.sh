@@ -88,13 +88,13 @@ lib log "Working with my git repos ..."
 lib git select browser-profiles
 lib input "Close Firefox for working with it's profile?" && {
   lib run "killall firefox"
-  [[ ! -e "$(lib git get-artifact-path)" ]] && lib log "artifact path: $(lib git get-artifact-path)" && lib git unpack-artifact
+  [[ ! -e $(lib git get-artifact-path) ]] && lib git unpack-artifact
   lib git update-artifact
   lib git force-push-artifact
 }
 
 lib git select software-backups
-[[ ! -e "$(lib git get-artifact-path)" ]] && lib git unpack-artifact
+[[ ! -e $(lib git get-artifact-path) ]] && lib git unpack-artifact
 lib git update-artifact
 lib git force-push-artifact
 

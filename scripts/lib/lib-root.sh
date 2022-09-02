@@ -13,12 +13,30 @@ function my_os_lib_prepare {
   lib log banner "Your system identified as: $MY_OS_SYSTEM"
 }
 
+function my_os_lib_show_err_log {
+  while IFS= read -r msg
+  do
+    echo -e "${MY_OS_COLOR_ERR}${msg}${MY_OS_COLOR_NONE}"
+  done < "$MY_OS_PATH_LOG_ERR"
+}
+
+function my_os_lib_show_warn_log {
+  while IFS= read -r msg
+  do
+    echo -e "${MY_OS_COLOR_WARN}${msg}${MY_OS_COLOR_NONE}"
+  done < "$MY_OS_PATH_LOG_WARN"
+}
+
 function my_os_lib_exit_cleanup {
 	lib log "Script finished. Cleaning up ..."
 	lib dir $MY_OS_PATH_SOFT_LISTS_DIR
 	rm $MY_OS_PATH_HELP_FILE 2> /dev/null
 	rm $MY_OS_PATH_WHAT_TO_STOW_FILE 2> /dev/null
 	rm *.tmp 2> /dev/null
+  lib log "Showing all warnings that've occurred:"
+  my_os_lib_show_warn_log
+  lib log "Showing all errors that've occurred:"
+  my_os_lib_show_err_log
 }
 
 function my_os_lib_script_picker {

@@ -27,9 +27,7 @@ function my_os_lib_git_get_artifact_destination {
 }
 
 function my_os_lib_git_get_artifact_path {
-  echo "$(my_os_lib_git_get_artifact_destination)/$(my_os_lib_git_get_artifact_dir_name)"
-  echo "artifact Path: " >&2
-  echo "$(my_os_lib_git_get_artifact_destination)/$(my_os_lib_git_get_artifact_dir_name)" >&2
+  echo $(my_os_lib_git_get_artifact_destination)/$(my_os_lib_git_get_artifact_dir_name)
 }
 
 function my_os_lib_git_get_artifact_dir_name {

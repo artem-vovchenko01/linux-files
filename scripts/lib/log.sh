@@ -17,7 +17,7 @@ function my_os_lib_log_warn {
 function my_os_lib_log_color_echo {
   msg="$2"
   timestamp="$(date +%H:%M:%S)"
-  echo "$msg" >> $MY_OS_PATH_LOG_ALL
+  echo "$timestamp > $msg" >> $MY_OS_PATH_LOG_ALL
   case $1 in
     E)
       color=$MY_OS_COLOR_ERR
