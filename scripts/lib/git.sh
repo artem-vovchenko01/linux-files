@@ -41,7 +41,7 @@ function my_os_lib_git_get_artifact_dir_name {
     browser-profiles)
       echo $MY_OS_GIT_ARTIFACT_DIR_BROWSER_PROFILES
       ;;
-    browser-profiles)
+    browser-profiles-brave)
       echo $MY_OS_GIT_ARTIFACT_DIR_BROWSER_PROFILES_BRAVE
       ;;
     software-backups)
@@ -125,8 +125,8 @@ function my_os_lib_git_force_push_artifact {
 }
 
 function my_os_lib_git_verify_force_push {
-  git-status=$(git status -s | wc -l)
-  [[ $git-status -gt 0 ]] && lib log err "git status show more than 0 changes, and that's after all pushes done!" && return
+  git_status=$(git status -s | wc -l)
+  [[ $git_status -gt 0 ]] && lib log err "git status show more than 0 changes, and that's after all pushes done!" && return
 
   repo=$(lib git get-selected-repo)
   url="$(my_os_lib_git_get_url $repo)"
