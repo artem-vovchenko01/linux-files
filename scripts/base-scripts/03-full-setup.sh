@@ -130,3 +130,16 @@ lib input "Install symlinks for directories?" && lib run "source $(lib path base
 lib input "Install dotfiles?" && lib run "source $(lib path base-scripts)/05-configs.sh"
 
 lib input "Install sway?" && lib run "source $(lib path envs)/sway.sh"
+
+##############################
+# NPM
+##############################
+
+lib log "Settings up npm ..."
+npm install -g git-file-history
+lib run "mkdir -p ~/.npm-global"
+lib run "npm config set prefix '~/.npm-global'"
+
+lib log "npm: installing git-file-history ..."
+lib run "npm install -g git-file-history"
+

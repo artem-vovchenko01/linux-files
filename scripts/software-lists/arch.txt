@@ -13,8 +13,10 @@ make
 python-pip
 nodejs
 npm
+ipython
 rust
 rpm-tools
+vagrant
 
 
 ########## SOCIAL
@@ -51,9 +53,9 @@ htop
 lsof
 smem
 gdu
-# bleachbit
-# powertop
-# iotop
+bleachbit
+powertop
+iotop
 # ncdu
 # cockpit
 
@@ -63,6 +65,7 @@ unrar
 vifm
 zip
 unzip
+tree
 # ranger
 
 # SYSTEM
@@ -94,7 +97,9 @@ pacutils
 # NETWORKING
 net-tools
 bind
+traceroute
 
+grc
 
 ########## FILES
 # pcmanfm-gtk3
@@ -132,6 +137,8 @@ yt-dlp
 ########## DEVELOPMENT
 docker
 virtualbox
+terraform
+libxcrypt-compat
 
 # docker-compose
 # qemu
@@ -175,6 +182,7 @@ mtr
 cmatrix 
 cowsay
 neofetch
+lolcat
 
 # sl
 

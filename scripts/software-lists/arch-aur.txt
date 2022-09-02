@@ -114,3 +114,7 @@ wlr-randr
 
 # pipes.sh
 
+########## PROGRAMMING
+
+google-cloud-sdk
+

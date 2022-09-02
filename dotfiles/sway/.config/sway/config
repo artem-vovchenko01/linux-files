@@ -173,7 +173,7 @@ output "HDMI-A-1" {
 	mode 2560x1440@74Hz
 	pos 0 0
 	transform normal
-    scale 1.25
+    scale 1.2
 }
 
 output "eDP-1" {

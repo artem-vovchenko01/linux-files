@@ -1,0 +1,7 @@
+dolphin
+okular
+pcmanfm
+vlc
+gwenview
+spectacle
+kate
