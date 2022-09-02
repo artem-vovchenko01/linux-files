@@ -14,17 +14,29 @@ function my_os_lib_prepare {
 }
 
 function my_os_lib_show_err_log {
+  cat $MY_OS_PATH_LOG_ERR | grep -q '===' &&
+  from_line=$(cat -n $MY_OS_PATH_LOG_ERR | grep '===' | tail -n2 | head -n 1 | tr -d ' ' | cut -d $'\t' -f 1) ||
+  from_line=1
+  [[ -z "$from_line" ]] && from_line=1
+  [[ $from_line -le 0 ]] && from_line=1
+
   while IFS= read -r msg
   do
     echo -e "${MY_OS_COLOR_ERR}${msg}${MY_OS_COLOR_NONE}"
-  done < "$MY_OS_PATH_LOG_ERR"
+  done < <(cat $MY_OS_PATH_LOG_ERR | tail -n +$from_line)
 }
 
 function my_os_lib_show_warn_log {
+  cat $MY_OS_PATH_LOG_WARN | grep -q '===' &&
+  from_line=$(cat -n $MY_OS_PATH_LOG_WARN | grep '===' | tail -n2 | head -n 1 | tr -d ' ' | cut -d $'\t' -f 1) ||
+  from_line=1
+  [[ -z "$from_line" ]] && from_line=1
+  [[ $from_line -le 0 ]] && from_line=1
+
   while IFS= read -r msg
   do
     echo -e "${MY_OS_COLOR_WARN}${msg}${MY_OS_COLOR_NONE}"
-  done < "$MY_OS_PATH_LOG_WARN"
+  done < <(cat $MY_OS_PATH_LOG_WARN | tail -n +$from_line)
 }
 
 function my_os_lib_exit_cleanup {

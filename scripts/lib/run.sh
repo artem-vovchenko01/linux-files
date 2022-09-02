@@ -11,11 +11,18 @@ function my_os_lib_run_int {
 
 function my_os_lib_run_default {
 	lib log cmd "$1"
-	eval "$1"
+  temp_file=$(mktemp)
+  eval "$1" 2> $temp_file
 	local ERR=$?
 	[[ $ERR -eq 0 ]] || { 
       lib log err "Command \"$1\" failed. Code: $ERR"
-      my_os_lib_run_if_error_menu "$1"
+        [[ $(cat $temp_file | wc -l) -gt 0 ]] && {
+          while IFS= read -r line; do
+            lib log err "$line"
+          done < $temp_file
+        }
+        rm $temp_file
+        my_os_lib_run_if_error_menu "$1"
     }
     return 0
 }

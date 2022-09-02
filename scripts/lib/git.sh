@@ -80,8 +80,8 @@ function my_os_lib_git_artifact_unpack {
     lib run "ls -lah ."
     return
   }
-  lib log "Unzipping ..."
-  unzip -P $(lib settings get zip_passwd) $MY_OS_GIT_ARTIFACT_NAME -d $artifact_destination
+  lib log "Unzipping ... (showing tail of output)"
+  unzip -P $(lib settings get zip_passwd) $MY_OS_GIT_ARTIFACT_NAME -d $artifact_destination | tail
   lib log "Removing temporary zip archive:"
   lib run "rm $MY_OS_GIT_ARTIFACT_NAME"
   lib log "Listing:"
@@ -96,11 +96,11 @@ function my_os_lib_git_update_artifact {
   lib run "git init"
   lib run "git remote add origin $REMOTE_URL"
   lib run "cp -r $(my_os_lib_git_get_artifact_destination)/$(my_os_lib_git_get_artifact_dir_name) ."
-  lib log "Zipping ..."
-  zip -P $(lib settings get zip_passwd) -r $MY_OS_GIT_ARTIFACT_NAME $(my_os_lib_git_get_artifact_dir_name)
+  lib log "Zipping (showing tail of output) ..."
+  zip -P $(lib settings get zip_passwd) -r $MY_OS_GIT_ARTIFACT_NAME $(my_os_lib_git_get_artifact_dir_name) | tail
   lib run "rm -rf $(my_os_lib_git_get_artifact_dir_name)"
   lib log "Splitting the archive into smaller chunks:"
-  lib run "split -b 5M $MY_OS_GIT_ARTIFACT_NAME"
+  lib run "split -b 4M $MY_OS_GIT_ARTIFACT_NAME"
   lib log "Removing temporary zip archive:"
   lib run "rm $MY_OS_GIT_ARTIFACT_NAME"
   lib log "Listing:"
@@ -131,12 +131,12 @@ function my_os_lib_git_verify_force_push {
   repo=$(lib git get-selected-repo)
   url="$(my_os_lib_git_get_url $repo)"
   lib run "git clone $url"
-  lib dir $repo
+  lib dir cd $repo
   lib run "cat * > $MY_OS_GIT_ARTIFACT_NAME"
-  lib log "Trying to list downloaded archive ..."
-  zip -sf $MY_OS_GIT_ARTIFACT_NAME && lib log "Listing of archive is successful! So, your data is backed up on using Git" ||
+  lib log "Trying to list downloaded archive (tail of output) ..."
+  zip -sf $MY_OS_GIT_ARTIFACT_NAME | tail && lib log "Listing of archive is successful! So, your data is backed up on using Git" ||
     lib log err "Listing of downloaded archive wasn't successful! Your data is probably not backed up correctly!"
-  lib dir ..
+  lib dir cd ..
   lib run "rm -rf $repo"
 }
 

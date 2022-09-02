@@ -41,6 +41,9 @@ lib log warn "Enter sudo password, so you won't need to do it again"
 lib run "sudo pwd > /dev/null"
 
 lib input secret-value "Please, provide password for encrypting and decrypting archives. It won't be shown to the screen and will be stored only in-memory"
+password_attempt_1="$(lib input get-value)"
+lib input secret-value "Repeat the password:"
+[[ "$password_attempt_1" -eq "$(lib input get-value)" ]] || { lib log err "Passwords doesn't match!"; exit; }
 lib settings set zip_passwd $(lib input get-value)
 
 lib input "Run script non-interactively?" && lib settings set-off interactive
