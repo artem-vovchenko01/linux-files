@@ -28,6 +28,8 @@ lib snippet ping
 
 lib log "Doing some OS-dependent chores ..."
 lib os is arch && {
+  lib log "Setting up parallel downloads for pacman ..."
+  sudo sed -i '/#ParallelDownloads/ s/^.*$/ParallelDownloads = 10/' /etc/pacman.conf
   lib input "Update repositories?" && lib run "sudo pacman -Sy"
   lib pkg install base-devel
 }
@@ -126,8 +128,10 @@ lib git select vimwiki
 ##############################
 
 lib input "Install software?" && lib run "source $(lib path base-scripts)/04-software.sh"
-lib input "Install symlinks for directories?" && lib run "source $(lib path base-scripts)/06-symlink-dirs.sh"
 lib input "Install dotfiles?" && lib run "source $(lib path base-scripts)/05-configs.sh"
+lib input "Install fonts?" && lib run "source $(lib path base-scripts)/10-fonts.sh"
+
+lib input "Install symlinks for directories?" && lib run "source $(lib path base-scripts)/06-symlink-dirs.sh"
 
 lib input "Install sway?" && lib run "source $(lib path envs)/sway.sh"
 
