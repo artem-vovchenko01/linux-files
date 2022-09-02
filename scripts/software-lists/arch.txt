@@ -101,34 +101,6 @@ bind
 # transmission-gtk
 
 
-########## SHELL
-zsh
-zsh-syntax-highlighting
-zsh-autosuggestions
-zsh-theme-powerlevel10k
-
-
-########## WAYLAND
-imv
-brightnessctl
-easyeffects
-wl-clipboard
-wofi
-playerctl
-grim
-slurp
-xorg-xwayland
-swaylock
-swayidle
-mako
-waybar
-pipewire
-pipewire-pulse 
-pipewire-alsa
-pipewire-jack
-wireplumber
-
-
 ########## MANJARO SWAY REPO
 # swaylock-effects
 
@@ -194,13 +166,6 @@ mtr
 # macchanger
 # proxychains-ng
 
-
-########## LOOK
-qt5ct
-breeze
-breeze-gtk
-lxappearance
-ttf-font-awesome
 
 # xcursor-breeze
 # papirus-maia-icon-theme

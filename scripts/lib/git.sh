@@ -33,10 +33,10 @@ function my_os_lib_git_get_artifact_path {
 function my_os_lib_git_get_artifact_dir_name {
   case "$(lib git get-selected-repo)" in
     browser-profiles)
-      echo "$MY_OS_GIT_ARTIFACT_DIR_BROWSER_PROFILES"
+      echo $MY_OS_GIT_ARTIFACT_DIR_BROWSER_PROFILES
       ;;
     software-backups)
-      echo "$MY_OS_GIT_ARTIFACT_DIR_SOFTWARE_BACKUPS"
+      echo $MY_OS_GIT_ARTIFACT_DIR_SOFTWARE_BACKUPS
       ;;
   esac
 }

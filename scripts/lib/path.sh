@@ -34,13 +34,13 @@ function my_os_lib_path_default {
       echo "$MY_OS_PATH_WHAT_TO_STOW_FILE"
       ;;
     browser-profiles)
-      echo "$MY_OS_GIT_PATH_FIREFOX_PROFILES"
+      echo $MY_OS_GIT_PATH_FIREFOX_PROFILES
       ;;
     software-backups)
-      echo "$MY_OS_GIT_PATH_SOFTWARE_BACKUPS"
+      echo $MY_OS_GIT_PATH_SOFTWARE_BACKUPS
       ;;
     software-backups-dir)
-      echo "$MY_OS_GIT_PATH_SOFTWARE_BACKUPS/$MY_OS_GIT_ARTIFACT_DIR_SOFTWARE_BACKUPS"
+      echo $MY_OS_GIT_PATH_SOFTWARE_BACKUPS/$MY_OS_GIT_ARTIFACT_DIR_SOFTWARE_BACKUPS
       ;;
   esac
 }

@@ -1,0 +1,20 @@
+########## WAYLAND
+imv
+brightnessctl
+easyeffects
+wl-clipboard
+wofi
+playerctl
+grim
+slurp
+xorg-xwayland
+swaylock
+swayidle
+mako
+waybar
+# pipewire
+# pipewire-pulse 
+# pipewire-alsa
+# pipewire-jack
+# wireplumber
+

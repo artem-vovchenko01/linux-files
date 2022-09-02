@@ -32,7 +32,7 @@ function my_os_lib_work_on_soft_list {
     lib log "Working on software list $list_file.tmp ..."
     lib input no-yes "Install them with confirmation for each package?" && one_by_one=1
     lib log "Comment lines which you don't need ..."
-    lib run "nvim $list_file.tmp"
+    lib settings is-on interactive && lib run "nvim $list_file.tmp"
 
     local soft=$(cat $list_file.tmp | grep -v '#' | tr '\n' ' ')
 
@@ -61,7 +61,7 @@ function my_os_lib_work_on_flatpak_list {
     lib run "cp $list_file $list_file.tmp"
     lib log warn "Working on software list $list_file.tmp ..."
     lib log "Comment lines which you don't need ..."
-    lib run "nvim $list_file.tmp"
+    lib settings is-on interactive && lib run "nvim $list_file.tmp"
 
     local soft=$(cat $list_file.tmp | grep -v '#' | tr '\n' ' ')
 
@@ -89,25 +89,34 @@ lib os is arch && {
 ##############################
 
 # Install regular packages
-while true; do
-  lib log warn "Choose the software list you want to work on:"
-  lib input choice $(ls $MY_OS_PATH_SOFT_LISTS_DIR | grep -v flatpak) "Finish"
-  soft_list_file="$(lib input get-choice)"
-  [[ $soft_list_file == "Finish" ]] && break
-  my_os_lib_work_on_soft_list $MY_OS_PATH_SOFT_LISTS_DIR/$soft_list_file
-done
+
+lib settings is-on interactive && {
+  while true; do
+    lib log warn "Choose the software list you want to work on:"
+    lib input choice $(ls $MY_OS_PATH_SOFT_LISTS_DIR | grep -v flatpak) "Finish"
+    soft_list_file="$(lib input get-choice)"
+    [[ $soft_list_file == "Finish" ]] && break
+    my_os_lib_work_on_soft_list $MY_OS_PATH_SOFT_LISTS_DIR/$soft_list_file
+  done
+} || {
+  for soft_list_file in $MY_OS_LIB_SELECTED_SOFT_LIST_FILES; do
+    my_os_lib_work_on_soft_list $MY_OS_PATH_SOFT_LISTS_DIR/$soft_list_file
+  done
+}
 
 # Install flatpaks
 lib pkg verify-cmd flatpak || lib input "Flatpak not found. Install it?" && lib pkg install flatpak
 lib pkg verify-cmd flatpak && lib input "Install some flatpaks?" && {
   lib input "Try adding flathub repo?" && lib run "sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo"
-  while true; do
-    lib log warn "Choose the software list you want to work on:"
-    lib input choice $(ls $MY_OS_PATH_SOFT_LISTS_DIR/flatpak) "Finish"
-    soft_list_file="$(lib input get-choice)"
-    [[ $soft_list_file == "Finish" ]] && break
-    my_os_lib_work_on_flatpak_list $MY_OS_PATH_SOFT_LISTS_DIR/$soft_list_file
-  done
+  lib settings is-on interactive && {
+    while true; do
+      lib log warn "Choose the software list you want to work on:"
+      lib input choice $(ls $MY_OS_PATH_SOFT_LISTS_DIR/flatpak) "Finish"
+      soft_list_file="$(lib input get-choice)"
+      [[ $soft_list_file == "Finish" ]] && break
+      my_os_lib_work_on_flatpak_list $MY_OS_PATH_SOFT_LISTS_DIR/$soft_list_file
+    done
+  }
 }
 
 # Clear caches

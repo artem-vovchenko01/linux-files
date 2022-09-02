@@ -45,6 +45,16 @@ lib settings set zip_passwd $(lib input get-value)
 
 lib input "Run script non-interactively?" && lib settings set-off interactive
 
+lib settings is-off interactive && {
+  while true; do
+    lib log warn "Choose the software list you want to install:"
+    lib input choice $(ls $MY_OS_PATH_SOFT_LISTS_DIR | grep -v flatpak) "Finish"
+    soft_list_file="$(lib input get-choice)"
+    [[ $soft_list_file == "Finish" ]] && break
+    MY_OS_LIB_SELECTED_SOFT_LIST_FILES="$soft_list_file ${MY_OS_LIB_SELECTED_SOFT_LIST_FILES}"
+  done
+}
+
 while true; do
   lib script-picker
   lib input "Finish the program?" && break
