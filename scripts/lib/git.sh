@@ -28,6 +28,8 @@ function my_os_lib_git_get_artifact_destination {
 
 function my_os_lib_git_get_artifact_path {
   echo "$(my_os_lib_git_get_artifact_destination)/$(my_os_lib_git_get_artifact_dir_name)"
+  echo "artifact Path: " >&2
+  echo "$(my_os_lib_git_get_artifact_destination)/$(my_os_lib_git_get_artifact_dir_name)" >&2
 }
 
 function my_os_lib_git_get_artifact_dir_name {
@@ -62,7 +64,9 @@ function my_os_lib_git_artifact_unpack {
     lib log warn "Destination ${artifact_destination}/${name_of_extracted_dir} already exists. Won't proceed"
     return
   }
-  lib run "unzip $MY_OS_GIT_ARTIFACT_NAME -d $artifact_destination"
+  lib log "Unzipping ..."
+  lib log "unzip -P $(lib settings get zip_passwd) $MY_OS_GIT_ARTIFACT_NAME -d $artifact_destination"
+  unzip -P $(lib settings get zip_passwd) $MY_OS_GIT_ARTIFACT_NAME -d $artifact_destination
 }
 
 function my_os_lib_git_update_artifact {
@@ -72,7 +76,9 @@ function my_os_lib_git_update_artifact {
   lib run "git init"
   lib run "git remote add origin $REMOTE_URL"
   lib run "cp -r $(my_os_lib_git_get_artifact_destination)/$(my_os_lib_git_get_artifact_dir_name) ."
-  lib run "zip -re $MY_OS_GIT_ARTIFACT_NAME $(my_os_lib_git_get_artifact_dir_name)"
+  lib log "Zipping ..."
+  lib log "zip -P $(lib settings get zip_passwd) -r $MY_OS_GIT_ARTIFACT_NAME $(my_os_lib_git_get_artifact_dir_name)"
+  zip -P $(lib settings get zip_passwd) -r $MY_OS_GIT_ARTIFACT_NAME $(my_os_lib_git_get_artifact_dir_name)
   lib run "rm -rf $(my_os_lib_git_get_artifact_dir_name)"
   lib git commit
 }

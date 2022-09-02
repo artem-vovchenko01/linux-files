@@ -19,12 +19,14 @@ lib pkg install neovim
 ##############################
 
 # lib run interactive "nmtui"
+lib log "Checking network connectivity ..."
 lib snippet ping
 
 ##############################
 # INSTALLING REQUIRED SOFTWARE
 ##############################
 
+lib log "Doing some OS-dependent chores ..."
 lib os is arch && {
   lib input "Update repositories?" && lib run "sudo pacman -Sy"
   lib pkg install base-devel
@@ -61,8 +63,6 @@ lib os is fedora && {
   lib input "Add AfterMozilla COPR?" && sudo dnf copr enable bgstack15/AfterMozilla
 }
 
-true
-
 ##############################
 # GRUB CONFIGURATION
 ##############################
@@ -75,6 +75,7 @@ true
 # CUSTOM SYSTEMD UNITS
 ##############################
 
+lib log "Working on custom systemd units ..."
 lib run "mkdir -p ~/.config/systemd/user/"
 lib input "Install custom systemd units?" && lib run "cp $MY_OS_PATH_REPO/custom-systemd-units/* ~/.config/systemd/user/"
 lib input no-yes "Enable sway battery manager - custom systemd unit?" && lib run "systemctl --user enable --now sway-battery-warn.timer"
@@ -82,10 +83,12 @@ lib input no-yes "Enable sway battery manager - custom systemd unit?" && lib run
 ##############################
 # WORKING WITH REPOSITORIES
 ##############################
+
+lib log "Working with my git repos ..."
 lib git select browser-profiles
 lib input "Close Firefox for working with it's profile?" && {
   lib run "killall firefox"
-  [[ ! -e "$(lib git get-artifact-path)" ]] && lib git unpack-artifact
+  [[ ! -e "$(lib git get-artifact-path)" ]] && lib log "artifact path: $(lib git get-artifact-path)" && lib git unpack-artifact
   lib git update-artifact
   lib git force-push-artifact
 }
@@ -97,8 +100,6 @@ lib git force-push-artifact
 
 lib git select vimwiki
 
-exit
-
 ##############################
 # LINKING ZHISTORY
 ##############################
@@ -107,4 +108,12 @@ exit
   [[ -e ~/.zhistory ]] && lib input "~/.zhistory already exists. Overwrite it and symlink to reference one?" && lib run "ln -sf $(lib path software-backups)/zsh/.zhistory ~/.zhistory"
   [[ ! -e ~/.zhistory ]] && lib run "ln -s $(lib path software-backups)/zsh/.zhistory ~/.zhistory"
 }
+
+##############################
+# LAUNCHING OTHER SCRIPTS
+##############################
+
+lib input "Install software?" && lib run "source $(lib path base-scripts)/04-software.sh"
+lib input "Install dotfiles?" && lib run "source $(lib path base-scripts)/05-configs.sh"
+lib input "Install symlinks for directories?" && lib run "source $(lib path base-scripts)/06-symlink-dirs.sh"
 

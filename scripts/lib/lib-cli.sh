@@ -64,6 +64,12 @@ function my_os_lib_menu_settings {
     set-off)
       my_os_lib_settings_set_off "$@"
       ;;
+    set)
+      my_os_lib_settings_set "$@"
+      ;;
+    get)
+      my_os_lib_settings_get "$@"
+      ;;
     default)
       my_os_lib_settings_default
       ;;
@@ -95,6 +101,12 @@ function my_os_lib_menu_input {
       ;;
     value)
       my_os_lib_input_ask_value "$@"
+      ;;
+    secret-value)
+      my_os_lib_input_ask_secret_value "$@"
+      ;;
+    get-value)
+      my_os_lib_input_get_value "$@"
       ;;
     choice)
       my_os_lib_input_choice "$@"
@@ -207,6 +219,9 @@ function my_os_lib_menu_dir {
       ;;
     additional-scripts)
       cd $MY_OS_PATH_ADDITIONAL_SCRIPTS
+      ;;
+    symlink-dirs)
+      cd $MY_OS_PATH_SYMLINK_DIRS
       ;;
     git)
       cd $MY_OS_PATH_GIT

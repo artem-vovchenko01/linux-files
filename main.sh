@@ -18,6 +18,10 @@ source $MY_OS_PATH_LIB/lib-root.sh
 ##################################################
 
 lib settings default
+
+lib input secret-value "Please, provide password for encrypting and decrypting archives. It won't be shown to the screen and will be stored only in-memory"
+lib settings set zip_passwd $(lib input get-value)
+
 lib input "Run script non-interactively?" && lib settings set-off interactive
 
 while true; do

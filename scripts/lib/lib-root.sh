@@ -41,19 +41,17 @@ function my_os_lib_script_picker {
   fi
 }
 
-source $MY_OS_PATH_LIB/env.sh
-source $MY_OS_PATH_LIB/settings.sh
-source $MY_OS_PATH_LIB/lib-cli.sh
-source $MY_OS_PATH_LIB/log.sh
-source $MY_OS_PATH_LIB/os.sh
-source $MY_OS_PATH_LIB/dir.sh
-source $MY_OS_PATH_LIB/git.sh
-source $MY_OS_PATH_LIB/pkg.sh
-source $MY_OS_PATH_LIB/snippet.sh
-source $MY_OS_PATH_LIB/run.sh
-source $MY_OS_PATH_LIB/help.sh
-source $MY_OS_PATH_LIB/input.sh
-source $MY_OS_PATH_LIB/path.sh
+function my_os_lib_source_libs {
+  source $MY_OS_PATH_LIB/lib-cli.sh
+  source $MY_OS_PATH_LIB/log.sh
+  source $MY_OS_PATH_LIB/env.sh
+  for script in $(ls $MY_OS_PATH_LIB | grep -v lib-root.sh); do
+    lib log "lib: sourcing $script"
+    source $MY_OS_PATH_LIB/$script
+  done
+}
+
+my_os_lib_source_libs
 
 my_os_lib_prepare
 

@@ -23,6 +23,19 @@ function my_os_lib_settings_set_on {
   esac
 }
 
+function my_os_lib_settings_set {
+  name="$1"
+  value="$2"
+  lib log warn "lib settings: setting value for $1. (not revealing value for security reasons)"
+  declare MY_OS_SETTINGS_SETTING_${name}=${value}
+}
+
+function my_os_lib_settings_get {
+  name="$1"
+  varname=MY_OS_SETTINGS_SETTING_$name
+  echo ${!varname}
+}
+
 function my_os_lib_settings_set_off {
   case $1 in
     interactive)

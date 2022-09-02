@@ -40,10 +40,21 @@ function my_os_lib_input_is_chosen {
   [[ $REPLY -eq $1 ]] && return 0 || return 1
 }
 
-function my_os_lib_ask_value {
+function my_os_lib_input_get_value {
+  echo "$VALUE"
+}
+
+function my_os_lib_input_ask_value {
 	lib log warn "$1"
 	echo -ne "${MY_OS_COLOR_WARN}>>> "
 	read VALUE
-	echo -ne "${MY_OS_COLOR_NONE}"
+	echo -e "${MY_OS_COLOR_NONE}"
+}
+
+function my_os_lib_input_ask_secret_value {
+	lib log warn "$1"
+	echo -ne "${MY_OS_COLOR_WARN}>>> "
+	read -s VALUE
+	echo -e "${MY_OS_COLOR_NONE}"
 }
 
