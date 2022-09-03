@@ -70,7 +70,6 @@ lib os is fedora && {
 ##############################
 
 lib log "Working on custom systemd units ..."
-lib run "mkdir -p ~/.config/systemd/user/"
 lib input "Install custom systemd units?" && lib run "cp $MY_OS_PATH_REPO/custom-systemd-units/* ~/.config/systemd/user/"
 lib input no-yes "Enable sway battery manager - custom systemd unit?" && lib run "systemctl --user enable --now sway-battery-warn.timer"
 
@@ -135,7 +134,6 @@ lib input "Install sway?" && lib run "source $(lib path envs)/sway.sh"
 
 lib log "Settings up npm ..."
 npm install -g git-file-history
-lib run "mkdir -p ~/.npm-global"
 lib run "npm config set prefix '~/.npm-global'"
 
 lib log "npm: installing git-file-history ..."

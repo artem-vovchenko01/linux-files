@@ -1,4 +1,3 @@
-lib run "mkdir -p ~/.local/share/fonts"
 lib dir cd ~/.local/share/fonts/
 
 lib input "Install Hack fonts?" && {
