@@ -9,6 +9,7 @@
 # LBRY
 # slack-desktop
 # telegram-cli-git
+teams
 
 
 ########## BROWSERS

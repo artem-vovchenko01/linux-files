@@ -21,6 +21,7 @@ export EDITOR=vim
 
 # Add every directory in $MY_CUSTOM_BIN to $PATH
 MY_CUSTOM_BIN=~/.my-own-scripts
+export PATH=$PATH:$MY_CUSTOM_BIN
 for dir in $(find $MY_CUSTOM_BIN -type d); do
     export PATH=$PATH:$dir
 done

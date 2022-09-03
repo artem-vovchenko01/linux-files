@@ -73,6 +73,7 @@ earlyoom
 inotify-tools
 pavucontrol
 libnotify
+dialog
 
 # TOOLS
 stow
