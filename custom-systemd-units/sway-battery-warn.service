@@ -2,7 +2,7 @@
 Description=Check battery status on Sway
 
 [Service]
-ExecStart=sh -c '~/.local/bin/scripts/tiling_wms/sway/sway_battery_check'
+ExecStart=sh -c '~/.my-own-scripts/tiling_wms/sway/sway_battery_check'
 
 [Install]
 WantedBy=multi-user.target
