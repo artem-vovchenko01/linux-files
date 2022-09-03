@@ -115,7 +115,7 @@ exec {
     '[ -x "$(command -v autotiling)" ] && autotiling'
     '[ -x "$(command -v wl-paste)" ] && [ -x "$(command -v cliphist)" ] && wl-paste --watch cliphist store'
 }
-exec "sh ~/.local/bin/scripts/tiling_wms/sway/track_prev_focus.sh"
+exec "sh ~/.my-own-scripts/tiling_wms/sway/track_prev_focus.sh"
 
 ########################################
 # ENVIRONMENT VARIABLES
@@ -177,7 +177,8 @@ output "HDMI-A-1" {
 }
 
 output "eDP-1" {
-	disable
+	mode 1920x1080@60Hz
+  scale 1
 }
 
 ########################################
@@ -306,4 +307,6 @@ $bindsym $mod+Control+$left resize shrink width 20px
 $bindsym $mod+Control+$down resize grow height 20px
 $bindsym $mod+Control+$up resize shrink height 20px
 $bindsym $mod+Control+$right resize grow width 20px
+
+bindsym $mod+Shift+r exec "foot bash -c '/home/artem/.my-own-scripts/tiling_wms/main.sh'"
 

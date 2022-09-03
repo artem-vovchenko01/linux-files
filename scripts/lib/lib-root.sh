@@ -8,9 +8,31 @@ function my_os_lib_prepare {
 
   lib log "All paths updated accordingly to repo path"
 
+  my_os_lib_check_dependencies
+
   my_os_lib_check_platform
 
   lib log banner "Your system identified as: $MY_OS_SYSTEM"
+}
+
+function my_os_lib_check_dependencies {
+  lib log "Checking dependencies ..."
+  my_os_lib_check_single_dep nvim neovim
+  my_os_lib_check_single_dep git git
+  my_os_lib_check_single_dep stow stow
+  my_os_lib_check_single_dep curl curl
+  my_os_lib_check_single_dep wget wget
+}
+
+function my_os_lib_check_single_dep {
+  cmd=$1
+  pkg=$2
+  lib log "dependencies: checking package $pkg providing command $cmd"
+  command -v $cmd &> /dev/null || {
+    lib log warn "dependencies: $pkg ($cmd) not found! Trying to install ..."
+    lib pkg install $pkg
+    command -v $cmd || lib log err "Can't install $pkg. Exiting ..." && exit
+  }
 }
 
 function my_os_lib_show_err_log {

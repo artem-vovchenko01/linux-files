@@ -1,9 +1,5 @@
 lib log banner "Running software installation script"
 
-lib log "Checking dependencies ..."
-
-lib pkg install neovim
-
 lib log 'Updating repositories...'
 
 lib input "Update repositories?" && {

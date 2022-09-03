@@ -7,14 +7,6 @@ lib log banner "Starting user setup script (full setup)"
 [[ $USER == "root" ]] && { lib log err "Running as root discouraged. Exiting"; exit 1; }
 
 ##############################
-# DEPENDENCIES
-##############################
-
-lib log "Checking dependencies ..."
-
-lib pkg install neovim
-
-##############################
 # NETOWRK CONFIGURATION
 ##############################
 

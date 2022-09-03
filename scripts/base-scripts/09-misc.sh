@@ -1,11 +1,4 @@
-banner "Running misc script"
-
-##############################
-# CHECK DEPENDENCIES
-##############################
-
-msg_info "Checking dependencies ..."
-check_and_install nvim neovim
+lib log banner "Running misc script"
 
 ##############################
 # CONFIGURING PACMAN

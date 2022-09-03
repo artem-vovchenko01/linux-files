@@ -15,6 +15,7 @@ export PATH=$PATH:~/.local/share/flatpak/exports/share
 export PATH="$PATH:$GEM_HOME/bin"
 export PATH="$PATH:$CARGO_HOME"
 export PATH="$PATH:$DOTNET_TOOLS_HOME"
+export PATH="$PATH:~/.local/bin"
 export PATH=~/.npm-global/bin:$PATH
 export EDITOR=vim
 

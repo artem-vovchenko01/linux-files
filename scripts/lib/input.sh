@@ -1,7 +1,7 @@
 function my_os_lib_input_yes_or_no {
-  lib log warn "$1"
+  lib log notice "$1"
   lib settings is-off interactive && {
-    lib log warn "Running in non-interactive mode. Choosing YES as intended by the script"
+    lib log notice "Running in non-interactive mode. Choosing YES as intended by the script"
     return 0
   }
   select yn in "Yes" "No"; do
@@ -13,9 +13,9 @@ function my_os_lib_input_yes_or_no {
 }
 
 function my_os_lib_input_no_or_yes {
-  lib log warn "$1"
+  lib log notice "$1"
   lib settings is-off interactive && {
-    lib log warn "Running in non-interactive mode. Choosing NO as intended by the script"
+    lib log notice "Running in non-interactive mode. Choosing NO as intended by the script"
     return 1
   }
   select yn in "Yes" "No"; do
@@ -45,15 +45,15 @@ function my_os_lib_input_get_value {
 }
 
 function my_os_lib_input_ask_value {
-	lib log warn "$1"
-	echo -ne "${MY_OS_COLOR_WARN}>>> "
+	lib log notice "$1"
+	echo -ne "${MY_OS_COLOR_NOTICE}>>> "
 	read VALUE
 	echo -e "${MY_OS_COLOR_NONE}"
 }
 
 function my_os_lib_input_ask_secret_value {
-	lib log warn "$1"
-	echo -ne "${MY_OS_COLOR_WARN}>>> "
+	lib log notice "$1"
+	echo -ne "${MY_OS_COLOR_NOTICE}>>> "
 	read -s VALUE
 	echo -e "${MY_OS_COLOR_NONE}"
 }

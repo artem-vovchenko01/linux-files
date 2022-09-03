@@ -4,14 +4,6 @@ MY_OS_TARGET_DIR=~
 lib log banner "Running config deployment script"
 
 ##############################
-# DEPENDENCIES
-##############################
-
-lib log "Checking dependencies ..."
-lib pkg install neovim
-lib pkg install stow
-
-##############################
 # UNSTOWING IF NEEDED
 ##############################
 

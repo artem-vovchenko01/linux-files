@@ -30,7 +30,7 @@ function my_os_lib_run_default {
 function my_os_lib_run_if_error_menu {
   while true; do
       lib settings is-off interactive && lib log warn "Script is running in non-interactive mode. Ignoring the error and continuing" && break
-      lib warn "Select what to do about it:"
+      lib log warn "Select what to do about it:"
       lib input choice 'Rerun the command "'"$1"'"' "Start new bash session for troubleshooting" "Show help, if available" "Execute arbitrary command" "Ignore the error and continue running the script"
       lib input is-chosen 1 && {
         lib log cmd "$1"

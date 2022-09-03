@@ -189,6 +189,9 @@ function my_os_lib_menu_log {
     warn)
       my_os_lib_log_warn "$@"
       ;;
+    notice)
+      my_os_lib_log_notice "$@"
+      ;;
     err)
       my_os_lib_log_err "$@"
       ;;
