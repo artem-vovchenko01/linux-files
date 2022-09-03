@@ -24,28 +24,28 @@ function my_os_lib_log_color_echo {
   case $1 in
     E)
       color=$MY_OS_COLOR_ERR
-      echo "$timestamp > $msg" >> $MY_OS_PATH_LOG_ERR
       LEVEL=ERR
+      echo "$timestamp [$LEVEL] $msg" >> $MY_OS_PATH_LOG_ERR
       ;;
     I)
       color=$MY_OS_COLOR_INFO
-      echo "$timestamp > $msg" >> $MY_OS_PATH_LOG_INFO
       LEVEL=INFO
+      echo "$timestamp [$LEVEL] $msg" >> $MY_OS_PATH_LOG_INFO
       ;;
     C)
       color=$MY_OS_COLOR_CMD
-      echo "$timestamp > $msg" >> $MY_OS_PATH_LOG_CMD
       LEVEL=CMD
+      echo "$timestamp [$LEVEL] $msg" >> $MY_OS_PATH_LOG_CMD
       ;;
     W)
       color=$MY_OS_COLOR_WARN
-      echo "$timestamp > $msg" >> $MY_OS_PATH_LOG_WARN
       LEVEL=WARN
+      echo "$timestamp [$LEVEL] $msg" >> $MY_OS_PATH_LOG_WARN
       ;;
     N)
       color=$MY_OS_COLOR_NOTICE
-      echo "$timestamp > $msg" >> $MY_OS_PATH_LOG_NOTICE
       LEVEL=NOTICE
+      echo "$timestamp [$LEVEL] $msg" >> $MY_OS_PATH_LOG_NOTICE
       ;;
   esac
   echo "$timestamp [$LEVEL] $msg" >> $MY_OS_PATH_LOG_ALL
