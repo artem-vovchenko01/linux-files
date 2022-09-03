@@ -112,8 +112,8 @@ wlr-randr
 
 ########## FUN
 
-
-# pipes.sh
+pipes.sh
+cava
 
 ########## PROGRAMMING
 
