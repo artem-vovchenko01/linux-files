@@ -22,7 +22,7 @@ MENU="Choose one of the following options:"
 function main_menu {
   OPTIONS=(1 "Change wallpaper"
            2 "Configure displays"
-           3 "Option 3")
+           3 "Suspend PC")
   CHOICE=$(dialog --clear \
                   --backtitle "$BACKTITLE" \
                   --title "$TITLE" \
@@ -39,7 +39,7 @@ function main_menu {
               display_menu
               ;;
           3)
-              echo "You chose Option 3"
+              systemctl suspend
               ;;
   esac
 }

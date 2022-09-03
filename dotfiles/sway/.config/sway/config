@@ -374,7 +374,7 @@ $bindsym $mod+Control+$down resize grow height 20px
 $bindsym $mod+Control+$up resize shrink height 20px
 $bindsym $mod+Control+$right resize grow width 20px
 
-bindsym $mod+Shift+r exec "foot bash -c '$my_own_scripts/tiling_wms/main.sh'"
+bindsym $mod+Shift+m exec "foot $my_own_scripts/tiling_wms/main.sh"
 
 ########################################
 # EXEC ALWAYS
