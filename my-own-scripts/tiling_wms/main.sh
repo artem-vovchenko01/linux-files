@@ -48,7 +48,7 @@ function main_menu {
               systemctl suspend
               ;;
           4)
-              mntui
+              nmtui
               ;;
           5)
               mount_menu
