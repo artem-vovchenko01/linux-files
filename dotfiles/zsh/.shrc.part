@@ -82,6 +82,7 @@ function ssh_add_startup_keys {
 
 alias abs_path="abs_filename"
 alias ls="ls --color=auto"
+alias grep="grep --color=auto"
 alias l="ls -a"
 alias ll="l -hl"
 alias vcd="vicd ."
@@ -108,6 +109,12 @@ alias k="kubectl"
 DEVICE="Pixel_4_API_30_2"
 alias android-emulate='echo Emulating device: $DEVICE; ~/Android/Sdk/emulator/emulator -avd $DEVICE -gpu on'
 alias android-clear-locks='rm -f ~/.android/avd/$DEVICE.avd/*.lock'
+
+##############################
+# COMPLETIONS
+##############################
+
+complete -C '/usr/bin/aws_completer' aws
 
 ##############################
 # SOURCES

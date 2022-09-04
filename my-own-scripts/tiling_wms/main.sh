@@ -1,5 +1,7 @@
 #! /bin/env bash
 
+source ~/.my-git-os/linux-files/scripts/lib/lib-root.sh
+
 function turn_on_display {
   dispaly=$1
   mode=$2
@@ -22,7 +24,11 @@ MENU="Choose one of the following options:"
 function main_menu {
   OPTIONS=(1 "Change wallpaper"
            2 "Configure displays"
-           3 "Suspend PC")
+           3 "Suspend PC"
+           4 "Choose network connection"
+           5 "Mount device"
+           6 "Unmount device"
+         )
   CHOICE=$(dialog --clear \
                   --backtitle "$BACKTITLE" \
                   --title "$TITLE" \
@@ -41,7 +47,36 @@ function main_menu {
           3)
               systemctl suspend
               ;;
+          4)
+              mntui
+              ;;
+          5)
+              mount_menu
+              ;;
+          6)
+              umount_menu
+              ;;
   esac
+}
+
+function mount_menu {
+  lsblk
+  devices=$(cat /proc/partitions | awk '{ print $4 }' | tail -n +3 | grep -v nvme | grep -v zram | grep -v dm-0)
+  lib log notice "Choose device you want to mount: "
+  lib input choice $devices
+  choice=$(lib input get-choice)
+  lib run "sudo mkdir /mnt/$choice"
+  lib run "sudo mount -o rw,gid=artem,uid=artem /dev/$choice /mnt/$choice" 
+}
+
+function umount_menu {
+  lsblk
+  devices=$(cat /proc/partitions | awk '{ print $4 }' | tail -n +3 | grep -v nvme | grep -v zram | grep -v dm-0)
+  devices=$(mount | awk '{ print $3 }' | grep /mnt)
+  lib log notice "Choose device you want to un-mount: "
+  lib input choice $devices
+  choice=$(lib input get-choice)
+  lib run "sudo umount $choice"
 }
 
 function display_menu {

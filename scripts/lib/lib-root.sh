@@ -1,3 +1,8 @@
+MY_OS_PATH_BASE=~/.my-git-os
+MY_OS_PATH_REPO=$MY_OS_PATH_BASE/linux-files
+MY_OS_PATH_SCRIPTS=$MY_OS_PATH_REPO/scripts
+MY_OS_PATH_LIB=$MY_OS_PATH_SCRIPTS/lib
+
 function my_os_lib_prepare {
   lib log "Making some preparations ..."
   trap "my_os_lib_exit_cleanup" 0
@@ -117,7 +122,27 @@ function my_os_lib_source_libs {
   done
 }
 
+function my_os_lib_boot_log_text {
+  echo
+  echo "======================================"
+  echo "Running the script $(realpath $(pwd)/$0) at: $(date)"
+  echo "======================================"
+  echo
+}
+
+function my_os_lib_init_logs {
+  my_os_lib_boot_log_text >> $MY_OS_PATH_LOG_ERR
+  my_os_lib_boot_log_text >> $MY_OS_PATH_LOG_INFO
+  my_os_lib_boot_log_text >> $MY_OS_PATH_LOG_WARN
+  my_os_lib_boot_log_text >> $MY_OS_PATH_LOG_CMD
+  my_os_lib_boot_log_text >> $MY_OS_PATH_LOG_ALL
+}
+
 my_os_lib_source_libs
 
 my_os_lib_prepare
+
+my_os_lib_init_logs
+
+lib settings default
 

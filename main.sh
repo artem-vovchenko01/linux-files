@@ -3,6 +3,7 @@
 ##################################################
 # GLOBAL VARIABLES
 ##################################################
+# these variables are duplicated in lib-root.sh
 MY_OS_PATH_BASE=~/.my-git-os
 MY_OS_PATH_REPO=$MY_OS_PATH_BASE/linux-files
 MY_OS_PATH_SCRIPTS=$MY_OS_PATH_REPO/scripts
@@ -16,26 +17,6 @@ source $MY_OS_PATH_LIB/lib-root.sh
 ##################################################
 # ENTRY POINT
 ##################################################
-
-function my_os_lib_boot_log_text {
-  echo
-  echo "======================================"
-  echo "Running the script at: $(date)"
-  echo "======================================"
-  echo
-}
-
-function my_os_lib_init_logs {
-  my_os_lib_boot_log_text >> $MY_OS_PATH_LOG_ERR
-  my_os_lib_boot_log_text >> $MY_OS_PATH_LOG_INFO
-  my_os_lib_boot_log_text >> $MY_OS_PATH_LOG_WARN
-  my_os_lib_boot_log_text >> $MY_OS_PATH_LOG_CMD
-  my_os_lib_boot_log_text >> $MY_OS_PATH_LOG_ALL
-}
-
-my_os_lib_init_logs
-
-lib settings default
 
 lib log warn "Enter sudo password, so you won't need to do it again"
 lib run "sudo pwd > /dev/null"
