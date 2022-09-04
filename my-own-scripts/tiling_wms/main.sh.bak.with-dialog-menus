@@ -14,22 +14,49 @@ function turn_off_display {
   wlr-randr --output $dispaly --off
 }
 
+HEIGHT=15
+WIDTH=40
+CHOICE_HEIGHT=4
+BACKTITLE="Main menu"
+TITLE="Choose what do you want to do:"
+MENU="Choose one of the following options:"
+
 function main_menu {
-   local choices=(
-      "Change wallpaper"
-      "Configure displays"
-      "Suspend PC"
-      "Choose network connection"
-      "Mount device"
-      "Unmount device"
-   )
-   lib input choice "${choices[@]}"
-   lib input is-chosen 1 && /home/artem/.my-own-scripts/tiling_wms/sway/wallpaper_picker.sh
-   lib input is-chosen 2 && display_menu
-   lib input is-chosen 3 && systemctl suspend
-   lib input is-chosen 4 && nmtui
-   lib input is-chosen 5 && mount_menu
-   lib input is-chosen 6 && umount_menu
+  OPTIONS=(1 "Change wallpaper"
+           2 "Configure displays"
+           3 "Suspend PC"
+           4 "Choose network connection"
+           5 "Mount device"
+           6 "Unmount device"
+         )
+  CHOICE=$(dialog --clear \
+                  --backtitle "$BACKTITLE" \
+                  --title "$TITLE" \
+                  --menu "$MENU" \
+                  $HEIGHT $WIDTH $CHOICE_HEIGHT \
+                  "${OPTIONS[@]}" \
+                  2>&1 >/dev/tty)
+  clear
+  case $CHOICE in
+          1)
+              /home/artem/.my-own-scripts/tiling_wms/sway/wallpaper_picker.sh
+              ;;
+          2)
+              display_menu
+              ;;
+          3)
+              systemctl suspend
+              ;;
+          4)
+              nmtui
+              ;;
+          5)
+              mount_menu
+              ;;
+          6)
+              umount_menu
+              ;;
+  esac
 }
 
 function mount_menu {

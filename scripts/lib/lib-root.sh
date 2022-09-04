@@ -123,9 +123,10 @@ function my_os_lib_source_libs {
 }
 
 function my_os_lib_boot_log_text {
+  [[ $0 = /* ]] && local real_path=$0 || local real_path=$(realpath $(pwd)/$0)
   echo
   echo "======================================"
-  echo "Running the script $(realpath $(pwd)/$0) at: $(date)"
+  echo "Running the script $real_path at: $(date)"
   echo "======================================"
   echo
 }
