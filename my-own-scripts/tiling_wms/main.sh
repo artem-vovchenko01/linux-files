@@ -15,21 +15,35 @@ function turn_off_display {
 }
 
 function main_menu {
-   local choices=(
-      "Change wallpaper"
-      "Configure displays"
-      "Suspend PC"
-      "Choose network connection"
-      "Mount device"
-      "Unmount device"
-   )
-   lib input choice "${choices[@]}"
-   lib input is-chosen 1 && /home/artem/.my-own-scripts/tiling_wms/sway/wallpaper_picker.sh
-   lib input is-chosen 2 && display_menu
-   lib input is-chosen 3 && systemctl suspend
-   lib input is-chosen 4 && nmtui
-   lib input is-chosen 5 && mount_menu
-   lib input is-chosen 6 && umount_menu
+  while true; do
+     local choices=(
+        "Change wallpaper"
+        "Configure displays"
+        "Suspend PC"
+        "Choose network connection"
+        "Mount device"
+        "Unmount device"
+        "Adjust brightness"
+        "Exit"
+     )
+     lib input choice "${choices[@]}"
+     lib input is-chosen 1 && /home/artem/.my-own-scripts/tiling_wms/sway/wallpaper_picker.sh
+     lib input is-chosen 2 && display_menu
+     lib input is-chosen 3 && systemctl suspend
+     lib input is-chosen 4 && nmtui
+     lib input is-chosen 5 && mount_menu
+     lib input is-chosen 6 && umount_menu
+     lib input is-chosen 7 && adjust_brightness
+   done
+}
+
+function adjust_brightness {
+  while true; do
+    lib input key-choice "k" "Increase brightness" "j" "Decrease brightness"
+    lib input is-key-stop-iteration && break
+    lib input is-key "k" && lib run "brightnessctl set +10%"
+    lib input is-key "j" && lib run "brightnessctl set 10%-"
+  done
 }
 
 function mount_menu {

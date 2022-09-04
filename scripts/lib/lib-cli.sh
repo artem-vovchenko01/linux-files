@@ -93,6 +93,15 @@ function my_os_lib_menu_input {
   arg_1="$1"
   shift 1
   case $arg_1 in
+    key-choice)
+      my_os_lib_input_key_choice "$@"
+      ;;
+    is-key)
+      my_os_lib_input_is_key "$@"
+      ;;
+    is-key-stop-iteration)
+      my_os_lib_input_is_key_stop_iteration "$@"
+      ;;
     yes-no)
       my_os_lib_input_yes_or_no "$@"
       ;;

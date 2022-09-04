@@ -12,6 +12,34 @@ function my_os_lib_input_yes_or_no {
   done
 }
 
+function my_os_lib_input_is_key_stop_iteration {
+  case $my_os_lib_input_char in
+    q)
+      return 0
+      ;;
+  esac
+  return 1
+}
+
+function my_os_lib_input_key_choice {
+   while [[ ! -z $1 ]]; do 
+     echo "$1) $2"
+     shift 2
+   done
+   echo "q) End working with this menu"
+
+   read -n 1 my_os_lib_input_char
+}
+
+function my_os_lib_input_is_key {
+  case $my_os_lib_input_char in
+    $1)
+      return 0
+      ;;
+  esac
+  return 1
+}
+
 function my_os_lib_input_no_or_yes {
   lib log notice "$1"
   lib settings is-off interactive && {
