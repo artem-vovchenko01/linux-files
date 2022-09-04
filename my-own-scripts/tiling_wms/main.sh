@@ -65,7 +65,7 @@ function mount_menu {
   lib log notice "Choose device you want to mount: "
   lib input choice $devices
   choice=$(lib input get-choice)
-  lib run "sudo mkdir /mnt/$choice"
+  lib run "sudo mkdir -p /mnt/$choice"
   lib run "sudo mount -o rw,gid=artem,uid=artem /dev/$choice /mnt/$choice" 
 }
 
