@@ -34,6 +34,7 @@ function main_menu {
      lib input is-chosen 5 && mount_menu
      lib input is-chosen 6 && umount_menu
      lib input is-chosen 7 && adjust_brightness
+     lib input is-chosen 8 && exit
    done
 }
 
