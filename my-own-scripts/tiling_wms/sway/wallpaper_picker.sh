@@ -13,6 +13,8 @@ background=$(ls $WALLPAPER_PATH | wofi -S dmenu)
 
 sed -Ei "s/^set \\\$default_wallpaper.*/set \\\$default_wallpaper $background/" ~/.config/sway/config
 
-swaymsg reload
+swaymsg "output * bg ~/Resources/Wallpapers/$background fill"
+
+# swaymsg reload
 notify-send -i $WALLPAPER_PATH/$background "Wallpaper $background set!"
 

@@ -55,9 +55,12 @@ function my_os_lib_input_no_or_yes {
 }
 
 function my_os_lib_input_choice {
+  local SAVE_COLUMNS=$COLUMNS
+  COLUMNS=12
   select CHOICE in "$@"; do
     return $REPLY
   done
+  COLUMNS=$SAVE_COLUMNS
 }
 
 function my_os_lib_input_get_choice {

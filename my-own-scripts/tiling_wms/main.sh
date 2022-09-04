@@ -7,11 +7,13 @@ function turn_on_display {
   mode=$2
   scale=$3
   wlr-randr --output $dispaly --on --mode $mode --scale $scale
+  lib log "Display $dispaly is turned on"
 }
 
 function turn_off_display {
   dispaly=$1
   wlr-randr --output $dispaly --off
+  lib log "Display $dispaly is turned off"
 }
 
 function main_menu {
@@ -27,13 +29,13 @@ function main_menu {
         "Exit"
      )
      lib input choice "${choices[@]}"
-     lib input is-chosen 1 && /home/artem/.my-own-scripts/tiling_wms/sway/wallpaper_picker.sh
-     lib input is-chosen 2 && display_menu
-     lib input is-chosen 3 && systemctl suspend
-     lib input is-chosen 4 && nmtui
-     lib input is-chosen 5 && mount_menu
-     lib input is-chosen 6 && umount_menu
-     lib input is-chosen 7 && adjust_brightness
+     lib input is-chosen 1 && /home/artem/.my-own-scripts/tiling_wms/sway/wallpaper_picker.sh && continue
+     lib input is-chosen 2 && display_menu && continue
+     lib input is-chosen 3 && systemctl suspend && continue
+     lib input is-chosen 4 && nmtui && continue
+     lib input is-chosen 5 && mount_menu && continue
+     lib input is-chosen 6 && umount_menu && continue
+     lib input is-chosen 7 && adjust_brightness && continue
      lib input is-chosen 8 && exit
    done
 }
@@ -45,6 +47,7 @@ function adjust_brightness {
     lib input is-key "k" && lib run "brightnessctl set +10%"
     lib input is-key "j" && lib run "brightnessctl set 10%-"
   done
+  lib log "Brightness adjustment is done!"
 }
 
 function mount_menu {
@@ -55,6 +58,7 @@ function mount_menu {
   choice=$(lib input get-choice)
   lib run "sudo mkdir -p /mnt/$choice"
   lib run "sudo mount -o rw,gid=artem,uid=artem /dev/$choice /mnt/$choice" 
+  lib log "Device /dev/$choice is mounted on /mnt/$choice"
 }
 
 function umount_menu {
@@ -65,40 +69,27 @@ function umount_menu {
   lib input choice $devices
   choice=$(lib input get-choice)
   lib run "sudo umount $choice"
+  lib log "Device /dev/$choice is unmounted from /mnt/$choice"
 }
 
 function display_menu {
-  OPTIONS=(1 "Turn on HDMI-A-1"
-           2 "Turn on eDP-1"
-           3 "Turn off HDMI-A-1"
-           4 "Turn off eDP-1"
-           5 "Turn on both")
-  CHOICE=$(dialog --clear \
-                  --backtitle "$BACKTITLE" \
-                  --title "$TITLE" \
-                  --menu "$MENU" \
-                  $HEIGHT $WIDTH $CHOICE_HEIGHT \
-                  "${OPTIONS[@]}" \
-                  2>&1 >/dev/tty)
-  clear
-  case $CHOICE in
-          1)
-              turn_on_display HDMI-A-1 2560x1440@74.968002Hz 1.2
-              ;;
-          2)
-              turn_on_display eDP-1 1920x1080@60Hz 1
-              ;;
-          3)
-              turn_off_display HDMI-A-1
-              ;;
-          4)
-              turn_off_display eDP-1
-              ;;
-          5)
-              turn_on_display HDMI-A-1 2560x1440@74.968002Hz 1.2
-              turn_on_display eDP-1 1920x1080@60Hz 1
-              ;;
-  esac
+  local choices=(
+    "Turn on HDMI-A-1"
+    "Turn on eDP-1"
+    "Turn off HDMI-A-1"
+    "Turn off eDP-1"
+    "Turn on both"
+  )
+  lib input choice "${choices[@]}"
+  lib input is-chosen 1 && turn_on_display HDMI-A-1 2560x1440@74.968002Hz 1
+  lib input is-chosen 2 && turn_on_display eDP-1 1920x1080@60Hz 1
+  lib input is-chosen 3 && turn_off_display HDMI-A-1
+  lib input is-chosen 4 && turn_off_display eDP-1
+  lib input is-chosen 5 && {
+      turn_on_display HDMI-A-1 2560x1440@74.968002Hz 1
+      turn_on_display eDP-1 1920x1080@60Hz 1
+  }
+  lib log "Display configuration is finished"
 }
 
 main_menu

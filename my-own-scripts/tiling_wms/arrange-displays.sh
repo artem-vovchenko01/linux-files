@@ -12,7 +12,7 @@ function turn_off_display {
 
 wlr-randr | grep -v '^ ' | grep -q HDMI-A-1 &&
 {
-  turn_on_display HDMI-A-1 2560x1440@74.968002Hz 1.2
+  turn_on_display HDMI-A-1 2560x1440@74.968002Hz 1
   wlr-randr | grep -v '^ ' | grep -q eDP-1 &&
     turn_off_display eDP-1
 } ||

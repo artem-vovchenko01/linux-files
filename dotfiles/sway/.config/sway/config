@@ -239,7 +239,7 @@ output "HDMI-A-1" {
 	mode 2560x1440@74Hz
 	pos 0 0
 	transform normal
-    scale 1.2
+    scale 1
 }
 
 output "eDP-1" {
@@ -348,8 +348,8 @@ $bindsym $mod+Shift+minus move scratchpad
 $bindsym $mod+minus scratchpad show
 
 # screenshots
-$bindsym $mod+Shift+Print exec ~/.local/bin/scripts/tiling_wms/sway/grim.sh region
-$bindsym Print exec ~/.local/bin/scripts/tiling_wms/sway/grim.sh
+$bindsym $mod+Shift+Print exec $my_own_scripts/tiling_wms/sway/grim.sh region
+$bindsym Print exec $my_own_scripts/tiling_wms/sway/grim.sh
 
 # xf-bindings
 $bindsym XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5% && $sink_volume > $WOBSOCK
