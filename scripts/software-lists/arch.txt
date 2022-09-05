@@ -47,8 +47,15 @@ man-pages
 arch-wiki-docs
 # arch-wiki-lite
 
-# MONITORING
 
+########## TOOLS
+
+# AUDIO
+pulsemixer
+pavucontrol
+# pamier
+
+# MONITORING
 htop
 lsof
 smem
@@ -66,14 +73,17 @@ vifm
 zip
 unzip
 tree
+ntfs-3g
+pcmanfm
+nemo
 # ranger
 
 # SYSTEM
 earlyoom
 inotify-tools
-pavucontrol
 libnotify
 dialog
+brightnessctl
 
 # TOOLS
 stow
@@ -82,6 +92,7 @@ tmux
 ripgrep
 pv
 jq
+yq
 fzf
 neovim
 mlocate
@@ -107,8 +118,6 @@ grc
 # transmission-gtk
 
 
-########## MANJARO SWAY REPO
-# swaylock-effects
 
 
 ########## CONTENT
@@ -122,12 +131,13 @@ obs-studio
 aria2
 cmus
 libreoffice-fresh
+gimp
 yt-dlp
+vlc
 
 # blender
 # streamlink
 # inkscape
-# vlc
 # qbittorrent
 # musescore
 # scribus
@@ -139,6 +149,7 @@ yt-dlp
 docker
 virtualbox
 terraform
+ansible
 libxcrypt-compat
 
 # docker-compose

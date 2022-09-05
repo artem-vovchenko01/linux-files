@@ -12,6 +12,7 @@
 teams
 
 
+
 ########## BROWSERS
 
 
@@ -41,6 +42,7 @@ cht.sh-git
 # FILES
 
 lf
+pacseek
 # ventoy-bin
 # mutt-wizard-git
 

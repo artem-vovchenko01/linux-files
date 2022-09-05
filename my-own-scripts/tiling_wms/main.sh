@@ -52,7 +52,7 @@ function adjust_brightness {
 
 function mount_menu {
   lsblk
-  devices=$(cat /proc/partitions | awk '{ print $4 }' | tail -n +3 | grep -v nvme | grep -v zram | grep -v dm-0)
+  devices=$(cat /proc/partitions | awk '{ print $4 }' | tail -n +3 | grep -v zram | grep -v dm-0)
   lib log notice "Choose device you want to mount: "
   lib input choice $devices
   choice=$(lib input get-choice)
@@ -63,7 +63,7 @@ function mount_menu {
 
 function umount_menu {
   lsblk
-  devices=$(cat /proc/partitions | awk '{ print $4 }' | tail -n +3 | grep -v nvme | grep -v zram | grep -v dm-0)
+  devices=$(cat /proc/partitions | awk '{ print $4 }' | tail -n +3 | grep -v zram | grep -v dm-0)
   devices=$(mount | awk '{ print $3 }' | grep /mnt)
   lib log notice "Choose device you want to un-mount: "
   lib input choice $devices

@@ -8,13 +8,21 @@ playerctl
 grim
 slurp
 xorg-xwayland
-swaylock
+swaybg
+swaylock-effects-git
 swayidle
 mako
 waybar
+autotiling
+
+# swaylock
 # pipewire
 # pipewire-pulse 
 # pipewire-alsa
 # pipewire-jack
 # wireplumber
+
+########## LAUNCHERS
+
+# sway-launcher-desktop
 

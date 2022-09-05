@@ -70,7 +70,23 @@ bar {
 # LOCKING
 ########################################
 
-set $locking swaylock -f --show-failed-attempts -c 333333
+# set $locking swaylock -f --show-failed-attempts -c 333333
+# use swaylock-effects for the next to work
+set $locking swaylock \
+	--screenshots \
+	--clock \
+	--indicator \
+	--indicator-radius 100 \
+	--indicator-thickness 7 \
+	--effect-blur 7x5 \
+	--effect-vignette 0.5:0.5 \
+	--ring-color 0b044d \
+	--key-hl-color 1800ff \
+	--line-color 00000000 \
+	--inside-color 00000088 \
+	--separator-color 00000000 \
+	--grace 2 \
+	--fade-in 0.2
 set $idle swayidle -w \
     timeout 800 'exec $locking' \
     timeout 1200 'swaymsg "output * dpms off"' \
@@ -212,6 +228,11 @@ for_window [title="^wlay$"] floating enable
 
 # inhibit idle
 for_window [app_id="microsoft teams - preview"] inhibit_idle fullscreen
+
+# see if window uses wayland or xwayland
+# for_window [shell=".*"] title_format "%title :: %shell"
+
+for_window [class="pcmanfm"] floating enable
 
 ########################################
 # INPUTS
