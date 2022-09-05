@@ -68,8 +68,12 @@ function umount_menu {
   lib log notice "Choose device you want to un-mount: "
   lib input choice $devices
   choice=$(lib input get-choice)
+  lib log "Launching terminal for monitoring of dirty pages, which could impact unmounting time: "
+  foot bash -c 'watch grep -e Dirty -e Writeback: /proc/meminfo' &> /dev/null &
+  foot_pid=$(jobs -l | grep foot | awk '{ print $2 }')
   lib run "sudo umount $choice"
   lib log "Device /dev/$choice is unmounted from /mnt/$choice"
+  kill $foot_pid
 }
 
 function display_menu {
