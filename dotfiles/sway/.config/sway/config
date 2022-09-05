@@ -174,6 +174,7 @@ client.urgent             $yellow  $yellow  $base03
 
 # exec wl-paste -t text --watch clipman store --no-persist
 exec $idle
+exec --no-startup-id autotiling
 exec $notifications
 exec {
     '[ -x "$(command -v flashfocus)" ] && flashfocus'
@@ -283,6 +284,7 @@ $bindsym $mod+Shift+q kill
 $bindsym $mod+d exec $menu
 $bindsym $mod+Shift+c reload
 # $bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit'
+$bindsym $mod+Shift+e exec $locking
 
 # movements
 $bindsym $mod+Left focus left
@@ -352,19 +354,19 @@ $bindsym $mod+Shift+Print exec $my_own_scripts/tiling_wms/sway/grim.sh region
 $bindsym Print exec $my_own_scripts/tiling_wms/sway/grim.sh
 
 # xf-bindings
-$bindsym XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5% && $sink_volume > $WOBSOCK
+$bindsym --locked XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5% && $sink_volume > $WOBSOCK
 
-$bindsym XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5% && $sink_volume > $WOBSOCK
+$bindsym --locked XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5% && $sink_volume > $WOBSOCK
 
-$bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle && pactl get-sink-mute @DEFAULT_SINK@ | sed -En "/no/ s/.*/$($sink_volume)/p; /yes/ s/.*/0/p" && notify-send "Mute volume toggle pressed!"
+$bindsym --locked XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle && pactl get-sink-mute @DEFAULT_SINK@ | sed -En "/no/ s/.*/$($sink_volume)/p; /yes/ s/.*/0/p" && notify-send "Mute volume toggle pressed!"
 
-$bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle && pactl get-source-mute @DEFAULT_SOURCE@ | sed -En "/no/ s/.*/$($source_volume)/p; /yes/ s/.*/0/p" && notify-send "Mute microphone toggle pressed!"
+$bindsym --locked XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle && pactl get-source-mute @DEFAULT_SOURCE@ | sed -En "/no/ s/.*/$($source_volume)/p; /yes/ s/.*/0/p" && notify-send "Mute microphone toggle pressed!"
 
-$bindsym XF86MonBrightnessUp exec light -A 5 && light -G | cut -d'.' -f1 > $WOBSOCK
-$bindsym XF86MonBrightnessDown exec light -U 5 && light -G | cut -d'.' -f1 > $WOBSOCK
-$bindsym XF86AudioPlay exec playerctl play-pause && notify-send "Music puase/resume toggle pressed"
-$bindsym XF86AudioNext exec playerctl next && notify-send "Plaing next track"
-$bindsym XF86AudioPrev exec playerctl previous && notify-send "Playing previous track"
+$bindsym --locked XF86MonBrightnessUp exec light -A 5 && light -G | cut -d'.' -f1 > $WOBSOCK
+$bindsym --locked XF86MonBrightnessDown exec light -U 5 && light -G | cut -d'.' -f1 > $WOBSOCK
+$bindsym --locked XF86AudioPlay exec playerctl play-pause && notify-send "Music puase/resume toggle pressed"
+$bindsym --locked XF86AudioNext exec playerctl next && notify-send "Plaing next track"
+$bindsym --locked XF86AudioPrev exec playerctl previous && notify-send "Playing previous track"
 $bindsym XF86Search exec $menu
 $bindsym XF86PowerOff exec $shutdown
 $bindsym XF86TouchpadToggle input type:touchpad events toggle enabled disabled
