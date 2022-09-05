@@ -23,8 +23,7 @@ function main_menu {
         "Configure displays"
         "Suspend PC"
         "Choose network connection"
-        "Mount device"
-        "Unmount device"
+        "Work with block devices"
         "Adjust brightness"
         "Exit"
      )
@@ -33,10 +32,27 @@ function main_menu {
      lib input is-chosen 2 && display_menu && continue
      lib input is-chosen 3 && systemctl suspend && continue
      lib input is-chosen 4 && nmtui && continue
-     lib input is-chosen 5 && mount_menu && continue
-     lib input is-chosen 6 && umount_menu && continue
-     lib input is-chosen 7 && adjust_brightness && continue
-     lib input is-chosen 8 && exit
+     lib input is-chosen 5 && mounting_devices_menu && continue
+     lib input is-chosen 6 && adjust_brightness && continue
+     lib input is-chosen 7 && break
+   done
+}
+
+function mounting_devices_menu {
+  while true; do
+     local choices=(
+        "Mount device"
+        "Unmount device"
+        "List block devices"
+        "Show drives"
+        "Back to main menu"
+     )
+     lib input choice "${choices[@]}"
+     lib input is-chosen 1 && mount_menu && continue
+     lib input is-chosen 2 && umount_menu && continue
+     lib input is-chosen 3 && lsblk && continue
+     lib input is-chosen 4 && sudo fdisk -l && continue
+     lib input is-chosen 5 && break
    done
 }
 
@@ -59,6 +75,7 @@ function mount_menu {
   lib run "sudo mkdir -p /mnt/$choice"
   lib run "sudo mount -o rw,gid=artem,uid=artem /dev/$choice /mnt/$choice" 
   lib log "Device /dev/$choice is mounted on /mnt/$choice"
+  lsblk
 }
 
 function umount_menu {
@@ -73,6 +90,7 @@ function umount_menu {
   foot_pid=$(jobs -l | grep foot | awk '{ print $2 }')
   lib run "sudo umount $choice"
   lib log "Device /dev/$choice is unmounted from /mnt/$choice"
+  lsblk
   kill $foot_pid
 }
 
