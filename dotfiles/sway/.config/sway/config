@@ -232,7 +232,6 @@ for_window [app_id="microsoft teams - preview"] inhibit_idle fullscreen
 # see if window uses wayland or xwayland
 # for_window [shell=".*"] title_format "%title :: %shell"
 
-for_window [class="pcmanfm"] floating enable
 
 ########################################
 # INPUTS
@@ -373,6 +372,9 @@ $bindsym $mod+minus scratchpad show
 # screenshots
 $bindsym $mod+Shift+Print exec $my_own_scripts/tiling_wms/sway/grim.sh region
 $bindsym Print exec $my_own_scripts/tiling_wms/sway/grim.sh
+
+# video recording
+$bindsym $mod+Shift+r exec $my_own_scripts/tiling_wms/sway/wf-recorder.sh
 
 # xf-bindings
 $bindsym --locked XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5% && $sink_volume > $WOBSOCK
