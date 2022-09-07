@@ -41,8 +41,10 @@ function main_menu {
 function mounting_devices_menu {
   while true; do
      local choices=(
-        "Mount device"
-        "Unmount device"
+        "Block mount"
+        "Block unmount"
+        "MTP mount"
+        "MTP unmount"
         "List block devices"
         "Show drives"
         "Back to main menu"
@@ -50,10 +52,43 @@ function mounting_devices_menu {
      lib input choice "${choices[@]}"
      lib input is-chosen 1 && mount_menu && continue
      lib input is-chosen 2 && umount_menu && continue
-     lib input is-chosen 3 && lsblk && continue
-     lib input is-chosen 4 && sudo fdisk -l && continue
-     lib input is-chosen 5 && break
+     lib input is-chosen 3 && mtp_mount && continue
+     lib input is-chosen 4 && mtp_unmount && continue
+     lib input is-chosen 5 && lsblk && continue
+     lib input is-chosen 6 && sudo fdisk -l && continue
+     lib input is-chosen 7 && break
    done
+}
+
+function mtp_mount {
+  lib log "Listing all devices: "
+  gio mount -l
+  available=$(gio mount -li | grep activation_root | cut -d= -f2)
+  available_for_mount=""
+  mounted=$(gio mount -l | grep Mount | grep -oE 'mtp://.*')
+  for device in $available; do
+    echo $mounted | grep -q $device || available_for_mount="$available_for_mount $device"
+  done
+  lib log "Choose MTP device to mount: "
+  lib input choice $available_for_mount Cancel
+  chosen=$(lib input get-choice)
+  [[ $chosen == "Cancel" ]] && lib log "Cancelled" || {
+    lib log "Trying to mount $chosen ..."
+    lib run "gio mount $chosen"
+  }
+}
+
+function mtp_unmount {
+  lib log "Listing all devices: "
+  gio mount -l
+  available=$(gio mount -l | grep Mount | grep -oE 'mtp://.*')
+  lib log "Choose MTP device to unmount: "
+  lib input choice $available Cancel
+  chosen=$(lib input get-choice)
+  [[ $chosen == "Cancel" ]] && lib log "Cancelled" || {
+    lib log "Trying to unmount $chosen ..."
+    lib run "gio mount -u $chosen"
+  }
 }
 
 function adjust_brightness {
