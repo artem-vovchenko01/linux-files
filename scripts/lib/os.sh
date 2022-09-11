@@ -37,6 +37,7 @@ function my_os_lib_sudo_mirror {
 }
 
 function my_os_lib_check_platform {
+  lib log "Checking OS platform ..."
   cat /etc/os-release | grep -iq debian && MY_OS_SYSTEM=DEBIAN
   cat /etc/os-release | grep -iq ubuntu && MY_OS_SYSTEM=UBUNTU
   cat /etc/os-release | grep -iq arch && MY_OS_SYSTEM=ARCH

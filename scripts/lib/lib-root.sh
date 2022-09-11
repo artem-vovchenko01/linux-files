@@ -11,9 +11,9 @@ function my_os_lib_prepare {
 
   lib log "All paths updated accordingly to repo path"
 
-  my_os_lib_check_dependencies
-
   my_os_lib_check_platform
+
+  my_os_lib_check_dependencies
 
   lib log banner "Your system identified as: $MY_OS_SYSTEM"
 }
