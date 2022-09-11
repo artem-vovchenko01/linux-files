@@ -201,6 +201,9 @@ function my_os_lib_menu_git {
     force-push-artifact)
       my_os_lib_git_force_push_artifact "$@"
       ;;
+    get-all-repos)
+      my_os_lib_git_get_all_repos "$@"
+      ;;
   esac
 }
 

@@ -116,7 +116,7 @@ function my_os_lib_script_picker {
 
 function my_os_lib_script_multi_picker {
   CHOICES=""
-  lib log warn "Picking multiple scripts to run"
+  lib log notice "Picking multiple scripts to run"
   while true; do
     lib script-picker NO_SOURCE
     CHOICES="$CHOICES $MY_OS_LIB_CHOSEN_SCRIPT_PATH"

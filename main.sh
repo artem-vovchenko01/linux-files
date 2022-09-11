@@ -19,12 +19,15 @@ source $MY_OS_PATH_LIB/lib-root.sh
 ##################################################
 
 function lib_os_script_setup_software {
-  lib log warn "Choose the software lists you want to install:"
+  lib log notice "Choose the software lists you want to install:"
   lib input multiple-choice $(ls $MY_OS_PATH_SOFT_LISTS_DIR | grep -v flatpak)
   MY_OS_LIB_SELECTED_SOFT_LIST_FILES="$(lib input get-multiple-choice)"
 }
 
 function lib_os_script_setup_manage_git_repos {
+  lib log notice "Choose repos you want to configure:"
+  lib input multiple-choice $(lib git get-all-repos)
+  MY_OS_LIB_SELECTED_REPOS=$(lib input get-multiple-choice)
   # archive password
   lib input secret-value "Please, provide password for encrypting and decrypting archives. It won't be shown to the screen and will be stored only in-memory"
   password_attempt_1="$(lib input get-value)"
@@ -38,7 +41,7 @@ function lib_os_script_setup_manage_git_repos {
 ##################################################
 
 # read sudo password
-lib log warn "Enter sudo password, so you won't need to do it again"
+lib log notice "Enter sudo password, so you won't need to do it again"
 lib run "sudo pwd > /dev/null"
 
 # settings

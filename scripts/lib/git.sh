@@ -18,6 +18,10 @@ function my_os_lib_git_get_url {
   esac
 }
 
+function my_os_lib_git_get_all_repos {
+  echo browser-profiles browser-profiles-brave vimwiki linux-files software-backups
+}
+
 function my_os_lib_git_get_artifact_destination {
   case "$(lib git get-selected-repo)" in
     browser-profiles)
