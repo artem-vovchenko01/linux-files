@@ -7,7 +7,7 @@ function my_os_lib_pkg_verify_pkg_exists {
   lib os is arch && my_os_lib_pkg_verify_cmd_exists paru && paru -Si $pkg &> /dev/null && return 0
   lib os is arch && pacman -Si $pkg &> /dev/null && return 0
   lib os is arch && pacman -Sg $pkg &> /dev/null && return 0
-  lib os is debian && apt info $pkg &> /dev/null && return 0
+  lib os is debian-based && apt info $pkg &> /dev/null && return 0
   lib os is fedora && dnf info $pkg &> /dev/null && return 0
   lib log warn "Package $pkg not found!"
   return 1
@@ -16,7 +16,7 @@ function my_os_lib_pkg_verify_pkg_exists {
 function my_os_lib_pkg_verify_pkg_installed {
 	lib os is arch && pacman -Qi $1 &> /dev/null && return 0
 	lib os is arch && pacman -Qg $1 &> /dev/null && lib log warn "Package group $1 is found installed " && return 0
-	lib os is debian && dpkg -l $1 &> /dev/null && return 0
+	lib os is debian-based && dpkg -l $1 &> /dev/null && return 0
 	lib os is fedora && rpm -qa | grep -q $1 && return 0
   lib log warn "Package $1 is not installed!"
   return 1
