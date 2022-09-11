@@ -102,12 +102,14 @@ function my_os_lib_menu_input {
     is-key-stop-iteration)
       my_os_lib_input_is_key_stop_iteration "$@"
       ;;
+
     yes-no)
       my_os_lib_input_yes_or_no "$@"
       ;;
     no-yes)
       my_os_lib_input_no_or_yes "$@"
       ;;
+
     value)
       my_os_lib_input_ask_value "$@"
       ;;
@@ -117,6 +119,7 @@ function my_os_lib_menu_input {
     get-value)
       my_os_lib_input_get_value "$@"
       ;;
+
     choice)
       my_os_lib_input_choice "$@"
       ;;
@@ -125,6 +128,13 @@ function my_os_lib_menu_input {
       ;;
     get-choice)
       my_os_lib_input_get_choice "$@"
+      ;;
+
+    multiple-choice)
+      my_os_lib_input_multiple_choice "$@"
+      ;;
+    get-multiple-choice)
+      my_os_lib_input_get_multiple_choice "$@"
       ;;
     *)
       my_os_lib_input_yes_or_no "$arg_1" "$@"

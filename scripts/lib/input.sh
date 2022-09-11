@@ -31,6 +31,19 @@ function my_os_lib_input_key_choice {
    read -n 1 my_os_lib_input_char
 }
 
+function my_os_lib_input_multiple_choice {
+  while true; do
+    [[ -n $CHOICES ]] && lib log warn "Already chosen: $CHOICES"
+    lib log warn "Choose an option. You can Finish (if done) or Reset (to clear choices):"
+    lib input choice "$@" Finish Reset
+    choice="$(lib input get-choice)"
+    [[ $choice == "Finish" ]] && break
+    [[ $choice == "Reset" ]] && CHOICES="" && lib log warn "Choices were successfully reset" && continue
+    CHOICES="$choice ${CHOICES}"
+  done
+  lib log warn "Your final choice is: $CHOICES"
+}
+
 function my_os_lib_input_is_key {
   case $my_os_lib_input_char in
     $1)
@@ -65,6 +78,10 @@ function my_os_lib_input_choice {
 
 function my_os_lib_input_get_choice {
   echo "$CHOICE"
+}
+
+function my_os_lib_input_get_multiple_choice {
+  echo "$CHOICES"
 }
 
 function my_os_lib_input_is_chosen {
