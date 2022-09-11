@@ -46,3 +46,5 @@ gsettings set org.gnome.shell.keybindings toggle-overview "[ '<Super>d' ]"
 # resize with right button
 gsettings set org.gnome.desktop.wm.preferences resize-with-right-button true
 
+# disable default Win+number behavior (in Ubuntu, for example)
+gsettings set org.gnome.shell.extensions.dash-to-dock hot-keys false
