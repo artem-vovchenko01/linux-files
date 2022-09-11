@@ -1,12 +1,6 @@
 lib log banner "Starting user setup script (full setup)"
 
 ##############################
-# CHECK - USER IS NOT ROOT
-##############################
-
-[[ $USER == "root" ]] && { lib log err "Running as root discouraged. Exiting"; exit 1; }
-
-##############################
 # NETOWRK CONFIGURATION
 ##############################
 
@@ -58,54 +52,6 @@ lib os is fedora && {
 }
 
 ##############################
-# GRUB CONFIGURATION
-##############################
-
-# exc_int "less /etc/default/grub"
-# exc "echo GRUB_DISABLE_OS_PROBER=false | sudo tee -a /etc/default/grub"
-# exc "sudo update-grub"
-
-##############################
-# CUSTOM SYSTEMD UNITS
-##############################
-
-lib log "Working on custom systemd units ..."
-lib input "Install custom systemd units?" && lib run "cp $MY_OS_PATH_REPO/custom-systemd-units/* ~/.config/systemd/user/"
-lib input no-yes "Enable sway battery manager - custom systemd unit?" && lib run "systemctl --user enable --now sway-battery-warn.timer"
-
-##############################
-# WORKING WITH REPOSITORIES
-##############################
-
-lib log "Working with my git repos ..."
-# Firefox profile
-lib git select browser-profiles-brave
-lib input "Close Brave for working with it's profile?" && {
-  lib run "pkill brave"
-  [[ ! -e $(lib git get-artifact-path) ]] && lib git unpack-artifact
-  lib git update-artifact
-  lib git force-push-artifact
-}
-
-# Firefox profile
-lib git select browser-profiles
-lib input "Close Firefox for working with it's profile?" && {
-  lib run "killall firefox"
-  [[ ! -e $(lib git get-artifact-path) ]] && lib git unpack-artifact
-  lib git update-artifact
-  lib git force-push-artifact
-}
-
-# Backups
-lib git select software-backups
-[[ ! -e $(lib git get-artifact-path) ]] && lib git unpack-artifact
-lib git update-artifact
-lib git force-push-artifact
-
-# Vimwiki
-lib git select vimwiki
-
-##############################
 # LINKING ZHISTORY
 ##############################
 
@@ -113,20 +59,6 @@ lib git select vimwiki
   [[ -e ~/.zhistory ]] && lib input "~/.zhistory already exists. Overwrite it and symlink to reference one?" && lib run "ln -sf $(lib path software-backups)/zsh/.zhistory ~/.zhistory"
   [[ ! -e ~/.zhistory ]] && lib run "ln -s $(lib path software-backups)/zsh/.zhistory ~/.zhistory"
 }
-
-##############################
-# LAUNCHING OTHER SCRIPTS
-##############################
-
-lib input "Install software?" && lib run "source $(lib path base-scripts)/04-software.sh"
-lib input "Install dotfiles?" && lib run "source $(lib path base-scripts)/05-configs.sh"
-lib input "Install fonts?" && lib run "source $(lib path base-scripts)/10-fonts.sh"
-
-lib log "Trying to remove Documents directory, if it's empty, so it can be changed to symlink"
-lib run "rmdir ~/Documents"
-lib input "Install symlinks for directories?" && lib run "source $(lib path base-scripts)/06-symlink-dirs.sh"
-
-lib input "Install sway?" && lib run "source $(lib path envs)/sway.sh"
 
 ##############################
 # NPM

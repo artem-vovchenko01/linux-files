@@ -20,6 +20,9 @@ function lib {
     script-picker)
       my_os_lib_script_picker "$@"
       ;;
+    script-multi-picker)
+      my_os_lib_script_multi_picker "$@"
+      ;;
     snippet)
       my_os_lib_menu_snippet "$@"
       ;;
@@ -105,6 +108,9 @@ function my_os_lib_menu_input {
 
     yes-no)
       my_os_lib_input_yes_or_no "$@"
+      ;;
+    interactive)
+      my_os_lib_input_interactive "$@"
       ;;
     no-yes)
       my_os_lib_input_no_or_yes "$@"

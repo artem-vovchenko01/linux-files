@@ -12,6 +12,16 @@ function my_os_lib_input_yes_or_no {
   done
 }
 
+function my_os_lib_input_interactive {
+  lib log notice "$1"
+  select yn in "Yes" "No"; do
+    case $yn in
+      Yes ) return 0;;
+      No ) return 1;;
+    esac
+  done
+}
+
 function my_os_lib_input_is_key_stop_iteration {
   case $my_os_lib_input_char in
     q)
@@ -32,6 +42,7 @@ function my_os_lib_input_key_choice {
 }
 
 function my_os_lib_input_multiple_choice {
+  CHOICES=""
   while true; do
     [[ -n $CHOICES ]] && lib log warn "Already chosen: $CHOICES"
     lib log warn "Choose an option. You can Finish (if done) or Reset (to clear choices):"

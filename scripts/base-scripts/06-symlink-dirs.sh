@@ -33,6 +33,9 @@ function lib_os_copy_int_wrapper {
 	lib_os_copy_link "$SRC" "$TARGET"
 }
 
+lib log "Trying to remove Documents directory, if it's empty, so it can be changed to symlink"
+lib run "rmdir ~/Documents"
+
 # Removing links if exist
 
 lib input "Remove links which are already present?" && {

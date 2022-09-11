@@ -1,0 +1,200 @@
+#################### SOFTWARE SELECTION LIST ####################
+# Comment out or remove packages you don't need. You can use regular or AUR packages
+# This file is temporary, so don't worry changing
+
+
+########## SYSTEM PACKAGES
+base-devel
+linux-headers
+
+
+########## PROGRAMMING LANGUAGES
+make
+python-pip
+nodejs
+npm
+ipython
+rust
+rpm-tools
+vagrant
+
+
+########## SOCIAL
+telegram-desktop
+
+# thunderbird
+# discord
+
+
+########## BROWSERS
+firefox
+
+# torbrowser-launcher
+# qutebrowser
+
+
+########## LEARNING
+# anki
+
+
+########## TOOLS
+
+# HELP
+tldr
+sysstat
+man-db
+man-pages
+arch-wiki-docs
+# arch-wiki-lite
+
+
+########## TOOLS
+
+# AUDIO
+pulsemixer
+pavucontrol
+# pamier
+
+# MONITORING
+htop
+lsof
+smem
+gdu
+bleachbit
+powertop
+iotop
+# ncdu
+# cockpit
+
+
+# FILES
+unrar
+vifm
+zip
+unzip
+tree
+ntfs-3g
+pcmanfm
+nemo
+# ranger
+
+# SYSTEM
+earlyoom
+inotify-tools
+libnotify
+dialog
+brightnessctl
+
+# TOOLS
+stow
+git
+tmux
+ripgrep
+pv
+jq
+yq
+fzf
+neovim
+mlocate
+wget
+# alacritty
+# xterm
+
+# PACKAGE MANAGEMENT
+pkgfile
+flatpak
+reflector
+pacutils
+
+# NETWORKING
+net-tools
+bind
+traceroute
+
+grc
+
+########## FILES
+# pcmanfm-gtk3
+# transmission-gtk
+
+
+
+
+########## CONTENT
+mpv
+zathura
+zathura-pdf-mupdf
+zathura-djvu
+audacity
+kdenlive
+obs-studio
+aria2
+cmus
+libreoffice-fresh
+gimp
+yt-dlp
+vlc
+
+# blender
+# streamlink
+# inkscape
+# qbittorrent
+# musescore
+# scribus
+# cherrytree
+# youtube-dl
+
+
+########## DEVELOPMENT
+docker
+virtualbox
+terraform
+ansible
+libxcrypt-compat
+
+# docker-compose
+# qemu
+# dosbox
+# code
+# nasm
+# jdk8-openjdk
+# jdk11-openjdk
+
+
+########## DEVELOPMENT
+## not sure if everythnig really in standard repos
+# python
+# python-graphviz
+# python-imutils
+# python-matplotlib
+# python-opencv
+# python-openpyxl
+# python-pydotplus
+# python-scikit-learn
+# python-statsmodels
+# python-tensorflow
+# python-xlrd
+
+
+########## PENTESTING
+nmap
+socat
+tcpdump
+mtr
+
+# macchanger
+# proxychains-ng
+
+
+# xcursor-breeze
+# papirus-maia-icon-theme
+
+
+########## FUN
+cmatrix 
+cowsay
+neofetch
+lolcat
+
+# sl
+

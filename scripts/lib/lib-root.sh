@@ -99,17 +99,30 @@ function my_os_lib_script_picker {
   script_name="$(lib input get-choice)"
   if [[ "$script_name" == "Choose other script" ]]; then
     lib log "Select script directory"
-    lib input choice $(ls $MY_OS_PATH_ADDITIONAL_SCRIPTS)
+    lib input choice $(ls -F $MY_OS_PATH_ADDITIONAL_SCRIPTS | grep / | tr -d /)
     script_dir="$(lib input get-choice)"
     lib log "Select script you want to run"
     lib input choice $(ls $MY_OS_PATH_ADDITIONAL_SCRIPTS/$script_dir)
     script_name="$(lib input get-choice)"
     script_path=$MY_OS_PATH_ADDITIONAL_SCRIPTS/$script_dir/$script_name
-    msg_info "Executing chosen script ($script_path) ..."
-    source $script_path
+    
+    MY_OS_LIB_CHOSEN_SCRIPT_PATH=$script_path
+    [[ $1 != "NO_SOURCE" ]] && lib log notice "Executing chosen script ($script_path) ..." && source $script_path
   else
-    source $MY_OS_PATH_BASE_SCRIPTS/$script_name
+    MY_OS_LIB_CHOSEN_SCRIPT_PATH=$MY_OS_PATH_BASE_SCRIPTS/$script_name
+    [[ $1 != "NO_SOURCE" ]] && source $MY_OS_PATH_BASE_SCRIPTS/$script_name
   fi
+}
+
+function my_os_lib_script_multi_picker {
+  CHOICES=""
+  lib log warn "Picking multiple scripts to run"
+  while true; do
+    lib script-picker NO_SOURCE
+    CHOICES="$CHOICES $MY_OS_LIB_CHOSEN_SCRIPT_PATH"
+    lib log notice "Your choices so far: $CHOICES"
+    lib input interactive "Continue choosing scripts?" || break
+  done
 }
 
 function my_os_lib_source_libs {
