@@ -98,8 +98,8 @@ function adjust_brightness {
   while true; do
     lib input key-choice "k" "Increase brightness" "j" "Decrease brightness"
     lib input is-key-stop-iteration && break
-    lib input is-key "k" && lib run "brightnessctl set +10%"
-    lib input is-key "j" && lib run "brightnessctl set 10%-"
+    lib input is-key "k" && lib run "brightnessctl set +10% || sudo brightnessctl set +10%"
+    lib input is-key "j" && lib run "brightnessctl set 10%- || sudo brightnessctl set 10%-"
   done
   lib log "Brightness adjustment is done!"
 }
