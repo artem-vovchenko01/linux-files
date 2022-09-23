@@ -1,7 +1,7 @@
 [credential]
 	helper = store
 [user]
-	email = a.vovchenko01@gmail.com
+	email = artem_vovchenko@epam.com
 	name = Artem Vovchenko
 [init]
 	defaultBranch = main

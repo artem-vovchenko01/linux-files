@@ -41,8 +41,27 @@ function lib {
     check-success)
       [[ $? -eq 0 ]] && return 0 || return 1
       ;;
+    system)
+      my_os_lib_menu_system "$@"
+      ;;
     *)
       lib log "lib command $1 not found!"
+      ;;
+  esac
+}
+
+function my_os_lib_menu_system {
+  arg_1="$1"
+  shift 1
+  case $arg_1 in
+    configure-displays)
+      my_os_lib_system_configure_displays "$@"
+      ;;
+    configure-displays-optimal)
+      my_os_lib_system_configure_displays_optimal "$@"
+      ;;
+    turnoff-displays)
+      my_os_lib_system_configure_displays_turnoff "$@"
       ;;
   esac
 }
@@ -128,6 +147,9 @@ function my_os_lib_menu_input {
 
     choice)
       my_os_lib_input_choice "$@"
+      ;;
+    choose-line)
+      my_os_lib_input_choose_line "$@"
       ;;
     is-chosen)
       my_os_lib_input_is_chosen "$@"

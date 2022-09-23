@@ -2,20 +2,6 @@
 
 source ~/.my-git-os/linux-files/scripts/lib/lib-root.sh
 
-function turn_on_display {
-  dispaly=$1
-  mode=$2
-  scale=$3
-  wlr-randr --output $dispaly --on --mode $mode --scale $scale
-  lib log "Display $dispaly is turned on"
-}
-
-function turn_off_display {
-  dispaly=$1
-  wlr-randr --output $dispaly --off
-  lib log "Display $dispaly is turned off"
-}
-
 function main_menu {
   while true; do
      local choices=(
@@ -25,16 +11,33 @@ function main_menu {
         "Choose network connection"
         "Work with block devices"
         "Adjust brightness"
+	"EPAM"
         "Exit"
      )
      lib input choice "${choices[@]}"
-     lib input is-chosen 1 && /home/artem/.my-own-scripts/tiling_wms/sway/wallpaper_picker.sh && continue
+     lib input is-chosen 1 && ~/.my-own-scripts/tiling_wms/sway/wallpaper_picker.sh && continue
      lib input is-chosen 2 && display_menu && continue
      lib input is-chosen 3 && systemctl suspend && continue
      lib input is-chosen 4 && nmtui && continue
      lib input is-chosen 5 && mounting_devices_menu && continue
      lib input is-chosen 6 && adjust_brightness && continue
-     lib input is-chosen 7 && break
+     lib input is-chosen 7 && epam_menu && continue
+     lib input is-chosen 8 && break
+   done
+}
+
+function epam_menu {
+  while true; do
+     local choices=(
+        "Restart GlobalProtect service"
+        "Back to main menu"
+     )
+     lib input choice "${choices[@]}"
+     lib input is-chosen 1 && {
+	    lib run "sudo systemctl restart gpd.service"
+     	    lib run "systemctl status gpd.service"
+     } && continue
+     lib input is-chosen 2 && break
    done
 }
 
@@ -108,7 +111,7 @@ function mount_menu {
   lib input choice $devices
   choice=$(lib input get-choice)
   lib run "sudo mkdir -p /mnt/$choice"
-  lib run "sudo mount -o rw,gid=artem,uid=artem /dev/$choice /mnt/$choice" 
+  lib run "sudo mount -o rw,gid=$(whoami),uid=$(whoami) /dev/$choice /mnt/$choice" 
   lib log "Device /dev/$choice is mounted on /mnt/$choice"
   lsblk
 }
@@ -130,23 +133,17 @@ function umount_menu {
 }
 
 function display_menu {
-  local choices=(
-    "Turn on HDMI-A-1"
-    "Turn on eDP-1"
-    "Turn off HDMI-A-1"
-    "Turn off eDP-1"
-    "Turn on both"
-  )
-  lib input choice "${choices[@]}"
-  lib input is-chosen 1 && turn_on_display HDMI-A-1 2560x1440@74.968002Hz 1
-  lib input is-chosen 2 && turn_on_display eDP-1 1920x1080@60Hz 1
-  lib input is-chosen 3 && turn_off_display HDMI-A-1
-  lib input is-chosen 4 && turn_off_display eDP-1
-  lib input is-chosen 5 && {
-      turn_on_display HDMI-A-1 2560x1440@74.968002Hz 1
-      turn_on_display eDP-1 1920x1080@60Hz 1
-  }
-  lib log "Display configuration is finished"
+  while true; do
+    local choices=(
+      "Configure and turn on display"
+      "Turn off display"
+      "Back to main menu"
+    )
+    lib input choice "${choices[@]}"
+    lib input is-chosen 1 && lib system configure-displays && continue
+    lib input is-chosen 2 && lib system turnoff-displays && continue
+    lib input is-chosen 3 && break
+  done
 }
 
 main_menu

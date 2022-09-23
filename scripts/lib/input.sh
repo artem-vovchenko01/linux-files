@@ -87,6 +87,22 @@ function my_os_lib_input_choice {
   COLUMNS=$SAVE_COLUMNS
 }
 
+function my_os_lib_input_choose_line {
+  LINES="$1"
+  OLDIFS="$IFS"
+  IFS=$'\n'
+
+  final_lines=()
+
+  for line in $LINES; do
+    final_lines+=( "$line" )
+  done
+   
+  my_os_lib_input_choice "${final_lines[@]}"
+
+  IFS="$OLDIFS"
+}
+
 function my_os_lib_input_get_choice {
   echo "$CHOICE"
 }
