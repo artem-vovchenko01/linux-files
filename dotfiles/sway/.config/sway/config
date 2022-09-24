@@ -80,13 +80,19 @@ set $locking swaylock \
 	--indicator-thickness 7 \
 	--effect-blur 7x5 \
 	--effect-vignette 0.5:0.5 \
-	--ring-color 0b044d \
+	--ring-color 3c4a5a \
 	--key-hl-color 1800ff \
 	--line-color 00000000 \
 	--inside-color 00000088 \
 	--separator-color 00000000 \
 	--grace 2 \
-	--fade-in 0.2
+	--fade-in 0.2 || swaylock \
+  --color 02050f \
+	--ring-color 0b044d \
+	--key-hl-color 1800ff \
+	--line-color 00000000 \
+	--inside-color 00000088 \
+	--separator-color 00000000 || swaylock
 set $idle swayidle -w \
     timeout 800 'exec $locking' \
     timeout 1200 'swaymsg "output * dpms off"' \

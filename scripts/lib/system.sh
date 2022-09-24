@@ -61,7 +61,7 @@ function my_os_lib_system_configure_displays_optimal {
     my_os_lib_system_turn_on_display $display ${resolution}@${rate} $scale
   fi
 
-  for other in $(echo $displays | grep -v $display); do
+  for other in $(echo "$displays" | grep -v $display); do
     my_os_lib_system_turn_off_display $other
   done
 }

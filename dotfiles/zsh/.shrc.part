@@ -144,3 +144,5 @@ if contains "$_CUR_SHELL_PROC" "zsh"; then
   [ -e $ZSH_POWERLEVEL10K_THEME_OTHER ] && source $ZSH_POWERLEVEL10K_THEME_OTHER
 fi
 export PATH=$HOME/.local/bin:$PATH
+
+alias check_battery=" upower -i `upower -e | grep 'BAT'` | grep perc"
