@@ -33,12 +33,6 @@ lib log banner "Running misc script"
   ask "Source the script with gnome shortcuts?" Y && exc "source $CUSTOM_SCRIPTS_PATH/gnome/gnome_shortcut_script.sh"
 }
 
-##############################
-# SYMLINKING SOME BINARIES
-##############################
-
-ask "Symlink /bin/nvim to /bin/vi?" Y && exc "sudo ln -s /bin/nvim /bin/vi"
-ask "Symlink /bin/nvim to /bin/vim?" Y && exc "sudo ln -s /bin/nvim /bin/vim"
 
 exc_int "rm -r ~/linux-files"
 

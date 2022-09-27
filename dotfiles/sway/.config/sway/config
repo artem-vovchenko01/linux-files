@@ -195,7 +195,7 @@ client.urgent             $yellow  $yellow  $base03
 ########################################
 
 # exec wl-paste -t text --watch clipman store --no-persist
-exec $idle
+# exec $idle
 exec --no-startup-id autotiling
 exec $notifications
 exec {

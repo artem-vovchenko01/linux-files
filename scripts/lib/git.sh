@@ -85,7 +85,7 @@ function my_os_lib_git_artifact_unpack {
     return
   }
   lib log "Unzipping ... (showing tail of output)"
-  unzip -P $(lib settings get zip_passwd) $MY_OS_GIT_ARTIFACT_NAME -d $artifact_destination | tail
+  unzip -P $(lib settings get zip_passwd_decrypt) $MY_OS_GIT_ARTIFACT_NAME -d $artifact_destination | tail
   lib log "Removing temporary zip archive:"
   lib run "rm $MY_OS_GIT_ARTIFACT_NAME"
   lib log "Listing:"
@@ -101,7 +101,7 @@ function my_os_lib_git_update_artifact {
   lib run "git remote add origin $REMOTE_URL"
   lib run "cp -r $(my_os_lib_git_get_artifact_destination)/$(my_os_lib_git_get_artifact_dir_name) ."
   lib log "Zipping (showing tail of output) ..."
-  zip -P $(lib settings get zip_passwd) -r $MY_OS_GIT_ARTIFACT_NAME $(my_os_lib_git_get_artifact_dir_name) | tail
+  zip -P $(lib settings get zip_passwd_encrypt) -r $MY_OS_GIT_ARTIFACT_NAME $(my_os_lib_git_get_artifact_dir_name) | tail
   lib run "rm -rf $(my_os_lib_git_get_artifact_dir_name)"
   lib log "Splitting the archive into smaller chunks:"
   lib run "split -b 4M $MY_OS_GIT_ARTIFACT_NAME"

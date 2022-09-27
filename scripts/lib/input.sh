@@ -50,9 +50,9 @@ function my_os_lib_input_multiple_choice {
     choice="$(lib input get-choice)"
     [[ $choice == "Finish" ]] && break
     [[ $choice == "Reset" ]] && CHOICES="" && lib log notice "Choices were successfully reset" && continue
-    CHOICES="$choice ${CHOICES}"
+    CHOICES+=( "$choice" )
   done
-  lib log notice "Your final choice is: $CHOICES"
+  lib log notice "Your final choice is: ${CHOICES[@]}"
 }
 
 function my_os_lib_input_is_key {
@@ -108,7 +108,10 @@ function my_os_lib_input_get_choice {
 }
 
 function my_os_lib_input_get_multiple_choice {
-  echo "$CHOICES"
+  for i in ${CHOICES[@]}; do
+    echo -n "$i"
+    echo -n " "
+  done
 }
 
 function my_os_lib_input_is_chosen {

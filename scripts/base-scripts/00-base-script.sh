@@ -1,12 +1,10 @@
-lib log banner "Starting user setup script (full setup)"
-
-##############################
-# NETOWRK CONFIGURATION
-##############################
+# Check networking
 
 # lib run interactive "nmtui"
-lib log "Checking network connectivity ..."
-lib snippet ping
+# lib log "Checking network connectivity ..."
+# lib snippet ping
+
+wget -q --spider http://google.com || lib log err "No network connection! Exiting" && exit 1
 
 ##############################
 # INSTALLING REQUIRED SOFTWARE
@@ -27,7 +25,7 @@ lib os is arch && {
 
 lib os is debian && {
   lib input "Update repositories?" && lib run "sudo apt update"
-  lib input "Install build-essential?" && lib run "install_pkg build-essential"
+  lib input "Install build-essential?" && lib run "lib pkg install build-essential"
 }
 
 lib os is fedora && {
@@ -60,14 +58,11 @@ lib os is fedora && {
   [[ ! -e ~/.zhistory ]] && lib run "ln -s $(lib path software-backups)/zsh/.zhistory ~/.zhistory"
 }
 
-##############################
-# NPM
-##############################
+# Installing basic software and dependencies
 
-lib log "Settings up npm ..."
-npm install -g git-file-history
-lib run "npm config set prefix '~/.npm-global'"
-
-lib log "npm: installing git-file-history ..."
-lib run "npm install -g git-file-history"
+my_os_lib_check_single_dep nvim neovim
+my_os_lib_check_single_dep git git
+my_os_lib_check_single_dep stow stow
+my_os_lib_check_single_dep curl curl
+my_os_lib_check_single_dep wget wget
 

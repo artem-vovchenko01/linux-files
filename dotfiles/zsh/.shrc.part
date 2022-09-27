@@ -77,40 +77,6 @@ function ssh_add_startup_keys {
 }
 
 ##############################
-# ALIASES
-##############################
-
-alias abs_path="abs_filename"
-alias ls="ls --color=auto"
-alias grep="grep --color=auto"
-alias l="ls -a"
-alias ll="l -hl"
-alias vcd="vicd ."
-alias g="git"
-alias gs="g status"
-alias gc="git commit"
-alias gp="git push"
-alias gl="git log --graph --all"
-alias ga="git add"
-alias v="nvim"
-alias perlconsole='rlwrap -A -pgreen -S"perl> " perl -wnE'"'"'say eval()//$@'"'"
-command -v lvim > /dev/null 2>&1 && {
-    alias v="lvim"
-    alias vi="lvim"
-}
-alias rtfm='ranger /usr/share/doc/arch-wiki/html/en'
-alias rtfmv='vifm /usr/share/doc/arch-wiki/html/en'
-alias ..="cd .."
-alias ...="cd ../.."
-alias ....="cd ../../.."
-alias kubectl="minikube kubectl -- "
-alias k="kubectl"
-
-DEVICE="Pixel_4_API_30_2"
-alias android-emulate='echo Emulating device: $DEVICE; ~/Android/Sdk/emulator/emulator -avd $DEVICE -gpu on'
-alias android-clear-locks='rm -f ~/.android/avd/$DEVICE.avd/*.lock'
-
-##############################
 # COMPLETIONS
 ##############################
 
@@ -143,6 +109,39 @@ if contains "$_CUR_SHELL_PROC" "zsh"; then
   [ -e $ZSH_POWERLEVEL10K_THEME_ARCH ] && source $ZSH_POWERLEVEL10K_THEME_ARCH
   [ -e $ZSH_POWERLEVEL10K_THEME_OTHER ] && source $ZSH_POWERLEVEL10K_THEME_OTHER
 fi
-export PATH=$HOME/.local/bin:$PATH
+
+##############################
+# ALIASES
+##############################
+
+alias abs_path="abs_filename"
+alias ls="ls --color=auto"
+alias grep="grep --color=auto"
+alias l="ls -a"
+alias ll="l -hl"
+alias vcd="vicd ."
+alias g="git"
+alias gs="g status"
+alias gc="git commit"
+alias gp="git push"
+alias gl="git log --graph --all"
+alias ga="git add"
+alias v="nvim"
+alias perlconsole='rlwrap -A -pgreen -S"perl> " perl -wnE'"'"'say eval()//$@'"'"
+command -v lvim > /dev/null 2>&1 && {
+    alias v="lvim"
+    alias vi="lvim"
+}
+alias rtfm='ranger /usr/share/doc/arch-wiki/html/en'
+alias rtfmv='vifm /usr/share/doc/arch-wiki/html/en'
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias kubectl="minikube kubectl -- "
+alias k="kubectl"
+
+DEVICE="Pixel_4_API_30_2"
+alias android-emulate='echo Emulating device: $DEVICE; ~/Android/Sdk/emulator/emulator -avd $DEVICE -gpu on'
+alias android-clear-locks='rm -f ~/.android/avd/$DEVICE.avd/*.lock'
 
 alias check_battery=" upower -i `upower -e | grep 'BAT'` | grep perc"

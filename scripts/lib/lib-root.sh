@@ -13,7 +13,7 @@ function my_os_lib_prepare {
 
   my_os_lib_check_platform
 
-  my_os_lib_check_dependencies
+  # my_os_lib_check_dependencies
 
   lib log banner "Your system identified as: $MY_OS_SYSTEM"
 }
@@ -32,15 +32,6 @@ function my_os_lib_prepare_dirs_and_files {
   lib run "touch $MY_OS_PATH_LOG_NOTICE"
   lib run "touch $MY_OS_PATH_LOG_INFO"
   lib run "touch $MY_OS_PATH_LOG_CMD"
-}
-
-function my_os_lib_check_dependencies {
-  lib log "Checking dependencies ..."
-  my_os_lib_check_single_dep nvim neovim
-  my_os_lib_check_single_dep git git
-  my_os_lib_check_single_dep stow stow
-  my_os_lib_check_single_dep curl curl
-  my_os_lib_check_single_dep wget wget
 }
 
 function my_os_lib_check_single_dep {
@@ -65,6 +56,7 @@ function my_os_lib_show_err_log {
   do
     echo -e "${MY_OS_COLOR_ERR}${msg}${MY_OS_COLOR_NONE}"
   done < <(cat $MY_OS_PATH_LOG_ERR | tail -n +$from_line)
+  cat $MY_OS_PATH_LOG_ERR | less
 }
 
 function my_os_lib_show_warn_log {
@@ -78,6 +70,7 @@ function my_os_lib_show_warn_log {
   do
     echo -e "${MY_OS_COLOR_WARN}${msg}${MY_OS_COLOR_NONE}"
   done < <(cat $MY_OS_PATH_LOG_WARN | tail -n +$from_line)
+  cat $MY_OS_PATH_LOG_WARN | less
 }
 
 function my_os_lib_exit_cleanup {
@@ -93,7 +86,7 @@ function my_os_lib_exit_cleanup {
 }
 
 function my_os_lib_script_picker {
-  lib log "Select script you want to run"
+  lib log notice "Select script you want to run"
   lib input choice $(ls $MY_OS_PATH_BASE_SCRIPTS) "Choose other script"
 
   script_name="$(lib input get-choice)"
@@ -115,13 +108,29 @@ function my_os_lib_script_picker {
 }
 
 function my_os_lib_script_multi_picker {
-  CHOICES=""
   lib log notice "Picking multiple scripts to run"
   while true; do
+    lib log notice "Your choices so far:"
+    for choice in ${CHOICES[@]}; do
+      echo $choice
+    done
+    lib input choice "Continue choosing" "Finish" "Remove some chosen scripts"
+    CHOICE="$(lib input get-choice)"
+    [[ "$CHOICE" == "Finish" ]] && break
+    [[ "$CHOICE" == "Remove some chosen scripts" ]] && my_os_lib_script_multi_unpicker && continue
+
     lib script-picker NO_SOURCE
-    CHOICES="$CHOICES $MY_OS_LIB_CHOSEN_SCRIPT_PATH"
-    lib log notice "Your choices so far: $CHOICES"
-    lib input interactive "Continue choosing scripts?" || break
+    CHOICES+=( "$MY_OS_LIB_CHOSEN_SCRIPT_PATH" )
+  done
+}
+
+function my_os_lib_script_multi_unpicker {
+  lib log notice "Deselecting multiple scripts"
+  while true; do
+    lib input choice ${CHOICES[@]} Done
+    CHOICE=$(lib input get-choice)
+    [[ $CHOICE ==  "Done" ]] && break
+    CHOICES=( $(echo ${CHOICES[@]/$CHOICE}) )
   done
 }
 

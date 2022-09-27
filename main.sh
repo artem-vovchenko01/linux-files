@@ -29,11 +29,51 @@ function lib_os_script_setup_manage_git_repos {
   lib input multiple-choice $(lib git get-all-repos)
   MY_OS_LIB_SELECTED_REPOS=$(lib input get-multiple-choice)
   # archive password
-  lib input secret-value "Please, provide password for encrypting and decrypting archives. It won't be shown to the screen and will be stored only in-memory"
+  lib input secret-value "Provide decryption password:"
   password_attempt_1="$(lib input get-value)"
   lib input secret-value "Repeat the password:"
   [[ "$password_attempt_1" -eq "$(lib input get-value)" ]] || { lib log err "Passwords doesn't match!"; exit; }
-  lib settings set zip_passwd $(lib input get-value)
+  lib settings set zip_passwd_decrypt $(lib input get-value)
+
+  lib input secret-value "Provide encryption password:"
+  password_attempt_1="$(lib input get-value)"
+  lib input secret-value "Repeat the password:"
+  [[ "$password_attempt_1" -eq "$(lib input get-value)" ]] || { lib log err "Passwords doesn't match!"; exit; }
+  lib settings set zip_passwd_encrypt $(lib input get-value)
+}
+
+function lib_os_choose_script_preset {
+  lib input interactive "Choose preset script list? " || return
+  CHOICES=(
+      /home/artem_vovchenko/.my-git-os/linux-files/scripts/base-scripts/00-base-script.sh
+      /home/artem_vovchenko/.my-git-os/linux-files/scripts/base-scripts/05-configs.sh
+      /home/artem_vovchenko/.my-git-os/linux-files/scripts/base-scripts/06-symlink-dirs.sh
+      /home/artem_vovchenko/.my-git-os/linux-files/scripts/additional-scripts/environments/sway.sh
+      /home/artem_vovchenko/.my-git-os/linux-files/scripts/base-scripts/04-software.sh
+      /home/artem_vovchenko/.my-git-os/linux-files/scripts/additional-scripts/software/lunarvim.sh
+      /home/artem_vovchenko/.my-git-os/linux-files/scripts/additional-scripts/system/symlink-binaries.sh
+      /home/artem_vovchenko/.my-git-os/linux-files/scripts/base-scripts/10-fonts.sh
+      /home/artem_vovchenko/.my-git-os/linux-files/scripts/additional-scripts/system/install-custom-systemd-units.sh
+      /home/artem_vovchenko/.my-git-os/linux-files/scripts/additional-scripts/software/npm.sh
+    )
+    for script in ${CHOICES[@]}; do
+      echo $script
+    done
+    lib input interactive "Choose this list? " && return
+
+
+  CHOICES=
+  CHOICES=(
+      this-is-line-for-bug-fix
+      /home/artem_vovchenko/.my-git-os/linux-files/scripts/additional-scripts/other/manage-git-repos.sh
+      /home/artem_vovchenko/.my-git-os/linux-files/scripts/additional-scripts/software/epam-suite.sh
+      /home/artem_vovchenko/.my-git-os/linux-files/scripts/additional-scripts/environments/sway-graphical.sh
+    )
+    for script in ${CHOICES[@]}; do
+      echo $script
+    done
+
+    lib input interactive "Choose this list? " || lib log notice "Not choosing anything" && CHOICES=
 }
 
 ##################################################
@@ -49,6 +89,8 @@ lib input "Run script non-interactively?" && lib settings set-off interactive
 
 # script choosing and script-specific setups
 lib settings is-off interactive && {
+  lib_os_choose_script_preset
+
   lib script-multi-picker
   CHOSEN_SCRIPTS=$(lib input get-multiple-choice)
 
