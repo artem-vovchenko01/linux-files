@@ -85,12 +85,13 @@ MY_OS_PATH_LIB=$MY_OS_PATH_SCRIPTS/lib
 }
 
 ##################################################
-# SOURCE LIBRARIES
+# SOURCE LIBRARIES AND BASE SCRIPT
 ##################################################
 source $MY_OS_PATH_LIB/lib-root.sh
+source $MY_OS_PATH_SCRIPTS/base-scripts/00-base-script.sh
 
 ##################################################
-# ENTRY POINT
+# ENTRYPOINT
 ##################################################
 
 # read sudo password
