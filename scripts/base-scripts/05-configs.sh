@@ -4,6 +4,27 @@ MY_OS_TARGET_DIR=~
 lib log banner "Running config deployment script"
 
 ##############################
+# BACKING UP IF NOT LINKS
+##############################
+
+function backup_if_not_link {
+  file=$1
+  path=$HOME/$1
+  [[ -e $path ]] && [[ ! -L $path ]] && {
+    lib log warn "$path exists, and is not a link. Backing up"
+    lib run "cp -r $path $path.bak && rm $path"
+  }
+}
+
+backup_if_not_link .bashrc
+backup_if_not_link .zshrc
+backup_if_not_link .bash_profile
+backup_if_not_link .bash_login
+backup_if_not_link .zprofile
+backup_if_not_link .ssh
+backup_if_not_link .gnupg
+
+##############################
 # UNSTOWING IF NEEDED
 ##############################
 
