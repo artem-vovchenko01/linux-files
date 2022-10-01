@@ -16,7 +16,7 @@ function lib_os_paru_install {
 	lib log 'Paru is not installed. Installing ...'
 	lib run 'git clone https://aur.archlinux.org/paru-bin.git'
 	lib run 'cd paru-bin'
-	lib run 'makepkg -si'
+	lib run 'makepkg --noconfirm -si'
 	lib run 'cd ..'
 	lib run 'rm -rf paru-bin'
 }
