@@ -42,14 +42,14 @@ function my_os_lib_input_key_choice {
 }
 
 function my_os_lib_input_multiple_choice {
-  CHOICES=""
+  CHOICES=()
   while true; do
-    [[ -n $CHOICES ]] && lib log notice "Already chosen: $CHOICES"
+    [[ -n $CHOICES ]] && lib log notice "Already chosen: ${CHOICES[@]}"
     lib log notice "Choose an option. You can Finish (if done) or Reset (to clear choices):"
     lib input choice "$@" Finish Reset
     choice="$(lib input get-choice)"
     [[ $choice == "Finish" ]] && break
-    [[ $choice == "Reset" ]] && CHOICES="" && lib log notice "Choices were successfully reset" && continue
+    [[ $choice == "Reset" ]] && CHOICES=() && lib log notice "Choices were successfully reset" && continue
     CHOICES+=( "$choice" )
   done
   lib log notice "Your final choice is: ${CHOICES[@]}"
