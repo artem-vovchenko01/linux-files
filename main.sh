@@ -1,20 +1,6 @@
 #! /usr/bin/env bash
 
 ##################################################
-# GLOBAL VARIABLES
-##################################################
-# these variables are duplicated in lib-root.sh
-MY_OS_PATH_BASE=~/.my-git-os
-MY_OS_PATH_REPO=$MY_OS_PATH_BASE/linux-files
-MY_OS_PATH_SCRIPTS=$MY_OS_PATH_REPO/scripts
-MY_OS_PATH_LIB=$MY_OS_PATH_SCRIPTS/lib
-
-##################################################
-# SOURCE LIBRARIES
-##################################################
-source $MY_OS_PATH_LIB/lib-root.sh
-
-##################################################
 # SCRIPT-SPECIFIC SETUPS
 ##################################################
 
@@ -75,6 +61,33 @@ function lib_os_choose_script_preset {
 
     lib input interactive "Choose this list? " || lib log notice "Not choosing anything" && CHOICES=
 }
+
+##################################################
+# GLOBAL VARIABLES
+##################################################
+# these variables are duplicated in lib-root.sh
+MY_OS_PATH_BASE=~/.my-git-os
+MY_OS_PATH_REPO=$MY_OS_PATH_BASE/linux-files
+MY_OS_PATH_SCRIPTS=$MY_OS_PATH_REPO/scripts
+MY_OS_PATH_LIB=$MY_OS_PATH_SCRIPTS/lib
+
+##################################################
+# INITIAL SETUP
+##################################################
+
+[[ -e $MY_OS_PATH_BASE ]] || { 
+  echo "It's probably your first time running this script. Doing set up steps ..."
+  mkdir -p $MY_OS_PATH_BASE
+  cd $MY_OS_PATH_BASE
+  git clone https://www.github.com/artem-vovchenko01/linux-files
+  cd -
+  echo "Initial setup steps completed!"
+}
+
+##################################################
+# SOURCE LIBRARIES
+##################################################
+source $MY_OS_PATH_LIB/lib-root.sh
 
 ##################################################
 # ENTRY POINT
