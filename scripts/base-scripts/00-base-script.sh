@@ -1,3 +1,11 @@
+# Installing basic software and dependencies
+
+my_os_lib_check_single_dep nvim neovim
+my_os_lib_check_single_dep git git
+my_os_lib_check_single_dep stow stow
+my_os_lib_check_single_dep curl curl
+my_os_lib_check_single_dep wget wget
+
 # Check networking
 
 # lib run interactive "nmtui"
@@ -57,12 +65,4 @@ lib os is fedora && {
   [[ -e ~/.zhistory ]] && lib input "~/.zhistory already exists. Overwrite it and symlink to reference one?" && lib run "ln -sf $(lib path software-backups)/zsh/.zhistory ~/.zhistory"
   [[ ! -e ~/.zhistory ]] && lib run "ln -s $(lib path software-backups)/zsh/.zhistory ~/.zhistory"
 }
-
-# Installing basic software and dependencies
-
-my_os_lib_check_single_dep nvim neovim
-my_os_lib_check_single_dep git git
-my_os_lib_check_single_dep stow stow
-my_os_lib_check_single_dep curl curl
-my_os_lib_check_single_dep wget wget
 
