@@ -161,6 +161,10 @@ function my_os_lib_init_logs {
   my_os_lib_boot_log_text >> $MY_OS_PATH_LOG_ALL
 }
 
+source $MY_OS_PATH_LIB/env.sh
+
+my_os_lib_prepare_dirs_and_files
+
 my_os_lib_source_libs
 
 my_os_lib_prepare
