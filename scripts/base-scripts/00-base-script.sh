@@ -12,7 +12,7 @@ my_os_lib_check_single_dep wget wget
 # lib log "Checking network connectivity ..."
 # lib snippet ping
 
-lib run "wget -q --spider http://google.com"
+wget -q --spider http://google.com || { lib log err "No network connection! Exiting" && exit 1; }
 
 ##############################
 # INSTALLING REQUIRED SOFTWARE

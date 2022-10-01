@@ -41,7 +41,7 @@ function my_os_lib_check_single_dep {
   command -v $cmd &> /dev/null || {
     lib log warn "dependencies: $pkg ($cmd) not found! Trying to install ..."
     lib pkg install $pkg
-    command -v $cmd || lib log err "Can't install $pkg. Exiting ..." && exit
+    command -v $cmd || { lib log err "Can't install $pkg. Exiting ..." && exit; }
   }
 }
 
