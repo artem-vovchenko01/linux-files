@@ -31,16 +31,16 @@ function lib_os_script_setup_manage_git_repos {
 function lib_os_choose_script_preset {
   lib input interactive "Choose preset script list? " || return
   CHOICES=(
-      /home/artem_vovchenko/.my-git-os/linux-files/scripts/base-scripts/00-base-script.sh
-      /home/artem_vovchenko/.my-git-os/linux-files/scripts/base-scripts/05-configs.sh
-      /home/artem_vovchenko/.my-git-os/linux-files/scripts/base-scripts/06-symlink-dirs.sh
-      /home/artem_vovchenko/.my-git-os/linux-files/scripts/additional-scripts/environments/sway.sh
-      /home/artem_vovchenko/.my-git-os/linux-files/scripts/base-scripts/04-software.sh
-      /home/artem_vovchenko/.my-git-os/linux-files/scripts/additional-scripts/software/lunarvim.sh
-      /home/artem_vovchenko/.my-git-os/linux-files/scripts/additional-scripts/system/symlink-binaries.sh
-      /home/artem_vovchenko/.my-git-os/linux-files/scripts/base-scripts/10-fonts.sh
-      /home/artem_vovchenko/.my-git-os/linux-files/scripts/additional-scripts/system/install-custom-systemd-units.sh
-      /home/artem_vovchenko/.my-git-os/linux-files/scripts/additional-scripts/software/npm.sh
+      $HOME/.my-git-os/linux-files/scripts/base-scripts/00-base-script.sh
+      $HOME/.my-git-os/linux-files/scripts/base-scripts/05-configs.sh
+      $HOME/.my-git-os/linux-files/scripts/base-scripts/06-symlink-dirs.sh
+      $HOME/.my-git-os/linux-files/scripts/additional-scripts/environments/sway.sh
+      $HOME/.my-git-os/linux-files/scripts/base-scripts/04-software.sh
+      $HOME/.my-git-os/linux-files/scripts/additional-scripts/software/lunarvim.sh
+      $HOME/.my-git-os/linux-files/scripts/additional-scripts/system/symlink-binaries.sh
+      $HOME/.my-git-os/linux-files/scripts/base-scripts/10-fonts.sh
+      $HOME/.my-git-os/linux-files/scripts/additional-scripts/system/install-custom-systemd-units.sh
+      $HOME/.my-git-os/linux-files/scripts/additional-scripts/software/npm.sh
     )
     for script in ${CHOICES[@]}; do
       echo $script
@@ -51,9 +51,9 @@ function lib_os_choose_script_preset {
   CHOICES=
   CHOICES=(
       this-is-line-for-bug-fix
-      /home/artem_vovchenko/.my-git-os/linux-files/scripts/additional-scripts/other/manage-git-repos.sh
-      /home/artem_vovchenko/.my-git-os/linux-files/scripts/additional-scripts/software/epam-suite.sh
-      /home/artem_vovchenko/.my-git-os/linux-files/scripts/additional-scripts/environments/sway-graphical.sh
+      $HOME/.my-git-os/linux-files/scripts/additional-scripts/other/manage-git-repos.sh
+      $HOME/.my-git-os/linux-files/scripts/additional-scripts/software/epam-suite.sh
+      $HOME/.my-git-os/linux-files/scripts/additional-scripts/environments/sway-graphical.sh
     )
     for script in ${CHOICES[@]}; do
       echo $script
