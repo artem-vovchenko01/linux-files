@@ -34,7 +34,7 @@ function lib_os_copy_int_wrapper {
 }
 
 lib log "Trying to remove Documents directory, if it's empty, so it can be changed to symlink"
-lib run "rmdir ~/Documents"
+[[ -d ~/Documents ]] && [[ $(ls -la ~/Documents | wc -l) == 3 ]] && rmdir ~/Documents
 
 # Removing links if exist
 

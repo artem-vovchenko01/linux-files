@@ -96,7 +96,7 @@ lib settings is-on interactive && {
   done
 } || {
   for soft_list_file in $MY_OS_LIB_SELECTED_SOFT_LIST_FILES; do
-    my_os_lib_work_on_soft_list $MY_OS_PATH_SOFT_LISTS_DIR/$soft_list_file
+    my_os_lib_work_on_soft_list $soft_list_file
   done
 }
 
