@@ -19,19 +19,19 @@ function my_os_lib_prepare {
 }
 
 function my_os_lib_prepare_dirs_and_files {
-  lib run "mkdir -p $MY_OS_PATH_REPO/tempfiles"
-  lib run "mkdir -p ~/.npm-global"
-  lib run "mkdir -p ~/.local/share/fonts"
-  lib run "mkdir -p ~/.config/systemd/user/"
-  lib run "mkdir -p $MY_OS_PATH_SYSTEM_SCRIPTS"
-  lib run "mkdir -p $MY_OS_PATH_GIT"
+  mkdir -p $MY_OS_PATH_REPO/tempfiles
+  mkdir -p ~/.npm-global
+  mkdir -p ~/.local/share/fonts
+  mkdir -p ~/.config/systemd/user
+  mkdir -p $MY_OS_PATH_SYSTEM_SCRIPTS
+  mkdir -p $MY_OS_PATH_GIT
 
-  lib run "touch $MY_OS_PATH_LOG_ALL"
-  lib run "touch $MY_OS_PATH_LOG_WARN"
-  lib run "touch $MY_OS_PATH_LOG_ERR"
-  lib run "touch $MY_OS_PATH_LOG_NOTICE"
-  lib run "touch $MY_OS_PATH_LOG_INFO"
-  lib run "touch $MY_OS_PATH_LOG_CMD"
+  touch $MY_OS_PATH_LOG_ALL
+  touch $MY_OS_PATH_LOG_WARN
+  touch $MY_OS_PATH_LOG_ERR
+  touch $MY_OS_PATH_LOG_NOTICE
+  touch $MY_OS_PATH_LOG_INFO
+  touch $MY_OS_PATH_LOG_CMD
 }
 
 function my_os_lib_check_single_dep {
