@@ -9,15 +9,15 @@
 # LBRY
 # slack-desktop
 # telegram-cli-git
-teams
+# teams
 
 
 
 ########## BROWSERS
 
 
-brave-bin
-librewolf-bin
+# brave-bin
+# librewolf-bin
 
 # chromium
 
