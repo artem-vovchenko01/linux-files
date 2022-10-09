@@ -8,6 +8,10 @@ an executable
 ]]
 -- THESE ARE EXAMPLE CONFIGS FEEL FREE TO CHANGE TO WHATEVER YOU WANT
 
+-- options
+
+vim.opt.wrap = true
+
 -- general
 lvim.log.level = "warn"
 lvim.format_on_save = true
@@ -160,13 +164,9 @@ lvim.builtin.treesitter.highlight.enabled = true
 -- }
 
 -- Additional Plugins
--- lvim.plugins = {
---     {"folke/tokyonight.nvim"},
---     {
---       "folke/trouble.nvim",
---       cmd = "TroubleToggle",
---     },
--- }
+lvim.plugins = {
+  { "vimwiki/vimwiki" },
+}
 
 -- Autocommands (https://neovim.io/doc/user/autocmd.html)
 -- vim.api.nvim_create_autocmd("BufEnter", {
