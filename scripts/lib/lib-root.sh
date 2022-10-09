@@ -52,11 +52,15 @@ function my_os_lib_show_err_log {
   [[ -z "$from_line" ]] && from_line=1
   [[ $from_line -le 0 ]] && from_line=1
 
+  log_preview_file=$MY_OS_PATH_TEMPFILES/log_less_preview.txt
+  echo > $log_preview_file
+
   while IFS= read -r msg
   do
     echo -e "${MY_OS_COLOR_ERR}${msg}${MY_OS_COLOR_NONE}"
+    echo ${msg} >> $log_preview_file
   done < <(cat $MY_OS_PATH_LOG_ERR | tail -n +$from_line)
-  cat $MY_OS_PATH_LOG_ERR | less
+  cat $log_preview_file | less
 }
 
 function my_os_lib_show_warn_log {
@@ -66,11 +70,14 @@ function my_os_lib_show_warn_log {
   [[ -z "$from_line" ]] && from_line=1
   [[ $from_line -le 0 ]] && from_line=1
 
+  log_preview_file=$MY_OS_PATH_TEMPFILES/log_less_preview.txt
+  echo > $log_preview_file
   while IFS= read -r msg
   do
     echo -e "${MY_OS_COLOR_WARN}${msg}${MY_OS_COLOR_NONE}"
+    echo ${msg} >> $log_preview_file
   done < <(cat $MY_OS_PATH_LOG_WARN | tail -n +$from_line)
-  cat $MY_OS_PATH_LOG_WARN | less
+  cat $log_preview_file | less
 }
 
 function my_os_lib_exit_cleanup {

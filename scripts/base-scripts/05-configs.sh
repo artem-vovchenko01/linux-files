@@ -24,6 +24,13 @@ backup_if_not_link .zprofile
 backup_if_not_link .ssh
 backup_if_not_link .gnupg
 
+# Lunarvim
+[[ -d ~/.config/lvim ]] && {
+  lib log notice "Configuring lunarvim config, not using stow ..."
+  backup_if_not_link .config/lvim/config.lua
+  lib run "ln -sf $MY_OS_PATH_DOTFILES/lunarvim/.config/lvim/config.lua ~/.config/lvim/config.lua"
+}
+
 ##############################
 # UNSTOWING IF NEEDED
 ##############################
@@ -31,7 +38,7 @@ backup_if_not_link .gnupg
 lib input no-yes "Do you want to UNSTOW some configs?" && {
     lib run "echo '##### Leave only lines with packages you want to UNstow' > $MY_OS_PATH_WHAT_TO_STOW_FILE"
     lib run "echo -e '##### Lines starting with # will be ignored\n' >> $MY_OS_PATH_WHAT_TO_STOW_FILE"
-    lib run "ls $MY_OS_STOW_DIR | grep -vE 'LICENSE|README|symlink_dirs' >> $MY_OS_PATH_WHAT_TO_STOW_FILE"
+    lib run "ls $MY_OS_STOW_DIR | grep -vE 'LICENSE|lunarvim|README|symlink_dirs' >> $MY_OS_PATH_WHAT_TO_STOW_FILE"
 
     lib log 'Leave only lines with packages you want to UNstow'
     lib run "nvim $MY_OS_PATH_WHAT_TO_STOW_FILE"
@@ -49,7 +56,7 @@ lib input no-yes "Do you want to UNSTOW some configs?" && {
 lib input "Do you want to stow some configs?" && {
 	lib run "echo '##### Leave only lines with packages you want to stow' > $MY_OS_PATH_WHAT_TO_STOW_FILE"
 	lib run "echo -e '##### Lines starting with # will be ignored\n' >> $MY_OS_PATH_WHAT_TO_STOW_FILE"
-	lib run "ls $MY_OS_STOW_DIR | grep -vE 'LICENSE|README|symlink-dirs' >> $MY_OS_PATH_WHAT_TO_STOW_FILE"
+	lib run "ls $MY_OS_STOW_DIR | grep -vE 'LICENSE|lunarvim|README|symlink-dirs' >> $MY_OS_PATH_WHAT_TO_STOW_FILE"
 
   lib settings is-on interactive && lib run "nvim $MY_OS_PATH_WHAT_TO_STOW_FILE"
 

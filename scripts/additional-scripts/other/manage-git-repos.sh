@@ -33,6 +33,9 @@ function my_os_lib_git_process_software_backups {
   lib git force-push-artifact
 }
 
+
+lib settings is-on interactive && lib_os_script_setup_manage_git_repos
+
 lib log "Working with my git repos ..."
 
 for repo in $MY_OS_LIB_SELECTED_REPOS; do

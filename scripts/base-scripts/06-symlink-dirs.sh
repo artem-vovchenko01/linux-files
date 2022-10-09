@@ -6,6 +6,12 @@ lib log banner "Running symlink deployment script"
 # FUNCTIONS
 ##############################
 
+function link_path_matching_current_user {
+  link_read=$(readlink $1)
+  olduser=$(echo $link_read | cut -d/ -f3)
+  newlink_matching_current_user=$(echo $link_read | sed "s/\/home\/$olduser\//\/home\/$(whoami)\//")
+}
+
 function lib_os_copy_link {
 	local LINK=$1
 	local DEST_DIR=$2
@@ -17,6 +23,7 @@ function lib_os_copy_link {
     	[[ -e $F_PATH ]] && ls -ld "$F_PATH" && lib input "$F_PATH exists. Remove it? (rm -i $F_PATH)" && "rm -i $F_PATH"
     	[[ -e $F_PATH ]] && ls -ld "$F_PATH" && lib input no-yes "$F_PATH exists. DANGER!!!! Remove it? (rm -rf $F_PATH/)" && "rm -rf $F_PATH/"
 	[[ -e $F_PATH ]] && lib log err "$F_PATH still exists. Can't copy!" && return
+
 	lib run "cp -P $LINK $DEST_DIR/"
 }
 
@@ -33,25 +40,33 @@ function lib_os_copy_int_wrapper {
 	lib_os_copy_link "$SRC" "$TARGET"
 }
 
+lib log notice "Fixing links in the repo to match current user ..."
+lib dir symlink-dirs
+for link in $(find -type l); do
+  link_realpath=$(realpath .)/$(echo $link | cut -c3-)
+  link_path_matching_current_user $link_realpath
+  lib run "ln -sf $newlink_matching_current_user $link_realpath"
+done
+
 lib log "Trying to remove Documents directory, if it's empty, so it can be changed to symlink"
 [[ -d ~/Documents ]] && [[ $(ls -la ~/Documents | wc -l) == 3 ]] && rmdir ~/Documents
 
 # Removing links if exist
 
-lib input "Remove links which are already present?" && {
-	lib dir ~
-	for link in $(find -maxdepth 1 . -type l); do
-		dest_path=$(echo $link | sed 's/^..//' | cut -d / -f 2- | awk -v home=$HOME ' { print home "/" $0 } ')
-		lib run "rm $dest_path"
-	done
-	lib dir cd -
-}
+# lib input "Remove links which are already present?" && {
+# 	lib dir cd ~
+# 	for link in $(find -maxdepth 1 -type l); do
+# 		dest_path=$(echo $link | sed 's/^..//' | cut -d / -f 2- | awk -v home=$HOME ' { print home "/" $0 } ')
+# 		lib run "rm $dest_path"
+# 	done
+# 	lib dir cd -
+# }
 
 # Creating links
 
 lib input "Proceed to creating links?" && {
   lib dir symlink-dirs
-	for link in $(find . -type l); do
+	for link in $(find -type l); do
 		dest_path=$(echo $link | sed 's/^..//' | cut -d / -f 2- | sed -E 's/\/?[^/]*$//' | awk -v home=$HOME ' { print home "/" $0 }')
 		lib_os_copy_int_wrapper $MY_OS_PATH_LINK_ROOT/$(echo $link | sed 's/^..//') $dest_path
 	done
