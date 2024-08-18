@@ -1,0 +1,13 @@
+hide_search=false
+insensitive=true
+key_down=Ctrl-j
+key_up=Ctrl-k
+key_left=Ctrl-h
+key_right=Ctrl-l
+key_submit=Ctrl-Return
+allow_images=true
+dynamic_lines=true
+image_size=150
+columns=3
+width=70%
+height=70%
