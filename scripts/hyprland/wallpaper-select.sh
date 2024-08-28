@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-WALL_PATH=~/Hyprland/Wallpapers
+CUSTOM_SETUP=~/custom-setup
+
+WALL_PATH=$CUSTOM_SETUP/hyprland/wallpapers
+
 CONF=~/.config/wofi/config-wallpapers
 NEW_WALL=$(ls $WALL_PATH | xargs -n1 -I {} echo img:$WALL_PATH/{}:text:{} | wofi -c $CONF --dmenu)
 [[ $? -ne 0 ]] && exit

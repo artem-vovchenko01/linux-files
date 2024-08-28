@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-WALL_PATH=/home/artem/Hyprland/Wallpapers
+CUSTOM_SETUP=~/custom-setup
+
+WALL_PATH=$CUSTOM_SETUP/hyprland/wallpapers
+
 NEW_WALL=$(find $WALL_PATH -type f | shuf -n 1)
 hyprctl hyprpaper preload "$NEW_WALL"
 hyprctl hyprpaper wallpaper "HDMI-A-1,$NEW_WALL"
