@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -x
 SCRIPTS=~/linux-files/scripts
-$CUSTOM_SETUP=~/custom-setup
+CUSTOM_SETUP=~/custom-setup
 
 PROLONGUE_DURATION=$(cat $SCRIPTS/pomodoro/config/prolongue_duration)
 STATUS=$(pomodoro status)
@@ -33,14 +33,14 @@ fi
 
 # break -> do nothing
 if $SCRIPTS/pomodoro/pomodoro-is-break.sh; then
-	echo -n 🍅 $(cat ~/IT/hyprland/pomodoro_break_status | awk -F '\x0d' '{print $NF}' | tr -d $'\x0a')
+	echo -n 🍅 $(cat $CUSTOM_SETUP/pomodoro/pomodoro_break_status | awk -F '\x0d' '{print $NF}' | tr -d $'\x0a')
 	exit
 fi
 
 # break ended -> do start
 # if last state was break
 if $SCRIPTS/pomodoro/pomodoro-is-break-ended.sh; then
-	echo stopped > ~/IT/hyprland/pomodoro/state
+	echo stopped > $CUSTOM_SETUP/pomodoro/state
 	nohup bash -c "zenity --info --text 'Break ended. Press OK to get going!'; $SCRIPTS/pomodoro/pomodoro-start.sh" >/dev/null 2>&1 &
 	exit
 fi

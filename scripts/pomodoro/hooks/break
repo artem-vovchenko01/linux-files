@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+CUSTOM_SETUP=~/custom-setup
+
+notify-send "Take a break!"
+touch $CUSTOM_SETUP/pomodoro/pomodoro_break_started_touch_timestamp
+echo break > $CUSTOM_SETUP/pomodoro/state

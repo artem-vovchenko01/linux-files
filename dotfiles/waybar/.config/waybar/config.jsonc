@@ -208,7 +208,7 @@
         "max-length": 40,
 	"interval": 1,
         "escape": true,
-        "exec": "/home/artem/my_scripts/pomodoro/pomodoro-status.sh" // Script in resources folder
+        "exec": "$HOME/linux-files/scripts/pomodoro/pomodoro-status.sh" // Script in resources folder
     },
     "hyprland/language": {
 	// https://www.iemoji.com/view/emoji/176/flags/united-states

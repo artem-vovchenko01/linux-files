@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+CUSTOM_SETUP=~/custom-setup
+
+notify-send "Pomodoro have ended"
+echo stopped > $CUSTOM_SETUP/pomodoro/state
