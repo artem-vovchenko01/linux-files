@@ -22,4 +22,4 @@ CHOICE=$(echo "$VMS" | wofi --dmenu)
 
 set -x
 cd $VMS_PATH/$CHOICE && \
-  scp -ri $(ls *.pem) "$OBJ" $(cat ./user)@$(cat ./ip):/home/$(cat ./user)/
+  kitty scp -ri $(ls *.pem) "$OBJ" $(cat ./user)@$(cat ./ip):/home/$(cat ./user)/

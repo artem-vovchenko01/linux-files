@@ -2,11 +2,11 @@
 set -x
 SCRIPTS=~/linux-files/scripts
 
-no_spawn_terminal() {
+is_spawn_terminal() {
   local dir=$1
   local item=$2
-  [ -f $dir/.menu_config ] && grep NO_SPAWN_TERMINAL $dir/.menu_config && \
-    cat $dir/.menu_config | grep NO_SPAWN_TERMINAL | cut -d= -f 2 | grep $item && \
+  [ -f $dir/.menu_config ] && grep SPAWN_TERMINAL $dir/.menu_config && \
+    cat $dir/.menu_config | grep SPAWN_TERMINAL | cut -d= -f 2 | grep $item && \
     return 0
   return 1
 }
@@ -28,8 +28,12 @@ display_dir() {
       display_dir $dir/$choice
       ;;
     *)
-      no_spawn_terminal $dir ${choice}.sh && $dir/${choice}.sh
-      no_spawn_terminal $dir ${choice}.sh || kitty bash -c "$dir/${choice}.sh; echo Press Return to close ...; read"
+      is_spawn_terminal $dir ${choice}.sh && kitty bash -c "$dir/${choice}.sh; echo Press Return to close ...; read"
+      is_spawn_terminal $dir ${choice}.sh || { 
+        $dir/${choice}.sh
+        CODE=$?
+        [ $CODE -eq 0 ] && notify-send "${choice}.sh: success" || notify-send "${choice}.sh: FAILURE!"
+      }
       ;;
   esac
 }
