@@ -18,3 +18,13 @@ Also included:
 * scripts for automatic installation of these configs and Arch installation
 * symlinks to some of my directories (mainly, browser data and cache for convenience between reinstalls)
 * some wallpapers
+
+# WM workability checklist
+
+* +/- volume buttons on keyboard
+* screenshots
+* main menu
+* running scripts from menu
+* pomodoro
+* app startup
+

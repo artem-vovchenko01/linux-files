@@ -1,0 +1,5 @@
+NO_SPAWN_TERMINAL=choose-audio-devices.sh
+NO_SPAWN_TERMINAL=file-duplicate-search.sh
+NO_SPAWN_TERMINAL=mount-drive.sh
+NO_SPAWN_TERMINAL=unmount-drive.sh
+NO_SPAWN_TERMINAL=reset-faillock.sh

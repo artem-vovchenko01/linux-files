@@ -1,0 +1,14 @@
+IGNORE=pomodoro-break.sh
+IGNORE=pomodoro-check-user-idle-on-break.sh
+IGNORE=pomodoro-disable.sh
+IGNORE=pomodoro-enable.sh
+IGNORE=pomodoro-end-break.sh
+IGNORE=pomodoro-is-break-ended.sh
+IGNORE=pomodoro-is-break.sh
+IGNORE=pomodoro-is-enabled.sh
+IGNORE=pomodoro-is-ended.sh
+IGNORE=pomodoro-is-running.sh
+IGNORE=pomodoro-prolongue.sh
+IGNORE=pomodoro-start.sh
+IGNORE=pomodoro-status.sh
+IGNORE=config

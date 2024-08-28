@@ -1,0 +1,2 @@
+set -x
+nohup "$@" >/dev/null 2>&1 &

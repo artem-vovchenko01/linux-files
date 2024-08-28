@@ -1,0 +1,4 @@
+IGNORE=is-user-idle.sh
+IGNORE=configure-clipboard.sh
+NO_SPAWN_TERMINAL=wallpaper-random.sh wallpaper-select.sh
+
