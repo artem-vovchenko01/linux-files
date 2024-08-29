@@ -1,16 +1,22 @@
 #!/usr/bin/env bash
-dir1=$1
-echo "Hashing $dir1"
+set -euo pipefail
+trap "echo Exited with error!" ERR
 
-find $dir1 -type f -exec md5sum {} \; | tee sums1.txt &
+dir1="$(realpath "$1")"
 
-wait
+tmpdir=$(mktemp -d)
+cd $tmpdir
+echo "Working directory: $tmpdir"
+echo "Hashing: $dir1"
+
+find "$dir1" -type f -exec md5sum {} \; | tee sums1.txt &
+find_pid=$!
+wait $find_pid
 
 cat sums1.txt | awk '{print $1}' | sort > srt1.txt
 
 sum1=$(md5sum srt1.txt | awk '{print $1}')
 
+echo "Working directory: $tmpdir"
+echo "Hashed: $dir1"
 echo "Hash for $dir1: $sum1"
-
-rm -v sums1.txt srt1.txt 
-
