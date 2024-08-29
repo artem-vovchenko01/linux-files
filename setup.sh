@@ -46,3 +46,8 @@ mkdir -vp ~/custom-setup/pomodoro
 ln -sf ~/linux-files/scripts/pomodoro/hooks/start ~/.pomodoro/hooks/start
 ln -sf ~/linux-files/scripts/pomodoro/hooks/stop ~/.pomodoro/hooks/stop
 ln -sf ~/linux-files/scripts/pomodoro/hooks/break ~/.pomodoro/hooks/break
+
+############################################
+# GIT SERVER FOR LOCAL NETWORK
+############################################
+mkdir -p ~/local-git-server

@@ -13,4 +13,4 @@ case $DIR in
 		;;
 esac
 
-kitty bash -c "set -x; sudo mount -o uid=1000,gid=1000 /dev/$DISK /mnt/$DIR; echo Press Return to close ...; read"
+kitty bash -c "set -x; sudo mount -o rw,uid=1000,gid=1000 /dev/$DISK /mnt/$DIR; echo Press Return to close ...; read"
