@@ -1,4 +1,4 @@
-# linux_files
+# linux-files
 
 This repository contains my personal linux configs and text data from other linux programs I use.
 

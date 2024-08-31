@@ -1,5 +1,5 @@
 # pkill -f wl-clip-persist
-SCRIPTS=~/linux_files/scripts
+SCRIPTS=~/linux-files/scripts
 
 pkill -f wl-paste
 

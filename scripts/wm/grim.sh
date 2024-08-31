@@ -5,7 +5,7 @@ PICTURES=~/Pictures
 
 [ ! -e $PICTURES/Screenshots ] && mkdir -p $PICTURES/Screenshots
 
-SCREENSHOT_PATH=$PICTURES/Screenshots/Screenshot_$(date | sed 's/[^[:alnum:]]\+/_/g').png
+SCREENSHOT_PATH=$PICTURES/Screenshots/Screenshot_$(date +'%Y-%m-%d_%H-%M-%S').png
 
 if [ "$1" = "region" ]; then
     grim -t png -g "$(slurp -d)" - | tee $SCREENSHOT_PATH | wl-copy
