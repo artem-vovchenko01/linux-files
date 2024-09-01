@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 
-SYNCTHING_DIR=/mnt/syncthing/Syncthing
+DATA_DIR=/mnt/data/data
 
 ############################################
 # CONFIGS
@@ -39,6 +39,10 @@ mkdir -vp ~/.config/waybar
 ln -sf ~/linux-files/dotfiles/waybar/.config/waybar/config.jsonc ~/.config/waybar/config.jsonc
 ln -sf ~/linux-files/dotfiles/waybar/.config/waybar/style.css ~/.config/waybar/style.css
 
+# lf
+mkdir -p ~/.config/lf
+ln -sf ~/linux-files/dotfiles/lf/.config/lf/lfrc ~/.config/lf/lfrc
+
 ############################################
 # CUSTOM SETUP DIRECTORY
 ############################################
@@ -57,4 +61,4 @@ ln -sf ~/linux-files/scripts/pomodoro/hooks/break ~/.pomodoro/hooks/break
 ############################################
 mkdir -p ~/local-git-server
 mkdir -p ~/Playground
-ln -sf $SYNCTHING_DIR/Playground ~/Playground/Syncthing
+ln -sf $DATA_DIR/Playground ~/Playground/shared
