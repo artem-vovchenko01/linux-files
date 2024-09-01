@@ -1,0 +1,165 @@
+##############################
+# SETTINGS
+##############################
+
+set -o vi
+
+##############################
+# EXPORTS
+##############################
+
+# CARGO_HOME=~/.cargo/bin
+# DOTNET_TOOLS_HOME=~/.dotnet/tools
+# export PATH=$PATH:~/.local/share/flatpak/exports/share
+# export PATH="$PATH:$GEM_HOME/bin"
+# export PATH="$PATH:$CARGO_HOME"
+# export PATH="$PATH:$DOTNET_TOOLS_HOME"
+
+export PATH="$PATH:~/.local/bin"
+export PATH=~/.npm-global/bin:$PATH
+export EDITOR=nvim
+
+# Custom scripts
+for dir in $(find -L ~/linux-files/scripts -type d); do
+ export PATH=$PATH:$dir
+done
+
+##############################
+# FUNCTIONS
+##############################
+
+contains() {
+    string="$1"
+    substring="$2"
+    if test "${string#*$substring}" != "$string"
+    then
+        return 0    # $substring is in $string
+    else
+        return 1    # $substring is not in $string
+    fi
+}
+
+function vicd {
+    local dst="$(command vifm --choose-dir - "$@")"
+    if [ -z "$dst" ]; then
+        echo 'Directory picking cancelled/failed'
+        return 1
+    fi
+    cd "$dst"
+}
+
+function mirrors {
+    sudo cp /etc/pacman.d/mirrorlist "/etc/pacman.d/mirrorlist.bac$(date)"
+    sudo reflector --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+}
+
+function abs_filename {
+  # $1 : relative filename
+  echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
+}
+
+function date_sync {
+    sudo date -s "$(wget -qSO- --max-redirect=0 google.com 2>&1 | grep Date: | cut -d' ' -f5-8)Z" 
+}
+
+function check_battery {
+ cat /sys/class/power_supply/BAT1/capacity
+}
+
+function ssh_add_startup_keys {
+    SSH_ADD_ON_STARTUP=~/.ssh/on_startup
+    for key in $(ls $SSH_ADD_ON_STARTUP); do
+        ssh-add $SSH_ADD_ON_STARTUP/$key
+    done
+}
+
+##############################
+# COMPLETIONS
+##############################
+
+# complete -C '/usr/bin/aws_completer' aws
+
+##############################
+# SOURCES
+##############################
+
+# [[ -e /usr/share/doc/pkgfile/command-not-found.zsh ]] && source /usr/share/doc/pkgfile/command-not-found.zsh
+
+ZSH_SYNTAX_HL_ARCH=/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+ZSH_AUTOSUGG_ARCH=/usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+ZSH_SYNTAX_HL_DEB=/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+ZSH_AUTOSUGG_DEB=/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+ZSH_POWERLEVEL10K_THEME_ARCH=/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+ZSH_POWERLEVEL10K_THEME_OTHER=~/powerlevel10k/powerlevel10k.zsh-theme
+
+_CUR_SHELL_PROC=$(readlink /proc/$$/exe)
+if contains "$_CUR_SHELL_PROC" "zsh"; then
+   # assume Zsh
+  [ -e $ZSH_SYNTAX_HL_ARCH ] && source $ZSH_SYNTAX_HL_ARCH
+  [ -e $ZSH_AUTOSUGG_ARCH ] && source $ZSH_AUTOSUGG_ARCH
+
+  [ -e $ZSH_SYNTAX_HL_DEB ] && source $ZSH_SYNTAX_HL_DEB
+  [ -e $ZSH_AUTOSUGG_DEB ] && source $ZSH_AUTOSUGG_DEB
+
+  [ -e $ZSH_POWERLEVEL10K_THEME_ARCH ] && source $ZSH_POWERLEVEL10K_THEME_ARCH
+  [ -e $ZSH_POWERLEVEL10K_THEME_OTHER ] && source $ZSH_POWERLEVEL10K_THEME_OTHER
+fi
+
+##############################
+# ALIASES
+##############################
+
+# use realpath
+alias abs_path="abs_filename"
+alias ls="ls --color=auto"
+alias grep="grep --color=auto"
+alias l="ls -a"
+alias ll="l -lah"
+alias vcd="vicd ."
+command -v lvim > /dev/null 2>&1 && {
+    alias v="lvim"
+    alias vi="lvim"
+    alias vim="lvim"
+    alias nvim="lvim"
+}
+alias g="git"
+alias gs="g status"
+alias gc="git commit"
+alias gp="git push"
+alias gb="git branch"
+alias gd="git diff --staged"
+alias gl="git log --graph --all"
+alias ga="git add"
+alias perlconsole='rlwrap -A -pgreen -S"perl> " perl -wnE'"'"'say eval()//$@'"'"
+alias rtfm='ranger /usr/share/doc/arch-wiki/html/en'
+alias rtfmv='vifm /usr/share/doc/arch-wiki/html/en'
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias k="kubectl"
+# alias kubectl="minikube kubectl -- "
+
+# DEVICE="Pixel_4_API_30_2"
+# alias android-emulate='echo Emulating device: $DEVICE; ~/Android/Sdk/emulator/emulator -avd $DEVICE -gpu on'
+# alias android-clear-locks='rm -f ~/.android/avd/$DEVICE.avd/*.lock'
+
+# alias check_battery="upower -i `upower -e | grep 'BAT'` | grep perc"
+
+##############################
+# PYTHON
+##############################
+
+# virtualenvwrapper
+# export WORKON_HOME=~/Virtualenvs
+# mkdir -p $WORKON_HOME
+# source ~/.local/bin/virtualenvwrapper.sh
+# export PROJECT_HOME=~/Playground/python/Projects
+
+# pyenv
+# export PYENV_ROOT="$HOME/.pyenv"
+# [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+# eval "$(pyenv init -)"
+# eval "$(pyenv virtualenv-init -)"
+

@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 
+SYNCTHING_DIR=/mnt/syncthing/Syncthing
+
 ############################################
 # CONFIGS
 ############################################
+
+# Shell
+ln -sf ~/linux-files/dotfiles/bash/.shrc.part
 
 # Hyprland
 mkdir -vp ~/.config/hypr
@@ -48,6 +53,8 @@ ln -sf ~/linux-files/scripts/pomodoro/hooks/stop ~/.pomodoro/hooks/stop
 ln -sf ~/linux-files/scripts/pomodoro/hooks/break ~/.pomodoro/hooks/break
 
 ############################################
-# GIT SERVER FOR LOCAL NETWORK
+# SETUP FOLDERS
 ############################################
 mkdir -p ~/local-git-server
+mkdir -p ~/Playground
+ln -sf $SYNCTHING_DIR/Playground ~/Playground/Syncthing
