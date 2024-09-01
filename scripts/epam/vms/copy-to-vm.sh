@@ -9,10 +9,10 @@ TMP_DIR=$(mktemp -d)
 CHOICE=$(echo file directory | xargs -n1 | wofi --dmenu)
 [[ $PIPESTATUS -ne 0 ]] && exit
 if [[ "$CHOICE" == "directory" ]]; then
-  kitty vifm --choose-dir $TMP_DIR/chosen_dir
+  kitty bash -c "lf -print-last-dir > $TMP_DIR/chosen_dir"
   OBJ="$(cat $TMP_DIR/chosen_dir)"
 else
-  kitty vifm --choose-file $TMP_DIR/chosen_file
+  kitty bash -c "lf -print-selection > $TMP_DIR/chosen_file"
   OBJ="$(cat $TMP_DIR/chosen_file)"
 fi
 

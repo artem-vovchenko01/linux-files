@@ -9,7 +9,7 @@ notify-send "Choose directory to scan for duplicates"
 notify-send "Exit when in proper directory"
 
 # Pick directory to scan
-kitty vifm --choose-dir $TMP_DIR/chosen_dir
+kitty bash -c "lf -print-last-dir > $TMP_DIR/chosen_dir"
 DIR=$(cat $TMP_DIR/chosen_dir)
 
 # Create script for processing each file
