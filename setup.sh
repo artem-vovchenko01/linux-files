@@ -49,12 +49,14 @@ ln -sf ~/linux-files/dotfiles/lf/.config/lf/lfrc ~/.config/lf/lfrc
 mkdir -vp ~/custom-setup/hyprland
 
 # Pomodoro
-mkdir -vp ~/custom-setup/pomodoro
-[ ! -f ~/custom-setup/pomodoro/enabled ] && echo false > ~/custom-setup/pomodoro/enabled
-[ ! -f ~/custom-setup/pomodoro/state ] && echo stopped > ~/custom-setup/pomodoro/state
-ln -sf ~/linux-files/scripts/pomodoro/hooks/start ~/.pomodoro/hooks/start
-ln -sf ~/linux-files/scripts/pomodoro/hooks/stop ~/.pomodoro/hooks/stop
-ln -sf ~/linux-files/scripts/pomodoro/hooks/break ~/.pomodoro/hooks/break
+if [ -d ~/.pomodoro ]; then
+	mkdir -vp ~/custom-setup/pomodoro
+	[ ! -f ~/custom-setup/pomodoro/enabled ] && echo false > ~/custom-setup/pomodoro/enabled
+	[ ! -f ~/custom-setup/pomodoro/state ] && echo stopped > ~/custom-setup/pomodoro/state
+	ln -sf ~/linux-files/scripts/pomodoro/hooks/start ~/.pomodoro/hooks/start
+	ln -sf ~/linux-files/scripts/pomodoro/hooks/stop ~/.pomodoro/hooks/stop
+	ln -sf ~/linux-files/scripts/pomodoro/hooks/break ~/.pomodoro/hooks/break
+fi
 
 ############################################
 # SETUP FOLDERS
