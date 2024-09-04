@@ -8,7 +8,7 @@ DATA_DIR=/mnt/data/data
 ############################################
 
 # Shell
-ln -sf ~/linux-files/dotfiles/bash/.shrc.part
+ln -sf ~/linux-files/dotfiles/bash/.shrc.part ~/.shrc.part.sh
 
 # SSH
 mkdir -vp ~/.ssh
