@@ -48,8 +48,19 @@ mkdir -p ~/.config/lf
 ln -sf ~/linux-files/dotfiles/lf/.config/lf/lfrc ~/.config/lf/lfrc
 
 ############################################
-# CUSTOM SETUP DIRECTORY
+# SETUP FOLDERS
 ############################################
+
+# Local git
+mkdir -p ~/local-git-server
+
+# Playground
+mkdir -p ~/Playground
+if [ -d $DATA_DIR ]; then
+  ln -sf $DATA_DIR/Playground ~/Playground/shared
+fi
+
+# Hyprland
 mkdir -vp ~/custom-setup/hyprland
 
 # Pomodoro
@@ -61,10 +72,3 @@ if [ -d ~/.pomodoro ]; then
 	ln -sf ~/linux-files/scripts/pomodoro/hooks/stop ~/.pomodoro/hooks/stop
 	ln -sf ~/linux-files/scripts/pomodoro/hooks/break ~/.pomodoro/hooks/break
 fi
-
-############################################
-# SETUP FOLDERS
-############################################
-mkdir -p ~/local-git-server
-mkdir -p ~/Playground
-ln -sf $DATA_DIR/Playground ~/Playground/shared
