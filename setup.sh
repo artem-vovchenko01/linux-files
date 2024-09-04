@@ -54,6 +54,22 @@ ln -sf ~/linux-files/dotfiles/lf/.config/lf/lfrc ~/.config/lf/lfrc
 
 # Local git
 mkdir -p ~/local-git-server
+echo "Example git file for client repo:"
+echo =========================================
+cat <<EOF
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[remote "pc"]
+	url = artem@192.168.0.84:/home/artem/local-git-server/logseq-personal
+	fetch = +refs/heads/*:refs/remotes/pc/*
+[branch "main"]
+	remote = pc
+	merge = refs/heads/main
+EOF
+echo =========================================
 
 # Playground
 mkdir -p ~/Playground
