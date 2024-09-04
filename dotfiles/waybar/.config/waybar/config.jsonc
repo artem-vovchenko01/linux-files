@@ -10,11 +10,11 @@
         /*
 		"sway/mode",
 		"sway/scratchpad",
-	*/
+    "custom/pomodoro"
+      */
         "custom/media",
         "hyprland/workspaces",
-        "tray",
-	"custom/pomodoro"
+        "tray"
     ],
     "modules-center": [
         "clock",

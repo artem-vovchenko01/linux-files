@@ -1,8 +1,9 @@
-TOTAL_SIZE=50
+TOTAL_SIZE=88
 HEADER=$1
 DASH='-'
-IS_COMMENT=1
 IS_COMMENT=0
+DECORATION_BEGIN="["
+DECORATION_END="]"
 
 print_stats() {
 	echo "Total: $TOTAL_SIZE"
@@ -25,9 +26,9 @@ print_comment() {
 		echo -n "$DASH"
 	done
 
-	echo -n ' [ '
+	echo -n "$DECORATION_BEGIN"
 	echo -n $HEADER
-	echo -n ' ] '
+	echo -n "$DECORATION_END"
 
 	for ((i=0; i < $DASH_SIZE; i++)); do
 		echo -n "$DASH"

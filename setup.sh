@@ -10,6 +10,10 @@ DATA_DIR=/mnt/data/data
 # Shell
 ln -sf ~/linux-files/dotfiles/bash/.shrc.part
 
+# SSH
+mkdir -vp ~/.ssh
+ln -sf ~/linux-files/dotfiles/ssh/.ssh/config ~/.ssh/config
+
 # Hyprland
 mkdir -vp ~/.config/hypr
 ln -sf ~/linux-files/dotfiles/hyprland/hyprland.conf ~/.config/hypr/hyprland.conf
