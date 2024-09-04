@@ -1,0 +1,2 @@
+IGNORE=allign-script-comment.sh
+SPAWN_TERMINAL=epam-vpn-connect.sh pc-route-traffic-laptop.sh pc-unroute-traffic-laptop.sh

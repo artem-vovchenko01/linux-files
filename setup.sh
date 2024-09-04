@@ -9,6 +9,7 @@ DATA_DIR=/mnt/data/data
 
 # Shell
 ln -sf ~/linux-files/dotfiles/bash/.shrc.part ~/.shrc.part.sh
+grep .shrc.part.sh ~/.bashrc || echo "source ~/.shrc.part.sh" >> ~/.bashrc
 
 # SSH
 mkdir -vp ~/.ssh
