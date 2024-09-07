@@ -86,6 +86,7 @@ else:
     print("Downloading absent songs ...")
     print("=============================")
     download_songs_by_idxs(absent_before)
+    print("=============================")
 
 print("Fixing filenames")
 print(run("fix-music-filenames.py"))
