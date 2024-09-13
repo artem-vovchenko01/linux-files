@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 SCRIPTS=~/linux-files/scripts
-VMS_PATH=~/EPAM/EPMA-DPAF/creds/vms
+VMS_PATH=~/EPAM/EPMA-DPAF/resources/creds/vms
 
 set -o pipefail
 DPAF_VMS=$(ls $VMS_PATH)
