@@ -2,7 +2,7 @@
 set -o pipefail
 
 SCRIPTS=~/linux-files/scripts
-VMS_PATH=~/EPAM/EPMA-DPAF/creds/vms
+VMS_PATH=~/EPAM/EPMA-DPAF/resources/creds/vms
 
 # File or dir
 TMP_DIR=$(mktemp -d)
