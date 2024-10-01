@@ -9,5 +9,5 @@ allow_images=true
 dynamic_lines=true
 image_size=150
 columns=3
-width=70%
-height=70%
+width=90%
+height=90%

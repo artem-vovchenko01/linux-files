@@ -8,3 +8,5 @@ key_submit=Ctrl-l
 allow_images=true
 dynamic_lines=true
 image_size=80
+width=80%
+height=80%
