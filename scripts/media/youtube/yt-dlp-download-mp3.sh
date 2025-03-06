@@ -3,7 +3,7 @@ f_convert() {
   local DIR="$2"
   mkdir "$DIR"
   cd "$DIR"
-  youtube-dl -f "bestaudio/best" -o "%(title)s.%(ext)s" --embed-metadata --extract-audio --audio-quality 0 --audio-format mp3 "$LINK"
+  yt-dlp -f "bestaudio/best" -o "%(title)s.%(ext)s" --embed-metadata --extract-audio --audio-quality 0 --audio-format mp3 "$LINK"
   mv *.mp3 ..
   cd ..
   rmdir "$DIR"
