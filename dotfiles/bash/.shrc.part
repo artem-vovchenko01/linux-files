@@ -15,7 +15,7 @@ set -o vi
 # export PATH="$PATH:$CARGO_HOME"
 # export PATH="$PATH:$DOTNET_TOOLS_HOME"
 
-export PATH="$PATH:~/.local/bin"
+export PATH="$PATH:~/.local/bin:/home/artem/Pobrane/flutter/flutter/bin"
 export PATH=~/.npm-global/bin:$PATH
 export EDITOR=nvim
 
@@ -172,4 +172,9 @@ alias k="kubectl"
 # [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 # eval "$(pyenv init -)"
 # eval "$(pyenv virtualenv-init -)"
+
+[ -f ~/.tree-sitter-complete.sh ] && source ~/.tree-sitter-complete.sh
+
+# Add Flutter binaries
+export PATH="$PATH":"$HOME/.pub-cache/bin":~/.my-c-bin
 

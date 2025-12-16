@@ -24,3 +24,11 @@ lvim.leader = "space"
 --   { "vimwiki/vimwiki" },
 -- }
 
+-- lvim.g.indent_blankline_use_treesitter = false
+-- lvim.builtin.treesitter.indent = { enable = false }
+
+-- disable Treesitter's indent module globally
+-- vim.builtin.treesitter.indent = { enable = false }
+
+-- also stop indent-blankline from querying Treesitter (avoids that crash path)
+-- im.g.indent_blankline_use_treesitter = false
