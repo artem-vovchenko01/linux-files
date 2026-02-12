@@ -1,0 +1,11 @@
+{
+    "window.zoomLevel": 2.5,
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 300,
+    "chat.disableAIFeatures": true,
+    "editor.wordWrap": "on",
+    "window.restoreWindows": "all",
+    "redhat.telemetry.enabled": false,
+    "workbench.colorTheme": "Default Dark Modern",
+    "claude-code.selectedModel": "opus"
+}

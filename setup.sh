@@ -48,6 +48,58 @@ ln -sf ~/linux-files/dotfiles/waybar/.config/waybar/style.css ~/.config/waybar/s
 mkdir -p ~/.config/lf
 ln -sf ~/linux-files/dotfiles/lf/.config/lf/lfrc ~/.config/lf/lfrc
 
+# Kitty
+mkdir -p ~/.config/kitty
+ln -sf ~/linux-files/dotfiles/kitty/.config/kitty/kitty.conf ~/.config/kitty/kitty.conf
+
+# VSCode
+mkdir -p ~/.config/{"Code - OSS",Code}/User/
+ln -sf ~/linux-files/dotfiles/code/settings.json ~/.config/"Code - OSS"/User/settings.json
+ln -sf ~/linux-files/dotfiles/code/keybindings.json ~/.config/"Code - OSS"/User/keybindings.json
+ln -sf ~/linux-files/dotfiles/code/settings.json ~/.config/Code/User/settings.json
+ln -sf ~/linux-files/dotfiles/code/keybindings.json ~/.config/Code/User/keybindings.json
+ln -sf ~/linux-files/dotfiles/code/settings.json ~/.config/Cursor/User/settings.json
+ln -sf ~/linux-files/dotfiles/code/keybindings.json ~/.config/Cursor/User/keybindings.json
+
+############################################
+# PACKAGES
+############################################
+if command -v pacman 2>&1 > /dev/null; then
+	echo Pacman detected
+	# thunar-archive-plugin - for enabling archiving options in thunar
+	# tumbler ffmpegthumbnailer libgsf file-roller - for making thumbnails in thunar work
+	PACKAGES="less libnotify wob hyprpaper hypridle git vifm neovim zoxide fzf kitty wl-clipboard imv grim slurp waybar hypridle otf-font-awesome inetutils thunar tumbler ffmpegthumbnailer libgsf file-roller thunar-archive-plugin zip unzip gedit zathura zathura-pdf-mupdf tesseract-data-eng cliphist tldr man-db man-pages"
+	echo $PACKAGES
+	read -r -p "Install the above packages? [y/N]: " ans
+	case "${ans,,}" in
+	  y|yes)
+	    sudo pacman -Sy $PACKAGES
+	    ;;
+	  *)
+	    echo "Cancelled."
+	    ;;
+	esac
+fi
+
+############################################
+# FONTS
+############################################
+read -r -p "Install fonts? [y/N]: " ans
+case "${ans,,}" in
+  y|yes)
+    sudo pacman -S ttf-hack-nerd inter-font noto-fonts noto-fonts-emoji
+    mkdir -vp ~/.config/fontconfig
+    ln -sf ~/linux-files/dotfiles/fontconfig/.config/fontconfig/fonts.conf ~/.config/fontconfig/fonts.conf
+    fc-cache -fv
+    fc-match sans-serif
+    fc-match system-ui
+    fc-match monospace
+    ;;
+  *)
+    echo "Cancelled."
+    ;;
+esac
+
 ############################################
 # SETUP FOLDERS
 ############################################
@@ -70,12 +122,16 @@ cat <<EOF
 	merge = refs/heads/main
 EOF
 echo =========================================
+read -p "Press enter to continue ... "
 
 # Playground
 mkdir -p ~/Playground
-if [ -d $DATA_DIR ]; then
-  ln -sf $DATA_DIR/Playground ~/Playground/shared
-fi
+#if [ -d $DATA_DIR ]; then
+#  ln -sf $DATA_DIR/Playground ~/Playground/shared
+#fi
+
+# Logseq
+mkdir -vp ~/logseq
 
 # Hyprland
 mkdir -vp ~/custom-setup/hyprland

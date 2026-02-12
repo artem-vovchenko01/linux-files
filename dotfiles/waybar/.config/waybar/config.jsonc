@@ -2,9 +2,9 @@
 {
     // "layer": "top", // Waybar at top layer
     // "position": "bottom", // Waybar position (top|bottom|left|right)
-    "height": 42, // Waybar height (to be removed for auto height)
+    "height": 32, // Compact height for large font
     // "width": 1280, // Waybar width
-    "spacing": 4, // Gaps between modules (4px)
+    "spacing": 3, // Minimal gaps between modules
     // Choose the order of the modules
     "modules-left": [
         /*
@@ -31,8 +31,8 @@
         /*"power-profiles-daemon",*/
         /*"temperature",*/
         /*"backlight",*/
-        /*"battery",*/
         /*"battery#bat2",*/
+        "battery",
         "network"
     ],
     // Modules configuration
@@ -106,10 +106,11 @@
     },
     "tray": {
         // "icon-size": 21,
-        "spacing": 10
+        "spacing": 6
     },
     "clock": {
-        "timezone": "Europe/Kiev",
+        "timezone": "Europe/Warsaw",
+        "format": " {:%H:%M}",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
         "format-alt": "{:%Y-%m-%d}"
     },
@@ -164,11 +165,12 @@
     },
     "network": {
         // "interface": "wlp2*", // (Optional) To force the use of this interface
-        "format-wifi": "{essid} ({signalStrength}%) ",
-        "format-ethernet": "{ipaddr}/{cidr} ",
-        "tooltip-format": "{ifname} via {gwaddr} ",
-        "format-linked": "{ifname} (No IP) ",
-        "format-disconnected": "Disconnected ⚠",
+        "format-wifi": "{signalStrength}% ",
+        "format-ethernet": "",
+        "tooltip-format-wifi": "{essid} ({signalStrength}%)\n{ifname} via {gwaddr}",
+        "tooltip-format-ethernet": "{ifname}: {ipaddr}/{cidr}",
+        "format-linked": "",
+        "format-disconnected": "",
         "format-alt": "{ifname}: {ipaddr}/{cidr}"
     },
     "pulseaudio": {
@@ -193,10 +195,10 @@
     "custom/media": {
         "format": "{icon} {}",
         "return-type": "json",
-        "max-length": 40,
+        "max-length": 24,
         "format-icons": {
             "spotify": "",
-            "default": "🎜"
+            "default": ""
         },
         "escape": true,
         "exec": "$HOME/.config/waybar/mediaplayer.py 2> /dev/null" // Script in resources folder
@@ -215,6 +217,7 @@
 	// look at "C/C++/Java Src codes
 	"format-uk": "\uD83C\uDDFA\uD83C\uDDE6 UK",
 	"format-en": "\uD83C\uDDFA\uD83C\uDDF8 EN",
-	"format-ru": "\uD83C\uDDF7\uD83C\uDDFA RU"
+	"format-ru": "\uD83C\uDDF7\uD83C\uDDFA RU",
+	"format-pl": "\uD83C\uDDF5\uD83C\uDDF1 PL"
     }
 }

@@ -87,6 +87,12 @@ function ssh_add_startup_keys {
 ##############################
 
 # complete -C '/usr/bin/aws_completer' aws
+# bash-completion
+if [ -r /usr/share/bash-completion/bash_completion ]; then
+  . /usr/share/bash-completion/bash_completion
+elif [ -r /etc/profile.d/bash_completion.sh ]; then
+  . /etc/profile.d/bash_completion.sh
+fi
 
 ##############################
 # SOURCES
@@ -149,6 +155,9 @@ alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
 alias k="kubectl"
+if command -v kitty 2>&1 > /dev/null; then
+	alias icat="kitty +kitten icat"
+fi
 # alias kubectl="minikube kubectl -- "
 
 # DEVICE="Pixel_4_API_30_2"
@@ -178,3 +187,6 @@ alias k="kubectl"
 # Add Flutter binaries
 export PATH="$PATH":"$HOME/.pub-cache/bin":~/.my-c-bin
 
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init bash)"
+fi
