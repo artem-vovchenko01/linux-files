@@ -25,6 +25,10 @@ ln -sf ~/linux-files/dotfiles/hyprland/hyprpaper.conf ~/.config/hypr/hyprpaper.c
 mkdir -vp ~/.config/mako
 ln -sf ~/linux-files/dotfiles/mako/.config/mako/config ~/.config/mako/config
 
+# Dunst
+mkdir -vp ~/.config/dunst
+ln -sf ~/linux-files/dotfiles/dunst/dunstrc ~/.config/dunst/dunstrc
+
 # Lunarvim
 mkdir -vp ~/.config/lvim
 ln -sf ~/linux-files/dotfiles/lunarvim/.config/lvim/config.lua ~/.config/lvim/config.lua

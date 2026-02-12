@@ -1,2 +1,57 @@
 [global]
 font = Sans 18
+markup = full
+format = "<b>%s</b>\n%b"
+alignment = left
+vertical_alignment = center
+show_indicators = yes
+
+origin = top-right
+offset = (18, 18)
+width = 420
+height = (0, 220)
+notification_limit = 10
+sort = yes
+
+padding = 14
+horizontal_padding = 14
+text_icon_padding = 12
+gap_size = 10
+
+icon_position = left
+min_icon_size = 32
+max_icon_size = 64
+enable_recursive_icon_lookup = true
+icon_theme = Adwaita
+
+progress_bar = true
+progress_bar_height = 8
+progress_bar_frame_width = 1
+progress_bar_corner_radius = 6
+
+frame_width = 1
+frame_color = "#3B4261"
+separator_height = 0
+corner_radius = 12
+corners = all
+
+stack_duplicates = false
+hide_duplicate_count = false
+idle_threshold = 0
+
+[urgency_low]
+background = "#1F2335"
+foreground = "#A9B1D6"
+frame_color = "#414868"
+
+[urgency_normal]
+background = "#24283B"
+foreground = "#C0CAF5"
+frame_color = "#7AA2F7"
+
+[urgency_critical]
+background = "#3B1F2B"
+foreground = "#F7C5D6"
+frame_color = "#F7768E"
+timeout = 10s
+override_dbus_timeout = 10s
