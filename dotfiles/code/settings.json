@@ -7,5 +7,6 @@
     "window.restoreWindows": "all",
     "redhat.telemetry.enabled": false,
     "workbench.colorTheme": "Default Dark Modern",
-    "claude-code.selectedModel": "opus"
+    "claude-code.selectedModel": "opus",
+    "python.defaultInterpreterPath": "/bin/python"
 }

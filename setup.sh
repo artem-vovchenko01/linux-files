@@ -72,7 +72,7 @@ if command -v pacman 2>&1 > /dev/null; then
 	echo Pacman detected
 	# thunar-archive-plugin - for enabling archiving options in thunar
 	# tumbler ffmpegthumbnailer libgsf file-roller - for making thumbnails in thunar work
-	PACKAGES="less libnotify wob hyprpaper hypridle git vifm neovim zoxide fzf kitty wl-clipboard imv grim slurp waybar hypridle otf-font-awesome inetutils thunar tumbler ffmpegthumbnailer libgsf file-roller thunar-archive-plugin zip unzip gedit zathura zathura-pdf-mupdf tesseract-data-eng cliphist tldr man-db man-pages"
+	PACKAGES="brightnessctl less libnotify wob hyprpaper hypridle git vifm neovim zoxide fzf kitty wl-clipboard imv grim slurp waybar hypridle otf-font-awesome inetutils thunar tumbler ffmpegthumbnailer libgsf file-roller thunar-archive-plugin zip unzip gedit zathura zathura-pdf-mupdf tesseract-data-eng cliphist tldr man-db man-pages"
 	echo $PACKAGES
 	read -r -p "Install the above packages? [y/N]: " ans
 	case "${ans,,}" in
