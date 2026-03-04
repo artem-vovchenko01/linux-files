@@ -7,6 +7,26 @@
     "window.restoreWindows": "all",
     "redhat.telemetry.enabled": false,
     "workbench.colorTheme": "Default Dark Modern",
-    "claude-code.selectedModel": "opus",
-    "python.defaultInterpreterPath": "/bin/python"
+    "python.defaultInterpreterPath": "/bin/python",
+    "claudeCode.selectedModel": "opus",
+    "claudeCode.disableLoginPrompt": true,
+    "airun.globalSettings": {
+        "encryptionKey": "be98fd50-f14c-4695-9ced-4fd2b7ce37ba",
+        "claudeCodeUseCustomConfig": false,
+        "alwaysTrustCodeMieSSL": false,
+        "codeMieUrl": "https://codemie.lab.epam.com",
+        "mcpConfigJson": {},
+        "mcpTimeoutSeconds": 60,
+        "streamTimeoutSeconds": 300,
+        "toolkits": [
+            "filesystem",
+            "ide",
+            "codeAnalysis",
+            "terminal"
+        ],
+        "featureFlags": {
+            "workflows": false
+        },
+        "enableDebugLogging": false
+    }
 }

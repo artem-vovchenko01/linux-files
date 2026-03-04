@@ -15,7 +15,8 @@ Configurations for the next programs included:
 Also included:
 
 * my little scripts which I use in tiling window managers. These scripts are probably too tied to my own machines for being used by other people but check them out if interested.
-* scripts for automatic installation of these configs and Arch installation
+* `setup.sh` as the main workflow for deploying configs
+* legacy scripts for old OS/Arch installation workflows (archived state)
 * symlinks to some of my directories (mainly, browser data and cache for convenience between reinstalls)
 * some wallpapers
 
@@ -27,4 +28,3 @@ Also included:
 * running scripts from menu
 * pomodoro
 * app startup
-
