@@ -13,24 +13,20 @@ fi
 
 socket="${XDG_RUNTIME_DIR:-/run/user/$UID}/hypr/${HYPRLAND_INSTANCE_SIGNATURE:-}/.socket2.sock"
 
-if command -v socat >/dev/null 2>&1 && [[ -S "$socket" ]]; then
-  socat -U - UNIX-CONNECT:"$socket" | while IFS= read -r event; do
+# Read events from the Hyprland socket; reconnect if stream drops.
+while true; do
+  if [[ ! -S "$socket" ]]; then
+    sleep 1
+    continue
+  fi
+
+  socat -u UNIX-CONNECT:"$socket" - 2>/dev/null | while IFS= read -r event; do
     case "$event" in
-      monitoradded*|monitorremoved*)
+      monitoradded*|monitorremoved*|configreloaded*)
         "$APPLY_SCRIPT" --quiet || true
         ;;
     esac
-  done
-  exit 0
-fi
+  done || true
 
-# Fallback: lightweight polling if socket events are unavailable.
-last=""
-while true; do
-  now="$(hyprctl monitors all | awk '/^Monitor / { print $2 }' | sort | tr '\n' ' ')"
-  if [[ "$now" != "$last" ]]; then
-    "$APPLY_SCRIPT" --quiet || true
-    last="$now"
-  fi
   sleep 2
 done

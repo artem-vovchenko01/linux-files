@@ -29,7 +29,7 @@ There are no build, lint, or test commands — this is a collection of shell scr
 ## Architecture
 
 ### Dotfile Deployment
-`setup.sh` creates symlinks from `dotfiles/` into `~/.config/` and `~/`. Configs live in the repo and are linked, not copied. This is the main maintained workflow. Adding a new config means adding the file under `dotfiles/<app>/` and a corresponding `ln -sf` line in `setup.sh`.
+`setup.sh` creates symlinks from `dotfiles/` into `~/.config/` and `~/`. Configs live in the repo and are linked, not copied. It is designed to be idempotent (safe to run many times). This is the main maintained workflow. Adding a new config means adding the file under `dotfiles/<app>/` and a corresponding `ln -sf` line in `setup.sh`.
 
 ### Script Organization (`scripts/`)
 Scripts are grouped by function: `admin/`, `devices/`, `media/`, `tiling-wm/`, `files/`, `pomodoro/`, `tool/`, `epam/`, etc. The wofi menu (`scripts/menu.sh`) provides a GUI launcher that recursively browses these directories. Per-directory `.menu_config` files control which scripts get a terminal (`SPAWN_TERMINAL=`) and which are hidden (`IGNORE=`).

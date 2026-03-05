@@ -56,6 +56,10 @@ ln -sf ~/linux-files/dotfiles/lf/.config/lf/lfrc ~/.config/lf/lfrc
 mkdir -p ~/.config/kitty
 ln -sf ~/linux-files/dotfiles/kitty/.config/kitty/kitty.conf ~/.config/kitty/kitty.conf
 
+# Foot
+mkdir -p ~/.config/foot
+ln -sf ~/linux-files/dotfiles/foot/.config/foot/foot.ini ~/.config/foot/foot.ini
+
 # VSCode
 mkdir -p ~/.config/{"Code - OSS",Code}/User/
 ln -sf ~/linux-files/dotfiles/code/settings.json ~/.config/"Code - OSS"/User/settings.json
@@ -72,7 +76,7 @@ if command -v pacman 2>&1 > /dev/null; then
 	echo Pacman detected
 	# thunar-archive-plugin - for enabling archiving options in thunar
 	# tumbler ffmpegthumbnailer libgsf file-roller - for making thumbnails in thunar work
-	PACKAGES="brightnessctl less libnotify wob hyprpaper hypridle git vifm neovim zoxide fzf kitty wl-clipboard imv grim slurp waybar hypridle otf-font-awesome inetutils thunar tumbler ffmpegthumbnailer libgsf file-roller thunar-archive-plugin zip unzip gedit zathura zathura-pdf-mupdf tesseract-data-eng cliphist tldr man-db man-pages"
+	PACKAGES="brightnessctl less libnotify wob hyprpaper hypridle git vifm neovim zoxide fzf kitty foot wl-clipboard imv grim slurp waybar hypridle otf-font-awesome inetutils socat thunar tumbler ffmpegthumbnailer libgsf file-roller thunar-archive-plugin zip unzip gedit zathura zathura-pdf-mupdf tesseract-data-eng cliphist tldr man-db man-pages"
 	echo $PACKAGES
 	read -r -p "Install the above packages? [y/N]: " ans
 	case "${ans,,}" in
