@@ -4,6 +4,27 @@ set -euxo pipefail
 DATA_DIR=/mnt/data/data
 
 ############################################
+# PACKAGE MANAGER DETECTION
+############################################
+if command -v pacman &>/dev/null; then
+	PKG_MGR=pacman
+	pkg_install() { sudo pacman -Sy "$@"; }
+elif command -v apt &>/dev/null; then
+	PKG_MGR=apt
+	pkg_install() { sudo apt update && sudo apt install -y "$@"; }
+elif command -v dnf &>/dev/null; then
+	PKG_MGR=dnf
+	pkg_install() { sudo dnf install -y "$@"; }
+elif command -v zypper &>/dev/null; then
+	PKG_MGR=zypper
+	pkg_install() { sudo zypper install -y "$@"; }
+else
+	PKG_MGR=unknown
+	pkg_install() { echo "No supported package manager found. Install manually: $*"; return 1; }
+fi
+echo "Detected package manager: $PKG_MGR"
+
+############################################
 # CONFIGS
 ############################################
 
@@ -72,16 +93,36 @@ ln -sf ~/linux-files/dotfiles/code/keybindings.json ~/.config/Cursor/User/keybin
 ############################################
 # PACKAGES
 ############################################
-if command -v pacman 2>&1 > /dev/null; then
-	echo Pacman detected
-	# thunar-archive-plugin - for enabling archiving options in thunar
-	# tumbler ffmpegthumbnailer libgsf file-roller - for making thumbnails in thunar work
-	PACKAGES="brightnessctl less libnotify wob hyprpaper hypridle git vifm neovim zoxide fzf kitty foot wl-clipboard imv grim slurp waybar hypridle otf-font-awesome inetutils socat thunar tumbler ffmpegthumbnailer libgsf file-roller thunar-archive-plugin zip unzip gedit zathura zathura-pdf-mupdf tesseract-data-eng cliphist tldr man-db man-pages"
-	echo $PACKAGES
+# Common packages (same name across distros)
+PACKAGES_COMMON="brightnessctl less wob hyprpaper hypridle git vifm neovim zoxide fzf kitty foot imv grim slurp waybar socat thunar tumbler ffmpegthumbnailer file-roller thunar-archive-plugin zip unzip gedit zathura cliphist tldr man-db"
+# thunar-archive-plugin - for enabling archiving options in thunar
+# tumbler ffmpegthumbnailer file-roller - for making thumbnails in thunar work
+
+# Distro-specific packages (different names across distros)
+case "$PKG_MGR" in
+	pacman)
+		PACKAGES_DISTRO="libnotify wl-clipboard otf-font-awesome inetutils libgsf zathura-pdf-mupdf tesseract-data-eng man-pages"
+		;;
+	apt)
+		PACKAGES_DISTRO="libnotify-bin wl-clipboard fonts-font-awesome inetutils-tools libgsf-1-common zathura-pdf-poppler tesseract-ocr-eng man"
+		;;
+	dnf)
+		PACKAGES_DISTRO="libnotify wl-clipboard fontawesome-fonts inetutils libgsf zathura-pdf-mupdf tesseract-langpack-eng man-pages"
+		;;
+	zypper)
+		PACKAGES_DISTRO="libnotify-tools wl-clipboard fontawesome-fonts inetutils libgsf-1 zathura-plugin-pdf-mupdf tesseract-ocr-traineddata-english man-pages"
+		;;
+	*)
+		PACKAGES_DISTRO=""
+		;;
+esac
+PACKAGES="$PACKAGES_COMMON $PACKAGES_DISTRO"
+if [[ -n "$PACKAGES" ]]; then
+	echo "$PACKAGES"
 	read -r -p "Install the above packages? [y/N]: " ans
 	case "${ans,,}" in
 	  y|yes)
-	    sudo pacman -Sy $PACKAGES
+	    pkg_install $PACKAGES
 	    ;;
 	  *)
 	    echo "Cancelled."
@@ -92,10 +133,21 @@ fi
 ############################################
 # FONTS
 ############################################
+case "$PKG_MGR" in
+	pacman)  FONT_PACKAGES="ttf-hack-nerd inter-font noto-fonts noto-fonts-emoji" ;;
+	apt)     FONT_PACKAGES="fonts-hack fonts-inter fonts-noto fonts-noto-color-emoji" ;;
+	dnf)     FONT_PACKAGES="google-noto-sans-fonts google-noto-emoji-fonts inter-fonts" ;;
+	zypper)  FONT_PACKAGES="google-noto-sans-fonts google-noto-coloremoji-fonts" ;;
+	*)       FONT_PACKAGES="" ;;
+esac
 read -r -p "Install fonts? [y/N]: " ans
 case "${ans,,}" in
   y|yes)
-    sudo pacman -S ttf-hack-nerd inter-font noto-fonts noto-fonts-emoji
+    if [[ -n "$FONT_PACKAGES" ]]; then
+      pkg_install $FONT_PACKAGES
+    else
+      echo "Unknown package manager — install fonts manually."
+    fi
     mkdir -vp ~/.config/fontconfig
     ln -sf ~/linux-files/dotfiles/fontconfig/.config/fontconfig/fonts.conf ~/.config/fontconfig/fonts.conf
     fc-cache -fv

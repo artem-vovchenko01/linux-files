@@ -216,6 +216,9 @@ fi
 # eval "$(pyenv init - bash)"
 
 
-alias codex="codex --dangerously-bypass-approvals-and-sandbox"
-alias claude="claude --dangerously-skip-permissions"
+alias codex="codex -a on-request -s danger-full-access"
+alias codex-yolo="codex --dangerously-bypass-approvals-and-sandbox"
+alias claude="claude --verbose --dangerously-skip-permissions"
 alias gemini="gemini --approval-mode yolo"
+
+export GROK_API_KEY=$(cat ~/.grok-api-key)
