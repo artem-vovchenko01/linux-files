@@ -94,23 +94,23 @@ ln -sf ~/linux-files/dotfiles/code/keybindings.json ~/.config/Cursor/User/keybin
 # PACKAGES
 ############################################
 # Common packages (same name across distros)
-PACKAGES_COMMON="brightnessctl less wob hyprpaper hypridle git vifm neovim zoxide fzf kitty foot imv grim slurp waybar socat thunar tumbler ffmpegthumbnailer file-roller thunar-archive-plugin zip unzip gedit zathura cliphist tldr man-db"
+PACKAGES_COMMON="less git vifm neovim zoxide fzf kitty foot imv thunar tumbler ffmpegthumbnailer file-roller thunar-archive-plugin zip unzip gedit zathura tldr man-db"
 # thunar-archive-plugin - for enabling archiving options in thunar
 # tumbler ffmpegthumbnailer file-roller - for making thumbnails in thunar work
 
 # Distro-specific packages (different names across distros)
 case "$PKG_MGR" in
 	pacman)
-		PACKAGES_DISTRO="libnotify wl-clipboard otf-font-awesome inetutils libgsf zathura-pdf-mupdf tesseract-data-eng man-pages"
+		PACKAGES_DISTRO="libnotify otf-font-awesome inetutils libgsf zathura-pdf-mupdf tesseract-data-eng man-pages"
 		;;
 	apt)
-		PACKAGES_DISTRO="libnotify-bin wl-clipboard fonts-font-awesome inetutils-tools libgsf-1-common zathura-pdf-poppler tesseract-ocr-eng man"
+		PACKAGES_DISTRO="libnotify-bin fonts-font-awesome inetutils-tools libgsf-1-common zathura-pdf-poppler tesseract-ocr-eng man"
 		;;
 	dnf)
-		PACKAGES_DISTRO="libnotify wl-clipboard fontawesome-fonts inetutils libgsf zathura-pdf-mupdf tesseract-langpack-eng man-pages"
+		PACKAGES_DISTRO="libnotify fontawesome-fonts inetutils libgsf zathura-pdf-mupdf tesseract-langpack-eng man-pages"
 		;;
 	zypper)
-		PACKAGES_DISTRO="libnotify-tools wl-clipboard fontawesome-fonts inetutils libgsf-1 zathura-plugin-pdf-mupdf tesseract-ocr-traineddata-english man-pages"
+		PACKAGES_DISTRO="libnotify-tools fontawesome-fonts inetutils libgsf-1 zathura-plugin-pdf-mupdf tesseract-ocr-traineddata-english man-pages"
 		;;
 	*)
 		PACKAGES_DISTRO=""
@@ -129,6 +129,29 @@ if [[ -n "$PACKAGES" ]]; then
 	    ;;
 	esac
 fi
+
+############################################
+# HYPRLAND PACKAGES
+############################################
+HYPR_COMMON="brightnessctl wob grim slurp waybar socat cliphist"
+case "$PKG_MGR" in
+	pacman)  HYPR_DISTRO="wl-clipboard hyprpaper hypridle" ;;
+	apt)     HYPR_DISTRO="wl-clipboard" ;;
+	dnf)     HYPR_DISTRO="wl-clipboard" ;;
+	zypper)  HYPR_DISTRO="wl-clipboard" ;;
+	*)       HYPR_DISTRO="" ;;
+esac
+HYPR_PACKAGES="$HYPR_COMMON $HYPR_DISTRO"
+echo "$HYPR_PACKAGES"
+read -r -p "Install Hyprland packages? [y/N]: " ans
+case "${ans,,}" in
+  y|yes)
+    pkg_install $HYPR_PACKAGES
+    ;;
+  *)
+    echo "Cancelled."
+    ;;
+esac
 
 ############################################
 # FONTS
