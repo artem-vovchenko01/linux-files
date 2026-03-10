@@ -82,7 +82,7 @@ mkdir -p ~/.config/foot
 ln -sf ~/linux-files/dotfiles/foot/.config/foot/foot.ini ~/.config/foot/foot.ini
 
 # VSCode
-mkdir -p ~/.config/{"Code - OSS",Code}/User/
+mkdir -p ~/.config/{"Code - OSS",Code,Cursor}/User/
 ln -sf ~/linux-files/dotfiles/code/settings.json ~/.config/"Code - OSS"/User/settings.json
 ln -sf ~/linux-files/dotfiles/code/keybindings.json ~/.config/"Code - OSS"/User/keybindings.json
 ln -sf ~/linux-files/dotfiles/code/settings.json ~/.config/Code/User/settings.json
