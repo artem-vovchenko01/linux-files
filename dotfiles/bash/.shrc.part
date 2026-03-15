@@ -206,6 +206,8 @@ fi
 # Add Flutter binaries
 export PATH="$PATH":"$HOME/.pub-cache/bin":~/.my-c-bin
 
+export PATH="$PATH:/home/artem/.cargo/bin"
+
 if command -v zoxide >/dev/null 2>&1; then
     eval "$(zoxide init bash)"
 fi
@@ -222,3 +224,21 @@ alias claude="claude --verbose --dangerously-skip-permissions"
 alias gemini="gemini --approval-mode yolo"
 
 export GROK_API_KEY=$(cat ~/.grok-api-key)
+
+eval "$(fzf --bash)"
+
+# Unlimited history size                                                                                    
+HISTSIZE=-1                                                                                                 
+HISTFILESIZE=-1                                                                                             
+												      
+# Append to history file instead of overwriting                                                             
+shopt -s histappend                                                                                         
+
+# Write history after every command (prevents loss on crash/kill)                                           
+PROMPT_COMMAND="history -a; ${PROMPT_COMMAND}"
+
+# Don't ignore any commands (optional: remove duplicates/spaces control)
+HISTCONTROL=
+
+# Store history with timestamps (optional but useful)
+# HISTTIMEFORMAT="%F %T  "

@@ -54,6 +54,9 @@ ln -sf ~/linux-files/dotfiles/dunst/dunstrc ~/.config/dunst/dunstrc
 mkdir -vp ~/.config/lvim
 ln -sf ~/linux-files/dotfiles/lunarvim/.config/lvim/config.lua ~/.config/lvim/config.lua
 
+# Neovim
+ln -sfn ~/linux-files/dotfiles/nvim/.config/nvim ~/.config/nvim
+
 # Git
 ln -sf ~/linux-files/dotfiles/git/.gitconfig ~/.gitconfig
 
