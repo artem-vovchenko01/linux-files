@@ -1,6 +1,0 @@
-########## SHELL
-zsh
-zsh-syntax-highlighting
-zsh-autosuggestions
-zsh-theme-powerlevel10k
-

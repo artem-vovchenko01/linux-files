@@ -1,6 +1,0 @@
-########## LOOK
-qt5ct
-breeze
-breeze-gtk
-lxappearance
-ttf-font-awesome
