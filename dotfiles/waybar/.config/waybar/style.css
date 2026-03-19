@@ -1,6 +1,6 @@
 * {
     font-family: "Hack Nerd Font Mono";
-    font-size: 20px;
+    font-size: 19px;
     padding: 0;
     margin: 0;
     min-height: 0;
@@ -10,7 +10,7 @@ window#waybar {
     background-color: rgba(43, 48, 59, 0.45);
     color: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.10);
-    border-radius: 10px;
+    border-radius: 9px;
     margin: 2px 6px 0 6px;
     padding: 1px 2px;
     transition-property: background-color;
@@ -47,9 +47,9 @@ button {
 }
 
 #workspaces button {
-    padding: 0 7px;
+    padding: 0 6px;
     margin: 0 1px;
-    border-radius: 7px;
+    border-radius: 6px;
     background-color: rgba(255, 255, 255, 0.08);
     color: #ffffff;
     transition: background-color 0.2s ease, box-shadow 0.2s ease;
@@ -86,6 +86,7 @@ button {
 #pulseaudio,
 #wireplumber,
 #custom-media,
+#custom-swap,
 #tray,
 #mode,
 #idle_inhibitor,
@@ -95,9 +96,9 @@ button {
 #window,
 #language,
 #keyboard-state {
-    padding: 0 7px;
+    padding: 0 6px;
     margin: 0 1px;
-    border-radius: 7px;
+    border-radius: 6px;
     border: 1px solid rgba(255, 255, 255, 0.10);
 }
 
@@ -114,6 +115,7 @@ button {
 #battery {
     background-color: #ffffff;
     color: #000000;
+    transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 #battery.charging,
@@ -165,14 +167,147 @@ label:focus {
 #cpu {
     background-color: #2ecc71;
     color: #000000;
+    transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 #memory {
     background-color: #9b59b6;
+    transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 #disk {
     background-color: #964b00;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+#cpu.load0,
+#memory.load0,
+#disk.load0,
+#custom-swap.load0 {
+    background-color: #9eddb0;
+    color: #1f2a1f;
+}
+
+#cpu.load1,
+#memory.load1,
+#disk.load1,
+#custom-swap.load1 {
+    background-color: #b2e4ad;
+    color: #1f2a1f;
+}
+
+#cpu.load2,
+#memory.load2,
+#disk.load2,
+#custom-swap.load2 {
+    background-color: #c6e9ac;
+    color: #1f2a1f;
+}
+
+#cpu.load3,
+#memory.load3,
+#disk.load3,
+#custom-swap.load3 {
+    background-color: #dcedad;
+    color: #1f2a1f;
+}
+
+#cpu.load4,
+#memory.load4,
+#disk.load4,
+#custom-swap.load4 {
+    background-color: #edf0b0;
+    color: #2b261b;
+}
+
+#cpu.load5,
+#memory.load5,
+#disk.load5,
+#custom-swap.load5 {
+    background-color: #f6dfab;
+    color: #2b261b;
+}
+
+#cpu.load6,
+#memory.load6,
+#disk.load6,
+#custom-swap.load6 {
+    background-color: #f5c99f;
+    color: #2f221d;
+}
+
+#cpu.load7,
+#memory.load7,
+#disk.load7,
+#custom-swap.load7 {
+    background-color: #f0b199;
+    color: #2f221d;
+}
+
+#cpu.load8,
+#memory.load8,
+#disk.load8,
+#custom-swap.load8 {
+    background-color: #e69597;
+    color: #321f24;
+}
+
+#cpu.load9,
+#memory.load9,
+#disk.load9,
+#custom-swap.load9 {
+    background-color: #d97b88;
+    color: #321f24;
+}
+
+#battery.charge9 {
+    background-color: #9eddb0;
+    color: #1f2a1f;
+}
+
+#battery.charge8 {
+    background-color: #b2e4ad;
+    color: #1f2a1f;
+}
+
+#battery.charge7 {
+    background-color: #c6e9ac;
+    color: #1f2a1f;
+}
+
+#battery.charge6 {
+    background-color: #dcedad;
+    color: #1f2a1f;
+}
+
+#battery.charge5 {
+    background-color: #edf0b0;
+    color: #2b261b;
+}
+
+#battery.charge4 {
+    background-color: #f6dfab;
+    color: #2b261b;
+}
+
+#battery.charge3 {
+    background-color: #f5c99f;
+    color: #2f221d;
+}
+
+#battery.charge2 {
+    background-color: #f0b199;
+    color: #2f221d;
+}
+
+#battery.charge1 {
+    background-color: #e69597;
+    color: #321f24;
+}
+
+#battery.charge0 {
+    background-color: #d97b88;
+    color: #321f24;
 }
 
 #backlight {

@@ -17,18 +17,13 @@ fi
 readarray -t target_keyboards < <(
   hyprctl -j devices | jq -r '
     .keyboards
-    | map(select(.main == true) | .name)
-    | if length > 0 then . else
-        (
-          .keyboards
-          | map(.name)
-          | map(
-              select(
-                test("consumer-control|system-control|hotkeys|power-button|sleep-button|video-bus|intel-hid-events|intel-hid-5-button-array") | not
-              )
-            )
+    | map(.name)
+    | map(
+        select(
+          test("consumer-control|system-control|hotkeys|power-button|sleep-button|video-bus|intel-hid-events|intel-hid-5-button-array") | not
         )
-      end
+      )
+    | unique
     | .[]
   '
 )
@@ -41,13 +36,3 @@ fi
 for kb in "${target_keyboards[@]}"; do
   hyprctl switchxkblayout "$kb" "$layout_index" >/dev/null
 done
-
-case "$layout_code" in
-  us) msg="🇺🇸 layout: us" ;;
-  ua) msg="🇺🇦 layout: ua" ;;
-  ru) msg="🇷🇺 layout: ru" ;;
-  pl) msg="🇵🇱 layout: pl" ;;
-  *)  msg="layout: $layout_code" ;;
-esac
-
-notify-send "Keyboard layout" "$msg" || true

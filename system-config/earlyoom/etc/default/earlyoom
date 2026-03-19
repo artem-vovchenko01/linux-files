@@ -1,0 +1,7 @@
+# Kill the biggest user process by RSS before desktop responsiveness collapses.
+# -m 10,10   : kill immediately once available user memory falls below 10%
+# -s 100,100 : ignore swap as a gating condition; react on RAM pressure alone
+# --sort-by-rss: prefer the biggest resident memory hog instead of oom_score
+# --ignore-root-user: avoid taking down root-owned system services
+# -r 0       : disable periodic memory reports in the journal
+EARLYOOM_ARGS="-m 10,10 -s 100,100 --sort-by-rss --ignore-root-user -r 0"

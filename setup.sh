@@ -24,6 +24,48 @@ else
 fi
 echo "Detected package manager: $PKG_MGR"
 
+pkg_is_installed() {
+	case "$PKG_MGR" in
+		pacman)
+			pacman -Qq "$1" &>/dev/null
+			;;
+		apt)
+			dpkg -s "$1" &>/dev/null
+			;;
+		dnf|zypper)
+			rpm -q "$1" &>/dev/null
+			;;
+		*)
+			return 1
+			;;
+	esac
+}
+
+pkg_ensure_installed() {
+	local missing=()
+	local pkg
+
+	for pkg in "$@"; do
+		if pkg_is_installed "$pkg"; then
+			echo "Already installed: $pkg"
+		else
+			missing+=("$pkg")
+		fi
+	done
+
+	if (( ${#missing[@]} > 0 )); then
+		pkg_install "${missing[@]}"
+	fi
+}
+
+install_root_file() {
+	local src="$1"
+	local dst="$2"
+	local mode="${3:-0644}"
+
+	sudo install -D -m "$mode" "$src" "$dst"
+}
+
 ############################################
 # CONFIGS
 ############################################
@@ -180,6 +222,36 @@ case "${ans,,}" in
     fc-match sans-serif
     fc-match system-ui
     fc-match monospace
+    ;;
+  *)
+    echo "Cancelled."
+    ;;
+esac
+
+############################################
+# OOM KILLER
+############################################
+read -r -p "Configure oom killer? [y/N]: " ans
+case "${ans,,}" in
+  y|yes)
+    case "$PKG_MGR" in
+      pacman|apt|dnf)
+        pkg_ensure_installed earlyoom
+        ;;
+      *)
+        echo "earlyoom package installation is not configured for $PKG_MGR. Install it manually."
+        ;;
+    esac
+
+    if command -v systemctl &>/dev/null; then
+      install_root_file ~/linux-files/system-config/earlyoom/etc/default/earlyoom /etc/default/earlyoom
+      install_root_file ~/linux-files/system-config/earlyoom/etc/systemd/system/earlyoom.service.d/override.conf /etc/systemd/system/earlyoom.service.d/override.conf
+      sudo systemctl daemon-reload
+      sudo systemctl enable --now earlyoom
+      sudo systemctl restart earlyoom
+    else
+      echo "systemctl not found; skipping service activation."
+    fi
     ;;
   *)
     echo "Cancelled."

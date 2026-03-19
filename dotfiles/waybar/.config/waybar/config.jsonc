@@ -2,7 +2,7 @@
 {
     // "layer": "top", // Waybar at top layer
     // "position": "bottom", // Waybar position (top|bottom|left|right)
-    "height": 32, // Compact height for large font
+    "height": 30, // Slightly tighter height to reduce bar footprint
     // "width": 1280, // Waybar width
     "spacing": 3, // Minimal gaps between modules
     // Choose the order of the modules
@@ -22,7 +22,9 @@
         "keyboard-state",
         "sway/window",
         "cpu",
-        "memory"
+        "memory",
+        "custom/swap",
+        "disk"
     ],
     "modules-right": [
         /*"mpd",*/
@@ -115,11 +117,52 @@
         "format-alt": "{:%Y-%m-%d}"
     },
     "cpu": {
+        "states": {
+            "load0": 0,
+            "load1": 10,
+            "load2": 20,
+            "load3": 30,
+            "load4": 40,
+            "load5": 50,
+            "load6": 60,
+            "load7": 70,
+            "load8": 80,
+            "load9": 90
+        },
         "format": "{usage}% ",
         "tooltip": false
     },
     "memory": {
-        "format": "{}% "
+        "states": {
+            "load0": 0,
+            "load1": 10,
+            "load2": 20,
+            "load3": 30,
+            "load4": 40,
+            "load5": 50,
+            "load6": 60,
+            "load7": 70,
+            "load8": 80,
+            "load9": 90
+        },
+        "format": "{used:0.1f}/{total:0.1f} G "
+    },
+    "disk": {
+        "path": "/",
+        "unit": "GiB",
+        "states": {
+            "load0": 0,
+            "load1": 10,
+            "load2": 20,
+            "load3": 30,
+            "load4": 40,
+            "load5": 50,
+            "load6": 60,
+            "load7": 70,
+            "load8": 80,
+            "load9": 90
+        },
+        "format": "{specific_used:0.0f}/{specific_total:0.0f} G "
     },
     "temperature": {
         // "thermal-zone": 2,
@@ -136,9 +179,16 @@
     },
     "battery": {
         "states": {
-            // "good": 95,
-            "warning": 30,
-            "critical": 15
+            "charge9": 100,
+            "charge8": 90,
+            "charge7": 80,
+            "charge6": 70,
+            "charge5": 60,
+            "charge4": 50,
+            "charge3": 40,
+            "charge2": 30,
+            "charge1": 20,
+            "charge0": 10
         },
         "format": "{capacity}% {icon}",
         "format-full": "{capacity}% {icon}",
@@ -212,9 +262,16 @@
         "escape": true,
         "exec": "$HOME/linux-files/scripts/pomodoro/pomodoro-status.sh" // Script in resources folder
     },
+    "custom/swap": {
+        "format": "{text} ⇄",
+        "return-type": "json",
+        "interval": 10,
+        "exec": "$HOME/linux-files/dotfiles/waybar/.config/waybar/swap-status.sh"
+    },
     "hyprland/language": {
 	// https://www.iemoji.com/view/emoji/176/flags/united-states
 	// look at "C/C++/Java Src codes
+	"keyboard-name": "at-translated-set-2-keyboard",
 	"format-uk": "\uD83C\uDDFA\uD83C\uDDE6 UK",
 	"format-en": "\uD83C\uDDFA\uD83C\uDDF8 EN",
 	"format-ru": "\uD83C\uDDF7\uD83C\uDDFA RU",

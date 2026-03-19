@@ -22,7 +22,7 @@ while true; do
 
   socat -u UNIX-CONNECT:"$socket" - 2>/dev/null | while IFS= read -r event; do
     case "$event" in
-      monitoradded*|monitorremoved*|configreloaded*)
+      monitoradded*|monitorremoved*)
         "$APPLY_SCRIPT" --quiet || true
         ;;
     esac
