@@ -135,6 +135,10 @@ ln -sf ~/linux-files/dotfiles/code/keybindings.json ~/.config/Code/User/keybindi
 ln -sf ~/linux-files/dotfiles/code/settings.json ~/.config/Cursor/User/settings.json
 ln -sf ~/linux-files/dotfiles/code/keybindings.json ~/.config/Cursor/User/keybindings.json
 
+# Tmux
+ln -sf ~/linux-files/dotfiles/tmux/tmux.conf ~/.tmux.conf
+
+
 ############################################
 # PACKAGES
 ############################################

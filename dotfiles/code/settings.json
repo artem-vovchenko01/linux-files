@@ -29,5 +29,6 @@
         },
         "enableDebugLogging": false
     },
-    "claudeCode.preferredLocation": "panel"
+    "claudeCode.preferredLocation": "panel",
+    "git.openRepositoryInParentFolders": "never"
 }

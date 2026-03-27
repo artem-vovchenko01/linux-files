@@ -242,3 +242,7 @@ HISTCONTROL=
 
 # Store history with timestamps (optional but useful)
 # HISTTIMEFORMAT="%F %T  "
+
+
+[ -d /home/linuxbrew ] && \
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)"

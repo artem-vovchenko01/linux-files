@@ -9,3 +9,7 @@
 	postBuffer = 157286400
 [pull]
 	rebase = false
+[core]
+	autocrlf = false
+[safe]
+	directory = *
