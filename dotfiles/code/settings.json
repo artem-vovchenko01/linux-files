@@ -32,5 +32,9 @@
     "claudeCode.preferredLocation": "panel",
     "git.openRepositoryInParentFolders": "never",
     "terminal.integrated.scrollback": 10000000,
-    "terminal.integrated.persistentSessionScrollback": 10000000
+    "terminal.integrated.persistentSessionScrollback": 10000000,
+    "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font Mono', 'Hack Nerd Font Mono', monospace",
+    "terminal.integrated.fontLigatures.enabled": false,
+    "terminal.integrated.gpuAcceleration": "off",
+    "terminal.integrated.mouseWheelScrollSensitivity": 3
 }

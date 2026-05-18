@@ -138,6 +138,20 @@ ln -sf ~/linux-files/dotfiles/code/keybindings.json ~/.config/Cursor/User/keybin
 # Tmux
 ln -sf ~/linux-files/dotfiles/tmux/tmux.conf ~/.tmux.conf
 
+# AI agents (shared global instructions)
+AI_GLOBAL=~/linux-files/ai/CLAUDE_GLOBAL_CONFIG.md
+
+# Claude Code
+[ -d ~/.claude ] && ln -sf "$AI_GLOBAL" ~/.claude/CLAUDE.md
+
+# Codex
+[ -d ~/.codex ] && ln -sf "$AI_GLOBAL" ~/.codex/AGENTS.md
+
+# OpenCode
+[ -d ~/.opencode ] && ln -sf "$AI_GLOBAL" ~/.opencode/AGENTS.md
+mkdir -vp ~/.config/opencode
+ln -sf ~/linux-files/dotfiles/opencode/opencode.json ~/.config/opencode/opencode.json
+
 
 ############################################
 # PACKAGES
@@ -150,7 +164,7 @@ PACKAGES_COMMON="less git vifm neovim zoxide fzf kitty foot imv thunar tumbler f
 # Distro-specific packages (different names across distros)
 case "$PKG_MGR" in
 	pacman)
-		PACKAGES_DISTRO="libnotify otf-font-awesome inetutils libgsf zathura-pdf-mupdf tesseract-data-eng man-pages"
+		PACKAGES_DISTRO="pacman-contrib libnotify otf-font-awesome inetutils libgsf zathura-pdf-mupdf tesseract-data-eng man-pages starship"
 		;;
 	apt)
 		PACKAGES_DISTRO="libnotify-bin fonts-font-awesome inetutils-tools libgsf-1-common zathura-pdf-poppler tesseract-ocr-eng man"
@@ -182,7 +196,7 @@ fi
 ############################################
 # HYPRLAND PACKAGES
 ############################################
-HYPR_COMMON="brightnessctl wob grim slurp waybar socat cliphist"
+HYPR_COMMON="brightnessctl wob grim slurp waybar socat cliphist blueman"
 case "$PKG_MGR" in
 	pacman)  HYPR_DISTRO="wl-clipboard hyprpaper hypridle" ;;
 	apt)     HYPR_DISTRO="wl-clipboard" ;;

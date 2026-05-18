@@ -35,7 +35,10 @@
         /*"backlight",*/
         /*"battery#bat2",*/
         "battery",
-        "network"
+        "pulseaudio",
+        "pulseaudio#source",
+        "network",
+        "bluetooth"
     ],
     // Modules configuration
     // "hyprland/workspaces": {
@@ -223,9 +226,24 @@
         "format-disconnected": "",
         "format-alt": "{ifname}: {ipaddr}/{cidr}"
     },
+    "bluetooth": {
+        "format": "BT",
+        "format-disabled": "",
+        "format-off": "BT ✕",
+        "format-on": "BT",
+        "format-connected": "BT ●",
+        "format-connected-battery": "BT ● {device_battery_percentage}%",
+        "tooltip-format": "{controller_alias}\t{controller_address}\n\n{num_connections} connected",
+        "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{num_connections} connected\n\n{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
+        "tooltip-format-enumerate-connected-battery": "{device_alias}\t{device_address}\t{device_battery_percentage}%",
+        "on-click": "blueman-manager",
+        "on-click-right": "rfkill toggle bluetooth"
+    },
     "pulseaudio": {
         // "scroll-step": 1, // %, can be a float
-        "format": "{volume}% {icon} {format_source}",
+        "format": "{volume}% 🔊",
+        "tooltip-format": "{desc}",
         "format-bluetooth": "{volume}% {icon} {format_source}",
         "format-bluetooth-muted": " {icon} {format_source}",
         "format-muted": " {format_source}",
@@ -240,7 +258,18 @@
             "car": "",
             "default": ["", "", ""]
         },
-        "on-click": "pavucontrol"
+        "scroll-step": 5,
+        "on-click": "$HOME/linux-files/scripts/admin/choose-audio-sink.sh",
+        "on-click-right": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
+    },
+    "pulseaudio#source": {
+        "scroll-step": 5,
+        "format": "{format_source}",
+        "format-source": "{volume}% 🎤",
+        "format-source-muted": "muted 🎤",
+        "tooltip-format": "{source_desc}",
+        "on-click": "$HOME/linux-files/scripts/admin/choose-audio-source.sh",
+        "on-click-right": "pactl set-source-mute @DEFAULT_SOURCE@ toggle"
     },
     "custom/media": {
         "format": "{icon} {}",

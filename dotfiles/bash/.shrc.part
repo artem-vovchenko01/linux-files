@@ -1,4 +1,4 @@
-##############################
+#############################
 # SETTINGS
 ##############################
 
@@ -8,24 +8,53 @@ set -o vi
 # EXPORTS
 ##############################
 
-# Remove stale pyenv env inherited from an old session.
-unset PYENV_ROOT PYENV_SHELL
-if [ -n "${PATH:-}" ]; then
-    _new_path=""
-    _old_ifs=$IFS
+_SHRC_SHELL_PROC=$(readlink /proc/$$/exe 2>/dev/null || printf '%s\n' "${SHELL:-}")
+case "$_SHRC_SHELL_PROC" in
+    *zsh*) _SHRC_SHELL=zsh ;;
+    *) _SHRC_SHELL=bash ;;
+esac
+
+_shrc_path_remove() {
+    [ -n "${PATH:-}" ] || return 0
+    _shrc_new_path=""
+    _shrc_old_ifs=$IFS
     IFS=':'
-    for _path_part in $PATH; do
-        [ "$_path_part" = "$HOME/.pyenv/shims" ] && continue
-        if [ -z "$_new_path" ]; then
-            _new_path="$_path_part"
+    for _shrc_path_part in $PATH; do
+        [ "$_shrc_path_part" = "$1" ] && continue
+        if [ -z "$_shrc_new_path" ]; then
+            _shrc_new_path="$_shrc_path_part"
         else
-            _new_path="$_new_path:$_path_part"
+            _shrc_new_path="$_shrc_new_path:$_shrc_path_part"
         fi
     done
-    IFS=$_old_ifs
-    PATH=$_new_path
-    unset _new_path _old_ifs _path_part
-fi
+    IFS=$_shrc_old_ifs
+    PATH=$_shrc_new_path
+    unset _shrc_new_path _shrc_old_ifs _shrc_path_part
+}
+
+_shrc_path_append() {
+    [ -d "$1" ] || return 0
+    case ":${PATH:-}:" in
+        *:"$1":*) ;;
+        *) PATH="${PATH:+$PATH:}$1" ;;
+    esac
+}
+
+_shrc_path_prepend() {
+    [ -d "$1" ] || return 0
+    case ":${PATH:-}:" in
+        *:"$1":*) ;;
+        *) PATH="$1${PATH:+:$PATH}" ;;
+    esac
+}
+
+_shrc_source_if_readable() {
+    [ -r "$1" ] && . "$1"
+}
+
+# Remove stale pyenv env inherited from an old session.
+unset PYENV_ROOT PYENV_SHELL
+_shrc_path_remove "$HOME/.pyenv/shims"
 
 # CARGO_HOME=~/.cargo/bin
 # DOTNET_TOOLS_HOME=~/.dotnet/tools
@@ -34,14 +63,124 @@ fi
 # export PATH="$PATH:$CARGO_HOME"
 # export PATH="$PATH:$DOTNET_TOOLS_HOME"
 
-export PATH="$PATH:~/.local/bin:$HOME/Pobrane/flutter/flutter/bin"
-export PATH=~/.npm-global/bin:$PATH
+_shrc_path_append "$HOME/.local/bin"
+export PATH
 export EDITOR=nvim
+# Workaround: broken IPv6 dual-stack hangs Python MSAL on login.microsoftonline.com (Azure CLI / Azure MCP).
+export RES_OPTIONS="no-aaaa"
 
 # Custom scripts
-for dir in $(find -L ~/linux-files/scripts -type d); do
- export PATH=$PATH:$dir
-done
+if [ -d "$HOME/linux-files/scripts" ]; then
+    while IFS= read -r dir; do
+        _shrc_path_append "$dir"
+    done <<EOF
+$(find -L "$HOME/linux-files/scripts" -type d)
+EOF
+    export PATH
+fi
+
+# EPAM scripts
+_shrc_path_append "$HOME/DATA/EPAM_resources/scripts"
+export PATH
+
+##############################
+# OPTIONAL PROGRAMMING TOOLS
+##############################
+
+# npm
+if [ -d "$HOME/.npm-global/bin" ]; then
+    _shrc_path_prepend "$HOME/.npm-global/bin"
+fi
+
+# Flutter/Dart
+if [ -d "$HOME/Pobrane/flutter/flutter" ]; then
+    _shrc_path_append "$HOME/Pobrane/flutter/flutter/bin"
+fi
+_shrc_path_append "$HOME/.pub-cache/bin"
+
+# Rust/Cargo
+_shrc_path_append "$HOME/.cargo/bin"
+
+# Personal compiled binaries
+_shrc_path_append "$HOME/.my-c-bin"
+
+# Apache Spark / PySpark
+_SHRC_SPARK_HOME=/opt/apache-spark
+_SHRC_SPARK_JAVA_HOME=/usr/lib/jvm/java-21-openjdk
+
+if [ -d "$_SHRC_SPARK_HOME" ]; then
+    export SPARK_HOME=$_SHRC_SPARK_HOME
+    _shrc_path_append "$SPARK_HOME/bin"
+    _shrc_path_append "$SPARK_HOME/sbin"
+fi
+
+export PATH
+
+_shrc_spark_java_major() {
+    [ -x "$_SHRC_SPARK_JAVA_HOME/bin/java" ] || return 1
+    "$_SHRC_SPARK_JAVA_HOME/bin/java" -version 2>&1 |
+        sed -n '1s/.*version "\([0-9][0-9]*\).*/\1/p'
+}
+
+_shrc_spark_with_java() {
+    local _shrc_spark_major
+
+    if ! command -v "$1" >/dev/null 2>&1; then
+        printf 'Spark command not found: %s\n' "$1" >&2
+        return 127
+    fi
+
+    if [ ! -x "$_SHRC_SPARK_JAVA_HOME/bin/java" ]; then
+        printf 'Spark Java not found: %s/bin/java\n' "$_SHRC_SPARK_JAVA_HOME" >&2
+        return 127
+    fi
+
+    _shrc_spark_major="$(_shrc_spark_java_major)"
+    case "$_shrc_spark_major" in
+        17|21) ;;
+        *)
+            printf 'Spark requires Java 17 or 21; found Java %s at %s\n' "${_shrc_spark_major:-unknown}" "$_SHRC_SPARK_JAVA_HOME" >&2
+            return 1
+            ;;
+    esac
+
+    JAVA_HOME=$_SHRC_SPARK_JAVA_HOME PATH=$_SHRC_SPARK_JAVA_HOME/bin:$PATH command "$@"
+}
+
+_shrc_pyspark_notebook() {
+    if ! command -v jupyter >/dev/null 2>&1; then
+        _shrc_spark_with_java pyspark "$@"
+        return $?
+    fi
+
+    PYSPARK_DRIVER_PYTHON=jupyter \
+        PYSPARK_DRIVER_PYTHON_OPTS=notebook \
+        _shrc_spark_with_java pyspark "$@"
+}
+
+_shrc_spark_java_supported() {
+    case "$(_shrc_spark_java_major)" in
+        17|21) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+_shrc_alias_spark_command() {
+    command -v "$1" >/dev/null 2>&1 || return 0
+    alias "$1=_shrc_spark_with_java $1"
+}
+
+_shrc_alias_pyspark_notebook() {
+    command -v pyspark >/dev/null 2>&1 || return 0
+    alias pyspark='_shrc_pyspark_notebook'
+}
+
+if [ -n "${SPARK_HOME:-}" ] && _shrc_spark_java_supported; then
+    _shrc_alias_pyspark_notebook
+    _shrc_alias_spark_command spark-shell
+    _shrc_alias_spark_command spark-submit
+    _shrc_alias_spark_command spark-sql
+fi
 
 ##############################
 # FUNCTIONS
@@ -59,16 +198,14 @@ contains() {
 }
 
 function vicd {
-    local dst="$(command lf -print-last-dir "$@")"
-    if [ -z "$dst" ]; then
-        echo 'Directory picking cancelled/failed'
+    if command -v vifm >/dev/null 2>&1; then
+        local dst="$(command vifm --choose-dir - "$@")"
+    elif command -v lf >/dev/null 2>&1; then
+        local dst="$(command lf -print-last-dir "$@")"
+    else
+        echo 'Neither vifm nor lf is available'
         return 1
     fi
-    cd "$dst"
-}
-
-function vicd {
-    local dst="$(command vifm --choose-dir - "$@")"
     if [ -z "$dst" ]; then
         echo 'Directory picking cancelled/failed'
         return 1
@@ -91,13 +228,14 @@ function date_sync {
 }
 
 function check_battery {
- cat /sys/class/power_supply/BAT1/capacity
+    [ -r /sys/class/power_supply/BAT1/capacity ] && cat /sys/class/power_supply/BAT1/capacity
 }
 
 function ssh_add_startup_keys {
-    SSH_ADD_ON_STARTUP=~/.ssh/on_startup
-    for key in $(ls $SSH_ADD_ON_STARTUP); do
-        ssh-add $SSH_ADD_ON_STARTUP/$key
+    SSH_ADD_ON_STARTUP="$HOME/.ssh/on_startup"
+    [ -d "$SSH_ADD_ON_STARTUP" ] || return 0
+    for key in "$SSH_ADD_ON_STARTUP"/*; do
+        [ -f "$key" ] && ssh-add "$key"
     done
 }
 
@@ -107,10 +245,12 @@ function ssh_add_startup_keys {
 
 # complete -C '/usr/bin/aws_completer' aws
 # bash-completion
-if [ -r /usr/share/bash-completion/bash_completion ]; then
-  . /usr/share/bash-completion/bash_completion
-elif [ -r /etc/profile.d/bash_completion.sh ]; then
-  . /etc/profile.d/bash_completion.sh
+if [ "$_SHRC_SHELL" = bash ]; then
+    if [ -r /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+    elif [ -r /etc/profile.d/bash_completion.sh ]; then
+        . /etc/profile.d/bash_completion.sh
+    fi
 fi
 
 ##############################
@@ -128,17 +268,16 @@ ZSH_AUTOSUGG_DEB=/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 ZSH_POWERLEVEL10K_THEME_ARCH=/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
 ZSH_POWERLEVEL10K_THEME_OTHER=~/powerlevel10k/powerlevel10k.zsh-theme
 
-_CUR_SHELL_PROC=$(readlink /proc/$$/exe)
-if contains "$_CUR_SHELL_PROC" "zsh"; then
+if [ "$_SHRC_SHELL" = zsh ]; then
    # assume Zsh
-  [ -e $ZSH_SYNTAX_HL_ARCH ] && source $ZSH_SYNTAX_HL_ARCH
-  [ -e $ZSH_AUTOSUGG_ARCH ] && source $ZSH_AUTOSUGG_ARCH
+  _shrc_source_if_readable "$ZSH_SYNTAX_HL_ARCH"
+  _shrc_source_if_readable "$ZSH_AUTOSUGG_ARCH"
 
-  [ -e $ZSH_SYNTAX_HL_DEB ] && source $ZSH_SYNTAX_HL_DEB
-  [ -e $ZSH_AUTOSUGG_DEB ] && source $ZSH_AUTOSUGG_DEB
+  _shrc_source_if_readable "$ZSH_SYNTAX_HL_DEB"
+  _shrc_source_if_readable "$ZSH_AUTOSUGG_DEB"
 
-  [ -e $ZSH_POWERLEVEL10K_THEME_ARCH ] && source $ZSH_POWERLEVEL10K_THEME_ARCH
-  [ -e $ZSH_POWERLEVEL10K_THEME_OTHER ] && source $ZSH_POWERLEVEL10K_THEME_OTHER
+  _shrc_source_if_readable "$ZSH_POWERLEVEL10K_THEME_ARCH"
+  _shrc_source_if_readable "$ZSH_POWERLEVEL10K_THEME_OTHER"
 fi
 
 ##############################
@@ -201,15 +340,10 @@ fi
 # eval "$(pyenv init -)"
 # eval "$(pyenv virtualenv-init -)"
 
-[ -f ~/.tree-sitter-complete.sh ] && source ~/.tree-sitter-complete.sh
-
-# Add Flutter binaries
-export PATH="$PATH":"$HOME/.pub-cache/bin":~/.my-c-bin
-
-export PATH="$PATH:/home/artem/.cargo/bin"
+_shrc_source_if_readable "$HOME/.tree-sitter-complete.sh"
 
 if command -v zoxide >/dev/null 2>&1; then
-    eval "$(zoxide init bash)"
+    eval "$(zoxide init "$_SHRC_SHELL")"
 fi
 
 # Add Pyenv
@@ -223,26 +357,47 @@ alias codex-yolo="codex --dangerously-bypass-approvals-and-sandbox"
 alias claude="claude --verbose --dangerously-skip-permissions"
 alias gemini="gemini --approval-mode yolo"
 
-export GROK_API_KEY=$(cat ~/.grok-api-key)
+if [ -r "$HOME/.grok-api-key" ]; then
+    export GROK_API_KEY="$(cat "$HOME/.grok-api-key")"
+fi
 
-eval "$(fzf --bash)"
+if command -v fzf >/dev/null 2>&1; then
+    if [ "$_SHRC_SHELL" = zsh ]; then
+        eval "$(fzf --zsh)"
+    else
+        eval "$(fzf --bash)"
+    fi
+fi
 
-# Unlimited history size                                                                                    
-HISTSIZE=-1                                                                                                 
-HISTFILESIZE=-1                                                                                             
-												      
-# Append to history file instead of overwriting                                                             
-shopt -s histappend                                                                                         
+if [ "$_SHRC_SHELL" = bash ]; then
+    # Unlimited history size
+    HISTSIZE=-1
+    HISTFILESIZE=-1
 
-# Write history after every command (prevents loss on crash/kill)                                           
-PROMPT_COMMAND="history -a; ${PROMPT_COMMAND}"
+    # Append to history file instead of overwriting
+    shopt -s histappend
 
-# Don't ignore any commands (optional: remove duplicates/spaces control)
-HISTCONTROL=
+    # Write history after every command.
+    case ";${PROMPT_COMMAND:-};" in
+        *";history -a;"*) ;;
+        *) PROMPT_COMMAND="history -a${PROMPT_COMMAND:+; $PROMPT_COMMAND}" ;;
+    esac
+
+    # Don't ignore any commands.
+    HISTCONTROL=
+fi
 
 # Store history with timestamps (optional but useful)
 # HISTTIMEFORMAT="%F %T  "
 
 
-[ -d /home/linuxbrew ] && \
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)"
+if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv "$_SHRC_SHELL")"
+fi
+
+# Starship prompt
+if command -v starship >/dev/null 2>&1; then
+    eval "$(starship init "$_SHRC_SHELL")"
+fi
+
+unset _SHRC_SHELL _SHRC_SHELL_PROC

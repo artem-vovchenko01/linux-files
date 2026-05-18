@@ -1,0 +1,144 @@
+#!/bin/sh
+
+set -u
+
+PATH="/home/artem/.local/bin:/usr/local/bin:/usr/bin:/bin:${PATH:-}"
+if [ -n "${HOME:-}" ]; then
+  PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+fi
+export PATH
+
+case "${CODE_REVIEW_SKIP:-}" in
+  1|true|TRUE|yes|YES|y|Y)
+    exit 0
+    ;;
+esac
+
+repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 1
+cd "$repo_root" || exit 1
+
+if git diff --cached --quiet --exit-code --; then
+  exit 0
+fi
+
+if [ ! -r /dev/tty ] || [ ! -w /dev/tty ]; then
+  echo "pre-commit review requires an interactive terminal." >&2
+  echo "Run commit from a terminal, use git commit --no-verify, or set CODE_REVIEW_SKIP=1 to bypass." >&2
+  exit 1
+fi
+
+has_codex=0
+has_claude=0
+codex_bin=$(command -v codex 2>/dev/null || true)
+claude_bin=$(command -v claude 2>/dev/null || true)
+[ -n "$codex_bin" ] && has_codex=1
+[ -n "$claude_bin" ] && has_claude=1
+
+if [ "$has_codex" -eq 0 ] && [ "$has_claude" -eq 0 ]; then
+  echo "No supported reviewer found. Install codex or claude, or bypass with CODE_REVIEW_SKIP=1." >/dev/tty
+  exit 1
+fi
+
+reviewer=${CODE_REVIEW_TOOL:-}
+if [ -n "$reviewer" ]; then
+  case "$reviewer" in
+    codex)
+      if [ "$has_codex" -eq 0 ]; then
+        echo "CODE_REVIEW_TOOL=codex, but codex is not available." >/dev/tty
+        exit 1
+      fi
+      ;;
+    claude)
+      if [ "$has_claude" -eq 0 ]; then
+        echo "CODE_REVIEW_TOOL=claude, but claude is not available." >/dev/tty
+        exit 1
+      fi
+      ;;
+    *)
+      echo "Unsupported CODE_REVIEW_TOOL=$reviewer. Use codex or claude." >/dev/tty
+      exit 1
+      ;;
+  esac
+elif [ "$has_codex" -eq 1 ] && [ "$has_claude" -eq 1 ]; then
+  while :; do
+    printf '\nPre-commit review: [c]odex, [l]aude, [s]kip, [a]bort? (default: codex) ' >/dev/tty
+    IFS= read -r choice </dev/tty || exit 1
+    case "$choice" in
+      ''|c|C|codex|Codex)
+        reviewer=codex
+        break
+        ;;
+      l|L|claude|Claude)
+        reviewer=claude
+        break
+        ;;
+      s|S|skip|Skip)
+        echo "Skipping pre-commit review." >/dev/tty
+        exit 0
+        ;;
+      a|A|abort|Abort|q|Q|quit|Quit)
+        echo "Commit aborted before review." >/dev/tty
+        exit 1
+        ;;
+      *)
+        echo "Please choose c, l, s, or a." >/dev/tty
+        ;;
+    esac
+  done
+elif [ "$has_codex" -eq 1 ]; then
+  reviewer=codex
+else
+  reviewer=claude
+fi
+
+prompt="You are running a local pre-commit review/fix pass.
+
+Review the staged changes in this repository. If you find real problems, fix them locally before returning.
+
+Use git status --short and git diff --cached to inspect the proposed commit. Focus on correctness bugs, security issues, broken infrastructure behavior, secrets, and missing validation that could cause a real failure. Ignore unrelated unstaged work unless it affects the staged diff.
+
+You may edit files, run local validation commands, and stage only fixes that should be included in this commit. Do not push, pull, fetch, commit, reset, checkout, rebase, or rewrite history. Do not touch remote branches.
+
+When finished, give concise findings and fixes with file references where possible, then state whether you think the commit should proceed."
+
+echo "" >/dev/tty
+echo "Starting interactive $reviewer review. Exit the reviewer when done." >/dev/tty
+echo "" >/dev/tty
+
+status=0
+case "$reviewer" in
+  codex)
+    "$codex_bin" --cd "$repo_root" --sandbox danger-full-access --ask-for-approval on-request --no-alt-screen "$prompt" </dev/tty >/dev/tty 2>&1 || status=$?
+    ;;
+  claude)
+    "$claude_bin" --dangerously-skip-permissions --name pre-commit-review "$prompt" </dev/tty >/dev/tty 2>&1 || status=$?
+    ;;
+esac
+
+echo "" >/dev/tty
+if [ "$status" -ne 0 ]; then
+  echo "$reviewer exited with status $status." >/dev/tty
+  printf 'Continue commit anyway? [y/N] ' >/dev/tty
+  IFS= read -r answer </dev/tty || exit 1
+  case "$answer" in
+    y|Y|yes|YES)
+      exit 0
+      ;;
+    *)
+      echo "Commit aborted." >/dev/tty
+      exit 1
+      ;;
+  esac
+fi
+
+printf 'Continue with commit using the current staged changes? [Y/n] ' >/dev/tty
+IFS= read -r answer </dev/tty || exit 1
+case "$answer" in
+  n|N|no|NO)
+    echo "Commit aborted." >/dev/tty
+    exit 1
+    ;;
+  *)
+    exit 0
+    ;;
+esac

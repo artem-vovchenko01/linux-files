@@ -7,6 +7,44 @@ vim.opt.signcolumn = "yes"
 vim.opt.timeout = true
 vim.opt.timeoutlen = 300
 
+local transparent_groups = {
+  "Normal",
+  "NormalNC",
+  "NormalFloat",
+  "FloatBorder",
+  "FloatTitle",
+  "SignColumn",
+  "EndOfBuffer",
+  "MsgArea",
+  "WinSeparator",
+  "FoldColumn",
+  "StatusLine",
+  "StatusLineNC",
+  "TabLineFill",
+  "NvimTreeNormal",
+  "NvimTreeNormalNC",
+  "NvimTreeEndOfBuffer",
+  "TelescopeNormal",
+  "TelescopeBorder",
+  "TelescopePromptNormal",
+  "TelescopePromptBorder",
+  "TelescopeResultsNormal",
+  "TelescopeResultsBorder",
+  "TelescopePreviewNormal",
+  "TelescopePreviewBorder",
+  "WhichKeyFloat",
+}
+
+local function apply_transparent_background()
+  for _, group in ipairs(transparent_groups) do
+    vim.api.nvim_set_hl(0, group, { bg = "none" })
+  end
+end
+
+vim.api.nvim_create_autocmd("ColorScheme", {
+  callback = apply_transparent_background,
+})
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
 if not vim.loop.fs_stat(lazypath) then
@@ -67,6 +105,29 @@ vim.lsp.config("lua_ls", {
 })
 
 require("lazy").setup({
+  {
+    "folke/tokyonight.nvim",
+    lazy = false,
+    priority = 1000,
+    opts = {
+      style = "storm",
+      transparent = true,
+      styles = {
+        sidebars = "transparent",
+        floats = "transparent",
+      },
+      on_highlights = function(highlights)
+        for _, group in ipairs(transparent_groups) do
+          highlights[group] = vim.tbl_extend("force", highlights[group] or {}, { bg = "none" })
+        end
+      end,
+    },
+    config = function(_, opts)
+      require("tokyonight").setup(opts)
+      vim.cmd.colorscheme("tokyonight-storm")
+      apply_transparent_background()
+    end,
+  },
   {
     "vimwiki/vimwiki",
     init = function()

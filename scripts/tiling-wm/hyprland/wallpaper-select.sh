@@ -42,11 +42,16 @@ if [ ! -f "$NEW_WALL_PATH" ]; then
     exit 1
 fi
 
+if ! pgrep -x hyprpaper >/dev/null; then
+    hyprctl dispatch exec hyprpaper >/dev/null
+    sleep 1
+fi
+
 readarray -t MONITORS < <(hyprctl monitors | awk '/^Monitor / { print $2 }')
 [ "${#MONITORS[@]}" -eq 0 ] && exit 1
 
 for MONITOR in "${MONITORS[@]}"; do
-    hyprctl hyprpaper wallpaper "$MONITOR,$NEW_WALL_PATH,cover" >/dev/null
+    hyprctl hyprpaper wallpaper "$MONITOR,$NEW_WALL_PATH" >/dev/null
 done
 
 notify-send -i "$NEW_WALL_PATH" "$(basename "$NEW_WALL_PATH")"
