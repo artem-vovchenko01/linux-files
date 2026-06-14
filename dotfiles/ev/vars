@@ -1,0 +1,8 @@
+# ev variables — one per line: <VAR> <picker-name> [on-set command]
+# The on-set command runs after the new value is exported.
+
+SUB   az-sub   az account set -s "$SUB"
+RG    az-rg
+VM    az-vm
+VNET  az-vnet
+SNET  az-snet

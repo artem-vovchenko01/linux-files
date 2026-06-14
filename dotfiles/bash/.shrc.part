@@ -239,6 +239,17 @@ function ssh_add_startup_keys {
     done
 }
 
+# Cloud env var TUI (`ev`); vars and pickers live in text files next to it.
+_shrc_source_if_readable "$HOME/linux-files/dotfiles/ev/ev.sh"
+
+# Public IP of $VM (or the VM given as $1) in $RG; also exported as $IP.
+function vmip {
+    IP=$(az vm list-ip-addresses -g "$RG" -n "${1:-$VM}" \
+        --query '[].virtualMachine.network.publicIpAddresses[0].ipAddress' -o tsv)
+    export IP
+    printf '%s\n' "$IP"
+}
+
 ##############################
 # COMPLETIONS
 ##############################
@@ -344,6 +355,10 @@ _shrc_source_if_readable "$HOME/.tree-sitter-complete.sh"
 
 if command -v zoxide >/dev/null 2>&1; then
     eval "$(zoxide init "$_SHRC_SHELL")"
+fi
+
+if command -v direnv >/dev/null 2>&1; then
+    eval "$(direnv hook "$_SHRC_SHELL")"
 fi
 
 # Add Pyenv

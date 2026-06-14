@@ -11,5 +11,11 @@
 	rebase = false
 [core]
 	autocrlf = false
+	pager = delta
 [safe]
 	directory = *
+[interactive]
+	diffFilter = delta --color-only --features=diff-so-fancy
+[delta]
+	navigate = true
+	line-numbers = true

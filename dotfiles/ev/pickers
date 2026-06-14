@@ -1,0 +1,9 @@
+# ev pickers — one per line: <name> <command>
+# The command prints candidate lines; extra tab-separated columns are
+# display-only, the first column becomes the variable's value.
+
+az-sub   az account list --query "[].[name,id]" -o tsv
+az-rg    az group list --query "[].name" -o tsv
+az-vm    az vm list -g "$RG" --query "[].name" -o tsv
+az-vnet  az network vnet list -g "$RG" --query "[].name" -o tsv
+az-snet  az network vnet subnet list -g "$RG" --vnet-name "$VNET" --query "[].name" -o tsv
