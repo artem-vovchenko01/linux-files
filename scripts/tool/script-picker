@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Fuzzy-pick a script from ~/linux-files/scripts and run/edit/copy it.
+#   Enter   run the script (extra args to script-picker are passed through)
+#   ctrl-e  edit in $EDITOR
+#   ctrl-y  copy its path to the clipboard
+set -euo pipefail
+
+ROOT=~/linux-files/scripts
+SELF=$(basename "$0")
+
+list_scripts() {
+  find "$ROOT" -type f \( -name '*.sh' -o -name '*.py' -o -perm -u+x \) \
+    -not -name "$SELF" -printf '%P\n' 2>/dev/null | sort -u
+}
+
+choice=$(list_scripts | fzf \
+  --prompt='script> ' \
+  --height=80% --reverse --border \
+  --header='enter: run   ctrl-e: edit   ctrl-y: copy path' \
+  --preview="bat --color=always --style=numbers '$ROOT/{}'" \
+  --preview-window='right:60%' \
+  --expect=ctrl-e,ctrl-y)
+
+key=$(head -1 <<<"$choice")
+sel=$(sed -n 2p <<<"$choice")
+[ -z "$sel" ] && exit 0
+path="$ROOT/$sel"
+
+case "$key" in
+  ctrl-e) exec "${EDITOR:-vi}" "$path" ;;
+  ctrl-y)
+    printf '%s' "$path" | { wl-copy 2>/dev/null || xclip -selection clipboard; }
+    echo "copied: $path" ;;
+  *) exec "$path" "$@" ;;
+esac

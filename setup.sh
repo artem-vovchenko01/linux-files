@@ -157,7 +157,7 @@ ln -sf ~/linux-files/dotfiles/opencode/opencode.json ~/.config/opencode/opencode
 # PACKAGES
 ############################################
 # Common packages (same name across distros)
-PACKAGES_COMMON="less git vifm neovim zoxide fzf direnv kitty foot imv nemo thunar tumbler ffmpegthumbnailer file-roller thunar-archive-plugin zip unzip gedit zathura tldr man-db"
+PACKAGES_COMMON="less git git-delta vifm neovim zoxide fzf direnv kitty foot imv nemo thunar tumbler ffmpegthumbnailer file-roller thunar-archive-plugin zip unzip gedit zathura tldr man-db"
 # thunar-archive-plugin - for enabling archiving options in thunar
 # tumbler ffmpegthumbnailer file-roller - for making thumbnails in thunar work
 
@@ -308,6 +308,7 @@ mkdir -p ~/Playground
 
 # Logseq
 mkdir -vp ~/logseq
+[ -d ~/logseq/logseq-work/cockpit-core ] && ln -sfn ~/logseq/logseq-work/cockpit-core ~/cockpit-core
 
 # Hyprland
 mkdir -vp ~/custom-setup/hyprland
