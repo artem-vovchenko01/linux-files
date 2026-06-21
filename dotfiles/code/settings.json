@@ -36,5 +36,7 @@
     "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font Mono', 'Hack Nerd Font Mono', monospace",
     "terminal.integrated.fontLigatures.enabled": false,
     "terminal.integrated.gpuAcceleration": "off",
-    "terminal.integrated.mouseWheelScrollSensitivity": 3
+    "terminal.integrated.mouseWheelScrollSensitivity": 3,
+    "window.autoDetectColorScheme": false,
+    "vim.disableExtension": true
 }

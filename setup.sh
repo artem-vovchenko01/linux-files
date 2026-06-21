@@ -14,7 +14,8 @@ elif command -v apt &>/dev/null; then
 	pkg_install() { sudo apt update && sudo apt install -y "$@"; }
 elif command -v dnf &>/dev/null; then
 	PKG_MGR=dnf
-	pkg_install() { sudo dnf install -y "$@"; }
+	# --skip-unavailable: a single unknown name shouldn't abort the whole batch
+	pkg_install() { sudo dnf install -y --skip-unavailable "$@"; }
 elif command -v zypper &>/dev/null; then
 	PKG_MGR=zypper
 	pkg_install() { sudo zypper install -y "$@"; }
@@ -152,12 +153,73 @@ AI_GLOBAL=~/linux-files/ai/CLAUDE_GLOBAL_CONFIG.md
 mkdir -vp ~/.config/opencode
 ln -sf ~/linux-files/dotfiles/opencode/opencode.json ~/.config/opencode/opencode.json
 
+# Syncthing (config + device keys live in ~/DATA/IT, database stays local)
+# config.xml is NOT symlinked: Syncthing rewrites it via atomic rename, which
+# replaces a symlink with a real file. Instead we point its config dir
+# (STCONFDIR) at ~/DATA/IT via a systemd drop-in and keep the database
+# (STDATADIR) on local storage. On a fresh machine the config + device identity
+# can also be restored from a backup left on the HDD (see syncthing-config-backup).
+mkdir -vp ~/DATA
+SYNCTHING_SRC=~/DATA/IT/configs/syncthing
+SYNCTHING_DROPIN=~/linux-files/systemd-units/syncthing.service.d/override.conf
+SYNCTHING_BACKUP_NAME=syncthing-config-backup
+
+# Look for a config backup on any mounted HDD partition.
+syncthing_hdd_backup=""
+for m in /run/media/"$USER"/*/; do
+	if [ -f "$m$SYNCTHING_BACKUP_NAME/config.xml" ]; then
+		syncthing_hdd_backup="$m$SYNCTHING_BACKUP_NAME"
+		break
+	fi
+done
+
+apply_syncthing_redirect() {
+	# Don't silently shadow a different identity already in the default location.
+	for d in ~/.local/state/syncthing ~/.config/syncthing; do
+		if [ -f "$d/config.xml" ]; then
+			echo "Existing Syncthing identity at $d would be shadowed by ~/DATA/IT."
+			read -r -p "Repoint Syncthing config to ~/DATA/IT and restart? [y/N]: " ans
+			case "${ans,,}" in
+				y|yes) ;;
+				*) echo "Left Syncthing untouched."; return ;;
+			esac
+			break
+		fi
+	done
+	systemctl --user stop syncthing 2>/dev/null || true
+	mkdir -vp ~/.config/systemd/user/syncthing.service.d
+	ln -sfv "$SYNCTHING_DROPIN" ~/.config/systemd/user/syncthing.service.d/override.conf
+	systemctl --user daemon-reload
+	systemctl --user enable --now syncthing 2>/dev/null || true
+	echo "Syncthing config dir set to $SYNCTHING_SRC; service (re)started."
+}
+
+if [ -f "$SYNCTHING_DROPIN" ]; then
+	if [ -f "$SYNCTHING_SRC/config.xml" ]; then
+		# A config is already present locally (e.g. ~/DATA/IT synced from a peer).
+		if [ -n "$syncthing_hdd_backup" ]; then
+			echo "Syncthing: a local config already exists at $SYNCTHING_SRC (synced IT folder)."
+			echo "          An HDD backup also exists at $syncthing_hdd_backup — ignoring it; the synced copy wins."
+		fi
+		echo "Syncthing: will repoint the service at $SYNCTHING_SRC and restart."
+		apply_syncthing_redirect
+	elif [ -n "$syncthing_hdd_backup" ]; then
+		echo "Syncthing: no synced ~/DATA/IT config; restoring from HDD backup at $syncthing_hdd_backup."
+		mkdir -vp "$SYNCTHING_SRC"
+		cp -v "$syncthing_hdd_backup"/* "$SYNCTHING_SRC"/
+		apply_syncthing_redirect
+	else
+		echo "Syncthing: backup not found — no HDD backup ($SYNCTHING_BACKUP_NAME) and no synced ~/DATA/IT."
+		echo "          Install syncthing, let the IT folder sync (or plug in the HDD backup), then re-run."
+	fi
+fi
+
 
 ############################################
 # PACKAGES
 ############################################
 # Common packages (same name across distros)
-PACKAGES_COMMON="less git git-delta vifm neovim zoxide fzf direnv kitty foot imv nemo thunar tumbler ffmpegthumbnailer file-roller thunar-archive-plugin zip unzip gedit zathura tldr man-db"
+PACKAGES_COMMON="less git git-delta vifm neovim zoxide fzf direnv kitty foot imv nemo thunar tumbler ffmpegthumbnailer file-roller thunar-archive-plugin zip unzip gedit zathura tldr man-db syncthing"
 # thunar-archive-plugin - for enabling archiving options in thunar
 # tumbler ffmpegthumbnailer file-roller - for making thumbnails in thunar work
 
@@ -170,7 +232,9 @@ case "$PKG_MGR" in
 		PACKAGES_DISTRO="libnotify-bin fonts-font-awesome inetutils-tools libgsf-1-common zathura-pdf-poppler tesseract-ocr-eng man"
 		;;
 	dnf)
-		PACKAGES_DISTRO="libnotify fontawesome-fonts inetutils libgsf zathura-pdf-mupdf tesseract-langpack-eng man-pages"
+		# Fedora: -free-fonts is the light icon set (-all/-web also pull web/JS/brands);
+		# inetutils/hostname dropped — hostname ships in the base install.
+		PACKAGES_DISTRO="libnotify fontawesome-6-free-fonts libgsf zathura-pdf-mupdf tesseract-langpack-eng man-pages"
 		;;
 	zypper)
 		PACKAGES_DISTRO="libnotify-tools fontawesome-fonts inetutils libgsf-1 zathura-plugin-pdf-mupdf tesseract-ocr-traineddata-english man-pages"
@@ -200,6 +264,8 @@ HYPR_COMMON="brightnessctl wob grim slurp waybar socat cliphist blueman"
 case "$PKG_MGR" in
 	pacman)  HYPR_DISTRO="wl-clipboard hyprpaper hypridle" ;;
 	apt)     HYPR_DISTRO="wl-clipboard" ;;
+	# Fedora: hyprpaper/hypridle aren't in the main repos — enable COPR
+	# solopasha/hyprland (or use swaybg/swayidle) if you want them.
 	dnf)     HYPR_DISTRO="wl-clipboard" ;;
 	zypper)  HYPR_DISTRO="wl-clipboard" ;;
 	*)       HYPR_DISTRO="" ;;
@@ -222,7 +288,7 @@ esac
 case "$PKG_MGR" in
 	pacman)  FONT_PACKAGES="ttf-hack-nerd inter-font noto-fonts noto-fonts-emoji" ;;
 	apt)     FONT_PACKAGES="fonts-hack fonts-inter fonts-noto fonts-noto-color-emoji" ;;
-	dnf)     FONT_PACKAGES="google-noto-sans-fonts google-noto-emoji-fonts inter-fonts" ;;
+	dnf)     FONT_PACKAGES="google-noto-sans-fonts google-noto-emoji-fonts rsms-inter-fonts" ;;
 	zypper)  FONT_PACKAGES="google-noto-sans-fonts google-noto-coloremoji-fonts" ;;
 	*)       FONT_PACKAGES="" ;;
 esac
@@ -233,6 +299,16 @@ case "${ans,,}" in
       pkg_install $FONT_PACKAGES
     else
       echo "Unknown package manager — install fonts manually."
+    fi
+    # Nerd Font for lvim/terminal/waybar icons. pacman ships ttf-hack-nerd;
+    # other distros don't package it, so fetch it into the user font dir.
+    if ! fc-list | grep -qi "Hack Nerd"; then
+      NERD_DIR=~/.local/share/fonts/HackNerd
+      mkdir -vp "$NERD_DIR"
+      NERD_URL=https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Hack.zip
+      curl -fsSL "$NERD_URL" -o /tmp/Hack.zip
+      unzip -o /tmp/Hack.zip -d "$NERD_DIR"
+      rm -f /tmp/Hack.zip
     fi
     mkdir -vp ~/.config/fontconfig
     ln -sf ~/linux-files/dotfiles/fontconfig/.config/fontconfig/fonts.conf ~/.config/fontconfig/fonts.conf
@@ -308,17 +384,32 @@ mkdir -p ~/Playground
 
 # Logseq
 mkdir -vp ~/logseq
-[ -d ~/logseq/logseq-work/cockpit-core ] && ln -sfn ~/logseq/logseq-work/cockpit-core ~/cockpit-core
 
-# Hyprland
-mkdir -vp ~/custom-setup/hyprland
+# VMs (disk images stay local; launch configs live in ~/DATA/IT/vm-configs)
+mkdir -vp ~/vms
+if [ ! -f ~/vms/AGENTS.md ]; then
+	cat > ~/vms/AGENTS.md <<'EOF'
+# ~/vms — local VM payloads
 
-# Pomodoro
-#if [ -d ~/.pomodoro ]; then
-#	mkdir -vp ~/custom-setup/pomodoro
-#	[ ! -f ~/custom-setup/pomodoro/enabled ] && echo false > ~/custom-setup/pomodoro/enabled
-#	[ ! -f ~/custom-setup/pomodoro/state ] && echo stopped > ~/custom-setup/pomodoro/state
-#	ln -sf ~/linux-files/scripts/pomodoro/hooks/start ~/.pomodoro/hooks/start
-#	ln -sf ~/linux-files/scripts/pomodoro/hooks/stop ~/.pomodoro/hooks/stop
-#	ln -sf ~/linux-files/scripts/pomodoro/hooks/break ~/.pomodoro/hooks/break
-#fi
+This directory holds large, **local-only** VM files (`.qcow2` disks, `.iso`
+installers, OVMF/TPM state). It is NOT synced and is wiped by an OS reinstall.
+
+Launch scripts / configs are version-controlled separately in
+`~/DATA/IT/vm-configs/` (Syncthing-synced, survives reinstalls). Do not keep a
+VM's run script only here — its canonical home is `vm-configs`. To rebuild a VM,
+recreate its disk image here and copy the matching run script from
+`~/DATA/IT/vm-configs/<vm>/`.
+EOF
+	echo "Wrote ~/vms/AGENTS.md (points VM configs at ~/DATA/IT/vm-configs)."
+fi
+
+# IT (Syncthing) + cockpit-core symlinks
+if [ -d ~/DATA/IT ]; then
+	ln -sfn ~/DATA/IT ~/IT
+	mkdir -vp ~/IT/hyprland
+	[ -d ~/DATA/cockpit-core ] && ln -sfn ~/DATA/cockpit-core ~/cockpit-core
+else
+	echo "WARNING: ~/DATA/IT not found — is Syncthing set up on this machine?"
+	echo "Skipping ~/IT and ~/cockpit-core symlinks until DATA/IT syncs."
+	read -p "Press enter to continue ... "
+fi

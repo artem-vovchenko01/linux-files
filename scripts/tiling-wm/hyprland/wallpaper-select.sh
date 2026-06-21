@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [ -d "$HOME/custom-setup/hyprland/wallpapers" ]; then
-    WALL_PATH="$HOME/custom-setup/hyprland/wallpapers"
+if [ -d "$HOME/IT/Resources/Wallpapers" ]; then
+    WALL_PATH="$HOME/IT/Resources/Wallpapers"
 elif [ -d "$HOME/linux-files/wallpapers" ]; then
     WALL_PATH="$HOME/linux-files/wallpapers"
 else

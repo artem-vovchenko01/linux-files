@@ -1,4 +1,4 @@
-HOSTS=$(cat ~/.ssh/config ~/custom-setup/shared/ssh-config | grep '^Host ' | awk '{print $2}')
+HOSTS=$(cat ~/.ssh/config ~/IT/configs/ssh/ssh-config | grep '^Host ' | awk '{print $2}')
 
 CHOICE=$(echo "$HOSTS" | wofi --dmenu)
 [[ $PIPESTATUS -ne 0 ]] && exit

@@ -4,7 +4,7 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import sys
 
-with open("/home/artem/custom-setup/secrets/spotify/secret.txt", "r") as f:
+with open("/home/artem/IT/creds/spotify/secret.txt", "r") as f:
     # in the secret.txt it looks like: client id=<id>=. Last = ensures that python retrieves the key without newline
     client_id = f.readline().split("=")[1]
     client_secret = f.readline().split("=")[1]

@@ -1,8 +1,8 @@
-CUSTOM_SETUP_DIR=~/custom-setup
+IDLE_FILE=~/IT/hyprland/is_user_idle
 
-mkdir -p $CUSTOM_SETUP_DIR/hyprland/state
+mkdir -p "$(dirname "$IDLE_FILE")"
 
-if [[ "$(cat $CUSTOM_SETUP_DIR/hyprland/state/is_user_idle)" -eq "1" ]]; then
+if [[ "$(cat "$IDLE_FILE")" -eq "1" ]]; then
   exit 0
 else
   exit 1
