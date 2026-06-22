@@ -103,6 +103,27 @@ ln -sfn ~/linux-files/dotfiles/nvim/.config/nvim ~/.config/nvim
 # Git
 ln -sf ~/linux-files/dotfiles/git/.gitconfig ~/.gitconfig
 
+# Git credential helper: ~/.gitconfig sets `credential.helper = libsecret` so
+# HTTPS credentials land in the Secret Service keyring (gnome-keyring/KWallet)
+# instead of being re-prompted every fetch/push. Git finds the helper binary in
+# its exec dir; only the package providing it differs per distro. On Debian/
+# Ubuntu the package ships source only, so build it from git's contrib tree.
+case "$PKG_MGR" in
+	pacman) GIT_CRED_PKGS="libsecret" ;;             # helper bundled in `git`
+	dnf)    GIT_CRED_PKGS="git-credential-libsecret" ;;
+	apt)    GIT_CRED_PKGS="libsecret-1-0" ;;
+	zypper) GIT_CRED_PKGS="libsecret-1-0" ;;
+	*)      GIT_CRED_PKGS="" ;;
+esac
+[ -n "$GIT_CRED_PKGS" ] && pkg_ensure_installed $GIT_CRED_PKGS
+
+# Debian/Ubuntu ship the helper as source only — git drops it under contrib but
+# doesn't compile it. Don't pull in a toolchain here; just point the way.
+if [ ! -x "$(git --exec-path)/git-credential-libsecret" ] && ! command -v git-credential-libsecret &>/dev/null; then
+	echo "git-credential-libsecret helper not found. On Debian/Ubuntu build it:"
+	echo "  sudo make -C /usr/share/doc/git/contrib/credential/libsecret"
+fi
+
 # Wofi
 mkdir -vp ~/.config/wofi
 ln -sf ~/linux-files/dotfiles/wofi/.config/wofi/config ~/.config/wofi/config
@@ -429,6 +450,39 @@ case "${ans,,}" in
     echo "Cancelled."
     ;;
 esac
+
+############################################
+# GIT CREDENTIAL MANAGER (Azure DevOps / EPAM)
+############################################
+# ~/.gitconfig routes dev.azure.com through GCM (Microsoft Entra OAuth) while
+# libsecret stays the default for every other host. GCM isn't in distro repos
+# and ships no rpm; the x64 tarball bundles the binary with its Skia/HarfBuzz
+# libs, so extract it whole under ~/.local and link the helper onto PATH. The
+# libs must sit beside the binary, hence the symlink (not a copied binary).
+# EPAM Azure DevOps over HTTPS only. Repo lives under git-ecosystem, not microsoft.
+if ! command -v git-credential-manager &>/dev/null; then
+  read -r -p "Install Git Credential Manager (Azure DevOps auth)? [y/N]: " ans
+  case "${ans,,}" in
+    y|yes)
+      GCM_API="https://api.github.com/repos/git-ecosystem/git-credential-manager/releases/latest"
+      GCM_GREP='https://[^"]*gcm-linux-x64[^"]*\.tar\.gz'
+      GCM_URL=$(curl -fsSL "$GCM_API" | grep -o "$GCM_GREP" | grep -v symbols | head -1)
+      if [[ -n "$GCM_URL" ]]; then
+        GCM_DIR=~/.local/share/git-credential-manager
+        mkdir -vp "$GCM_DIR" ~/.local/bin
+        curl -fSL "$GCM_URL" -o /tmp/gcm.tar.gz
+        tar -xzf /tmp/gcm.tar.gz -C "$GCM_DIR"
+        rm -f /tmp/gcm.tar.gz
+        ln -sf "$GCM_DIR/git-credential-manager" ~/.local/bin/git-credential-manager
+      else
+        echo "Could not resolve GCM tarball asset; install manually."
+      fi
+      ;;
+    *)
+      echo "Skipped GCM; Azure DevOps over HTTPS will prompt until installed."
+      ;;
+  esac
+fi
 
 ############################################
 # GNOME KEYBOARD SHORTCUTS (Fedora)
