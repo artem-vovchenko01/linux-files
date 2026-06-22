@@ -48,3 +48,14 @@ gsettings set org.gnome.desktop.wm.preferences resize-with-right-button true
 
 # disable default Win+number behavior (in Ubuntu, for example)
 gsettings set org.gnome.shell.extensions.dash-to-dock hot-keys false
+
+# custom launchers: Win+E -> file manager, Win+Enter -> terminal
+schema=org.gnome.settings-daemon.plugins.media-keys.custom-keybinding
+root=/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings
+gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['$root/files/', '$root/term/']"
+gsettings set "$schema:$root/files/" name 'Files'
+gsettings set "$schema:$root/files/" command 'nautilus --new-window'
+gsettings set "$schema:$root/files/" binding '<Super>e'
+gsettings set "$schema:$root/term/" name 'Terminal'
+gsettings set "$schema:$root/term/" command 'ptyxis --new-window'
+gsettings set "$schema:$root/term/" binding '<Super>Return'

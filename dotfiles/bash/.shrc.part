@@ -68,6 +68,10 @@ export PATH
 export EDITOR=nvim
 # Workaround: broken IPv6 dual-stack hangs Python MSAL on login.microsoftonline.com (Azure CLI / Azure MCP).
 export RES_OPTIONS="no-aaaa"
+# Point the Docker client lib at Podman's rootless socket so lazydocker works.
+if [ -S "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/podman/podman.sock" ]; then
+    export DOCKER_HOST="unix://${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/podman/podman.sock"
+fi
 
 # Custom scripts
 if [ -d "$HOME/linux-files/scripts" ]; then

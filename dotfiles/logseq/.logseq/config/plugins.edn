@@ -1,0 +1,2 @@
+{:logseq-vim-shortcuts {:version "v0.2.0", :repo "vipzhicheng/logseq-plugin-vim-shortcuts", :effect true, :theme false}
+ :logseq-tabs {:version "v1.19.4", :repo "pengx17/logseq-plugin-tabs", :effect true, :theme false}}

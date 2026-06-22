@@ -127,6 +127,17 @@ ln -sf ~/linux-files/dotfiles/kitty/.config/kitty/kitty.conf ~/.config/kitty/kit
 mkdir -p ~/.config/foot
 ln -sf ~/linux-files/dotfiles/foot/.config/foot/foot.ini ~/.config/foot/foot.ini
 
+# Ptyxis (Fedora default terminal): settings live in dconf, not a file, so we
+# write the 10M-line scrollback into the default profile instead of symlinking.
+if command -v dconf >/dev/null; then
+  PTYXIS_UUID=$(dconf read /org/gnome/Ptyxis/default-profile-uuid | tr -d "'")
+  if [ -n "$PTYXIS_UUID" ]; then
+    PTYXIS_P=/org/gnome/Ptyxis/Profiles/$PTYXIS_UUID/
+    dconf write "${PTYXIS_P}limit-scrollback" true
+    dconf write "${PTYXIS_P}scrollback-lines" 10000000
+  fi
+fi
+
 # VSCode
 mkdir -p ~/.config/{"Code - OSS",Code,Cursor}/User/
 ln -sf ~/linux-files/dotfiles/code/settings.json ~/.config/"Code - OSS"/User/settings.json
@@ -219,7 +230,7 @@ fi
 # PACKAGES
 ############################################
 # Common packages (same name across distros)
-PACKAGES_COMMON="less git git-delta vifm neovim zoxide fzf direnv kitty foot imv nemo thunar tumbler ffmpegthumbnailer file-roller thunar-archive-plugin zip unzip gedit zathura tldr man-db syncthing"
+PACKAGES_COMMON="less git git-delta vifm neovim zoxide fzf direnv kitty foot imv nemo thunar tumbler ffmpegthumbnailer file-roller thunar-archive-plugin zip unzip gedit zathura tldr man-db syncthing htop btop"
 # thunar-archive-plugin - for enabling archiving options in thunar
 # tumbler ffmpegthumbnailer file-roller - for making thumbnails in thunar work
 
@@ -234,7 +245,9 @@ case "$PKG_MGR" in
 	dnf)
 		# Fedora: -free-fonts is the light icon set (-all/-web also pull web/JS/brands);
 		# inetutils/hostname dropped — hostname ships in the base install.
-		PACKAGES_DISTRO="libnotify fontawesome-6-free-fonts libgsf zathura-pdf-mupdf tesseract-langpack-eng man-pages"
+		# fuse-libs: Fedora ships only fuse3, but type-2 AppImages link against the
+		# FUSE 2 ABI (libfuse.so.2), so they fail to launch without it.
+		PACKAGES_DISTRO="libnotify fontawesome-6-free-fonts libgsf zathura-pdf-mupdf tesseract-langpack-eng man-pages fuse-libs"
 		;;
 	zypper)
 		PACKAGES_DISTRO="libnotify-tools fontawesome-fonts inetutils libgsf-1 zathura-plugin-pdf-mupdf tesseract-ocr-traineddata-english man-pages"
@@ -353,6 +366,85 @@ case "${ans,,}" in
 esac
 
 ############################################
+# APPIMAGELAUNCHER
+############################################
+# ~/Applications is the canonical home for downloaded AppImages; create it
+# unconditionally so other tooling can rely on it.
+mkdir -vp ~/Applications
+
+read -r -p "Install AppImageLauncher? [y/N]: " ans
+case "${ans,,}" in
+  y|yes)
+    # Release asset names carry a build hash, so resolve the x86_64 AppImage
+    # URL from the latest release at runtime instead of hardcoding it.
+    AIL_API="https://api.github.com/repos/TheAssassin/AppImageLauncher/releases/latest"
+    AIL_GREP='https://[^"]*-lite-[^"]*x86_64.AppImage'
+    AIL_URL=$(curl -fsSL "$AIL_API" | grep -m1 -o "$AIL_GREP")
+    if [[ -n "$AIL_URL" ]]; then
+      AIL_DEST=~/Applications/AppImageLauncher.AppImage
+      curl -fSL "$AIL_URL" -o "$AIL_DEST"
+      chmod +x "$AIL_DEST"
+      echo "Downloaded AppImageLauncher to $AIL_DEST"
+      # The lite AppImage integrates itself (binfmt hook + desktop entry) via
+      # its `install` subcommand; ~/.local/lib/appimagelauncher-lite marks it
+      # done, so skip the step when re-running setup.sh.
+      if [ -d ~/.local/lib/appimagelauncher-lite ]; then
+        echo "AppImageLauncher already integrated; skipping install."
+      else
+        "$AIL_DEST" install
+      fi
+    else
+      echo "Could not find AppImageLauncher AppImage asset; install manually."
+    fi
+    ;;
+  *)
+    echo "Cancelled."
+    ;;
+esac
+
+############################################
+# JESSEDUFFIELD TUIS (lazygit, lazydocker)
+############################################
+read -r -p "Install latest lazygit & lazydocker? [y/N]: " ans
+case "${ans,,}" in
+  y|yes)
+    mkdir -vp ~/.local/bin
+    # Resolve each release's x86_64 Linux tarball URL at runtime so versions
+    # aren't hardcoded. grep -i because the two repos disagree on casing
+    # (lazydocker uses Linux_x86_64, lazygit uses linux_x86_64).
+    for tool in lazygit lazydocker; do
+      api="https://api.github.com/repos/jesseduffield/$tool/releases/latest"
+      url=$(curl -fsSL "$api" | grep -m1 -io 'https://[^"]*linux_x86_64.tar.gz')
+      if [[ -n "$url" ]]; then
+        curl -fSL "$url" -o /tmp/$tool.tar.gz
+        tar -xzf /tmp/$tool.tar.gz -C ~/.local/bin "$tool"
+        rm -f /tmp/$tool.tar.gz
+        echo "Installed $tool to ~/.local/bin/$tool"
+      else
+        echo "Could not find $tool release asset; install manually."
+      fi
+    done
+    ;;
+  *)
+    echo "Cancelled."
+    ;;
+esac
+
+############################################
+# GNOME KEYBOARD SHORTCUTS (Fedora)
+############################################
+# Fedora ships GNOME by default, so apply the custom gsettings keybindings.
+# || true: gsettings exits non-zero on schemas missing here (e.g. dash-to-dock)
+# and we don't want that to abort the rest of setup.
+if [ -r /etc/os-release ] && grep -q '^ID=fedora' /etc/os-release; then
+	if command -v gsettings &>/dev/null; then
+		bash ~/linux-files/scripts/de/gnome/gnome_shortcut_script.sh || true
+	else
+		echo "gsettings not found; skipping GNOME keyboard shortcuts."
+	fi
+fi
+
+############################################
 # SETUP FOLDERS
 ############################################
 
@@ -384,6 +476,12 @@ mkdir -p ~/Playground
 
 # Logseq
 mkdir -vp ~/logseq
+# App-level config (~/.logseq) is machine-local; symlink the portable bits.
+# Per-graph config (each graph's logseq/config.edn) is synced with the graph.
+# preferences.json is volatile UI state and intentionally not linked.
+mkdir -vp ~/.logseq/config
+ln -sf ~/linux-files/dotfiles/logseq/.logseq/config/config.edn ~/.logseq/config/config.edn
+ln -sf ~/linux-files/dotfiles/logseq/.logseq/config/plugins.edn ~/.logseq/config/plugins.edn
 
 # VMs (disk images stay local; launch configs live in ~/DATA/IT/vm-configs)
 mkdir -vp ~/vms

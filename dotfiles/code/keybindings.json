@@ -31,5 +31,9 @@
             "text": "\u001b\r"
         },
         "when": "terminalFocus"
+    },
+    {
+        "key": "ctrl+alt+v",
+        "command": "toggleVim"
     }
 ]

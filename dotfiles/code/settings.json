@@ -38,5 +38,11 @@
     "terminal.integrated.gpuAcceleration": "off",
     "terminal.integrated.mouseWheelScrollSensitivity": 3,
     "window.autoDetectColorScheme": false,
+    "vim.handleKeys": {
+        "<C-d>": true,
+        "<C-u>": true,
+        "<C-f>": true,
+        "<C-b>": true
+    },
     "vim.disableExtension": true
 }
