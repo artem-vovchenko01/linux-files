@@ -251,7 +251,7 @@ fi
 # PACKAGES
 ############################################
 # Common packages (same name across distros)
-PACKAGES_COMMON="less git git-delta vifm neovim zoxide fzf direnv kitty foot imv nemo thunar tumbler ffmpegthumbnailer file-roller thunar-archive-plugin zip unzip gedit zathura tldr man-db syncthing htop btop"
+PACKAGES_COMMON="less git git-delta vifm neovim zoxide fzf direnv kitty foot imv nemo thunar tumbler ffmpegthumbnailer file-roller thunar-archive-plugin zip unzip gedit zathura tealdeer man-db syncthing htop btop"
 # thunar-archive-plugin - for enabling archiving options in thunar
 # tumbler ffmpegthumbnailer file-roller - for making thumbnails in thunar work
 
