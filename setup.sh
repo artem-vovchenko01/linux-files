@@ -400,7 +400,8 @@ case "${ans,,}" in
     # URL from the latest release at runtime instead of hardcoding it.
     AIL_API="https://api.github.com/repos/TheAssassin/AppImageLauncher/releases/latest"
     AIL_GREP='https://[^"]*-lite-[^"]*x86_64.AppImage'
-    AIL_URL=$(curl -fsSL "$AIL_API" | grep -m1 -o "$AIL_GREP")
+    AIL_JSON=$(curl -fsSL "$AIL_API")
+    AIL_URL=$(printf '%s' "$AIL_JSON" | grep -m1 -o "$AIL_GREP")
     if [[ -n "$AIL_URL" ]]; then
       AIL_DEST=~/Applications/AppImageLauncher.AppImage
       curl -fSL "$AIL_URL" -o "$AIL_DEST"
