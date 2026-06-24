@@ -537,6 +537,19 @@ mkdir -vp ~/.logseq/config
 ln -sf ~/linux-files/dotfiles/logseq/.logseq/config/config.edn ~/.logseq/config/config.edn
 ln -sf ~/linux-files/dotfiles/logseq/.logseq/config/plugins.edn ~/.logseq/config/plugins.edn
 
+# Hermes skills (work-specific Claude skills shipped in the logseq-work graph)
+# logseq-work carries its own .claude/skills; when both Hermes and that graph are
+# present, surface each skill to Hermes by linking it into the Hermes skills dir.
+# ln -sfn so re-runs replace the link instead of nesting inside the linked dir.
+HERMES_SKILLS=~/.hermes/skills
+WORK_SKILLS=~/logseq/logseq-work/.claude/skills
+if [ -d ~/.hermes ] && [ -d "$HERMES_SKILLS" ] && [ -d "$WORK_SKILLS" ]; then
+	for skill in "$WORK_SKILLS"/*/; do
+		[ -d "$skill" ] || continue
+		ln -sfn "${skill%/}" "$HERMES_SKILLS/$(basename "$skill")"
+	done
+fi
+
 # VMs (disk images stay local; launch configs live in ~/DATA/IT/vm-configs)
 mkdir -vp ~/vms
 if [ ! -f ~/vms/AGENTS.md ]; then

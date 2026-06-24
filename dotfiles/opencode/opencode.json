@@ -1,5 +1,36 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "google-vertex-anthropic": {
+      "options": {
+        "project": "hl2-epmp-mvis-t1iylu",
+        "location": "global"
+      }
+    },
+    "openrouter": {
+      "models": {
+        "z-ai/glm-5.2": {
+          "options": {
+            "provider": {
+              "only": [
+                "together",
+                "parasail",
+                "gmicloud",
+                "venice"
+              ],
+              "allow_fallbacks": false,
+              "data_collection": "deny",
+              "ignore": [
+		"fireworks",
+                "deepinfra",
+		"cloudflare"
+		]
+            }
+          }
+        }
+      }
+    }
+  },
   "mcp": {
     "chrome-devtools": {
       "type": "local",
