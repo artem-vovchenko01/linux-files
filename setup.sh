@@ -550,6 +550,46 @@ if [ -d ~/.hermes ] && [ -d "$HERMES_SKILLS" ] && [ -d "$WORK_SKILLS" ]; then
 	done
 fi
 
+# Claude Code memories — logseq-work project
+# Claude stores per-project memories under ~/.claude/projects/<encoded-path>/memory/.
+# We symlink that dir into the logseq-work repo so Syncthing + git sync it across
+# machines. The encoded path matches the absolute path of the repo on this user's box.
+CLAUDE_PROJ=~/.claude/projects/-home-artem-logseq-logseq-work
+LOGSEQ_WORK=~/logseq/logseq-work
+CLAUDE_MEM=$CLAUDE_PROJ/memory
+LOGSEQ_MEM=$LOGSEQ_WORK/ai/claude-memories
+
+if [ ! -d "$LOGSEQ_WORK" ]; then
+	echo "logseq-work not found at $LOGSEQ_WORK — skipping Claude memory link."
+elif [ ! -d "$CLAUDE_PROJ" ]; then
+	echo "Claude project for logseq-work not yet created."
+	echo "Open Claude Code in $LOGSEQ_WORK once, then re-run setup.sh."
+elif [ -L "$CLAUDE_MEM" ]; then
+	echo "Claude memories already linked: $CLAUDE_MEM"
+else
+	proceed=y
+	MEM_REAL_HAS_FILES=$([ -d "$CLAUDE_MEM" ] && [ -n "$(ls -A "$CLAUDE_MEM" 2>/dev/null)" ] && echo y || echo n)
+	MEM_SYNC_HAS_FILES=$([ -d "$LOGSEQ_MEM" ] && [ -n "$(ls -A "$LOGSEQ_MEM" 2>/dev/null)" ] && echo y || echo n)
+	if [ "$MEM_REAL_HAS_FILES" = y ] && [ "$MEM_SYNC_HAS_FILES" = y ]; then
+		echo "Both $CLAUDE_MEM and $LOGSEQ_MEM have content."
+		read -r -p "Merge $CLAUDE_MEM into $LOGSEQ_MEM and relink? [y/N]: " proceed
+	fi
+	case "${proceed,,}" in
+		y|yes)
+			mkdir -vp "$LOGSEQ_MEM"
+			if [ -d "$CLAUDE_MEM" ] && [ ! -L "$CLAUDE_MEM" ]; then
+				cp -rn "$CLAUDE_MEM"/. "$LOGSEQ_MEM"/
+				rm -rf "$CLAUDE_MEM"
+			fi
+			ln -sfn "$LOGSEQ_MEM" "$CLAUDE_MEM"
+			echo "Linked $CLAUDE_MEM -> $LOGSEQ_MEM"
+			;;
+		*)
+			echo "Skipped Claude memory linking."
+			;;
+	esac
+fi
+
 # VMs (disk images stay local; launch configs live in ~/DATA/IT/vm-configs)
 mkdir -vp ~/vms
 if [ ! -f ~/vms/AGENTS.md ]; then

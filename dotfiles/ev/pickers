@@ -7,3 +7,4 @@ az-rg    az group list --query "[].name" -o tsv
 az-vm    az vm list -g "$RG" --query "[].name" -o tsv
 az-vnet  az network vnet list -g "$RG" --query "[].name" -o tsv
 az-snet  az network vnet subnet list -g "$RG" --vnet-name "$VNET" --query "[].name" -o tsv
+dbx      awk '/^\[/{p=$0;gsub(/[][]/,"",p)} /^host/{print p"\t"$3}' "$HOME/.databrickscfg"

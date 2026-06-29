@@ -375,6 +375,9 @@ alias codex="codex -a on-request -s danger-full-access"
 alias codex-yolo="codex --dangerously-bypass-approvals-and-sandbox"
 alias claude="claude --verbose --dangerously-skip-permissions"
 alias gemini="gemini --approval-mode yolo"
+alias agy="agy --dangerously-skip-permissions"
+alias agent="agent --yolo"
+alias grok="grok --always-approve"
 
 if [ -r "$HOME/.grok-api-key" ]; then
     export GROK_API_KEY="$(cat "$HOME/.grok-api-key")"

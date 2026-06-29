@@ -6,3 +6,4 @@ RG    az-rg
 VM    az-vm
 VNET  az-vnet
 SNET  az-snet
+DATABRICKS_CONFIG_PROFILE  dbx
