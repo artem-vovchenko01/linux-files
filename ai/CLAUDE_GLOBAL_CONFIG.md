@@ -2,6 +2,9 @@ NEVER split a single shell command across multiple lines (no `\` continuations),
 
 Also, keep each shell line short enough to fit on one terminal row (~80 chars). Long lines wrap in my terminal and the wrap gets interpreted as a newline on paste, breaking the command. If a command would exceed ~80 chars, split it into multiple short *separate* commands using shell variables (e.g. `IMG=...` on one line, then `docker run ... $IMG` on the next) — not by line-continuing one command.
 
+# understand purpose first
+Before diving into details of any task — reading messages, investigating infra, reviewing code, answering questions — pause to establish *why* it's being done: what problem is being solved, what the person or team is trying to achieve, what the broader goal is. If the purpose is unclear or only partially visible, say so and ask. Work informed by purpose, not just by the immediate details in front of you.
+
 # code style
 When working on code, don't overengineer — align with the style the surrounding code is already written in. Don't add unnecessary comments that look AI-generated or ad-hoc (e.g. comments explaining a specific fix or prompt). If you comment, make it fit the repository's style and genuinely useful for a human to read.
 
