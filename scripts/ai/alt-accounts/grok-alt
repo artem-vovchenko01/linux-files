@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# grok-alt  --  run Grok CLI on a second xAI account instead of the one
+# `grok` uses.
+#
+# GROK_HOME is the root for everything Grok keeps per account: config.toml,
+# auth.json, sessions, rules. Pointing it at ~/.grok-alt keeps both accounts
+# logged in at once, so nothing has to be switched back afterwards. It is the
+# only path override Grok has, so sessions/ is symlinked back to the primary
+# home to keep `grok --resume` working across both accounts.
+# Documented in ~/.grok/docs/user-guide/05-configuration.md ("Paths").
+#
+# Usage:
+#   grok-alt login                  log the second account in (do this first)
+#   grok-alt inspect                show the config and home this wrapper uses
+#   grok-alt                        interactive session on that account
+#   grok-alt -p 'prompt'            headless run on that account
+#
+# Main use case: side agents run through this wrapper so they do not eat the
+# primary account's usage window.
+
+export GROK_HOME="$HOME/.grok-alt"
+mkdir -p "$GROK_HOME"
+
+. "$(dirname "$(readlink -f "$0")")/share-sessions.sh"
+share_sessions "$HOME/.grok" "$GROK_HOME" dir:sessions
+
+# XAI_API_KEY authenticates Grok on its own, ahead of the stored browser
+# login, so leaving it set would bill the key's account instead of the one
+# this wrapper logged in. GROK_API_KEY is not a Grok CLI variable, but
+# .shrc.part exports it, so drop it too rather than reason about it later.
+unset XAI_API_KEY GROK_API_KEY
+
+# Same full-access posture as claude-alt: an unattended agent must never stop
+# on an approval prompt.
+command -v grok >/dev/null || { echo "anomaly: grok not found" >&2; exit 1; }
+exec grok --always-approve "$@"

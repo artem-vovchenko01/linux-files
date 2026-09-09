@@ -171,20 +171,6 @@ ln -sf ~/linux-files/dotfiles/code/keybindings.json ~/.config/Cursor/User/keybin
 # Tmux
 ln -sf ~/linux-files/dotfiles/tmux/tmux.conf ~/.tmux.conf
 
-# AI agents (shared global instructions)
-AI_GLOBAL=~/linux-files/ai/CLAUDE_GLOBAL_CONFIG.md
-
-# Claude Code
-[ -d ~/.claude ] && ln -sf "$AI_GLOBAL" ~/.claude/CLAUDE.md
-
-# Codex
-[ -d ~/.codex ] && ln -sf "$AI_GLOBAL" ~/.codex/AGENTS.md
-
-# OpenCode
-[ -d ~/.opencode ] && ln -sf "$AI_GLOBAL" ~/.opencode/AGENTS.md
-mkdir -vp ~/.config/opencode
-ln -sf ~/linux-files/dotfiles/opencode/opencode.json ~/.config/opencode/opencode.json
-
 # Syncthing (config + device keys live in ~/DATA/IT, database stays local)
 # config.xml is NOT symlinked: Syncthing rewrites it via atomic rename, which
 # replaces a symlink with a real file. Instead we point its config dir
@@ -538,59 +524,6 @@ mkdir -vp ~/.logseq/config
 ln -sf ~/linux-files/dotfiles/logseq/.logseq/config/config.edn ~/.logseq/config/config.edn
 ln -sf ~/linux-files/dotfiles/logseq/.logseq/config/plugins.edn ~/.logseq/config/plugins.edn
 
-# Hermes skills (work-specific Claude skills shipped in the logseq-work graph)
-# logseq-work carries its own .claude/skills; when both Hermes and that graph are
-# present, surface each skill to Hermes by linking it into the Hermes skills dir.
-# ln -sfn so re-runs replace the link instead of nesting inside the linked dir.
-HERMES_SKILLS=~/.hermes/skills
-WORK_SKILLS=~/logseq/logseq-work/.claude/skills
-if [ -d ~/.hermes ] && [ -d "$HERMES_SKILLS" ] && [ -d "$WORK_SKILLS" ]; then
-	for skill in "$WORK_SKILLS"/*/; do
-		[ -d "$skill" ] || continue
-		ln -sfn "${skill%/}" "$HERMES_SKILLS/$(basename "$skill")"
-	done
-fi
-
-# Claude Code memories — logseq-work project
-# Claude stores per-project memories under ~/.claude/projects/<encoded-path>/memory/.
-# We symlink that dir into the logseq-work repo so Syncthing + git sync it across
-# machines. The encoded path matches the absolute path of the repo on this user's box.
-CLAUDE_PROJ=~/.claude/projects/-home-artem-logseq-logseq-work
-LOGSEQ_WORK=~/logseq/logseq-work
-CLAUDE_MEM=$CLAUDE_PROJ/memory
-LOGSEQ_MEM=$LOGSEQ_WORK/ai/claude-memories
-
-if [ ! -d "$LOGSEQ_WORK" ]; then
-	echo "logseq-work not found at $LOGSEQ_WORK — skipping Claude memory link."
-elif [ ! -d "$CLAUDE_PROJ" ]; then
-	echo "Claude project for logseq-work not yet created."
-	echo "Open Claude Code in $LOGSEQ_WORK once, then re-run setup.sh."
-elif [ -L "$CLAUDE_MEM" ]; then
-	echo "Claude memories already linked: $CLAUDE_MEM"
-else
-	proceed=y
-	MEM_REAL_HAS_FILES=$([ -d "$CLAUDE_MEM" ] && [ -n "$(ls -A "$CLAUDE_MEM" 2>/dev/null)" ] && echo y || echo n)
-	MEM_SYNC_HAS_FILES=$([ -d "$LOGSEQ_MEM" ] && [ -n "$(ls -A "$LOGSEQ_MEM" 2>/dev/null)" ] && echo y || echo n)
-	if [ "$MEM_REAL_HAS_FILES" = y ] && [ "$MEM_SYNC_HAS_FILES" = y ]; then
-		echo "Both $CLAUDE_MEM and $LOGSEQ_MEM have content."
-		read -r -p "Merge $CLAUDE_MEM into $LOGSEQ_MEM and relink? [y/N]: " proceed
-	fi
-	case "${proceed,,}" in
-		y|yes)
-			mkdir -vp "$LOGSEQ_MEM"
-			if [ -d "$CLAUDE_MEM" ] && [ ! -L "$CLAUDE_MEM" ]; then
-				cp -rn "$CLAUDE_MEM"/. "$LOGSEQ_MEM"/
-				rm -rf "$CLAUDE_MEM"
-			fi
-			ln -sfn "$LOGSEQ_MEM" "$CLAUDE_MEM"
-			echo "Linked $CLAUDE_MEM -> $LOGSEQ_MEM"
-			;;
-		*)
-			echo "Skipped Claude memory linking."
-			;;
-	esac
-fi
-
 # VMs (disk images stay local; launch configs live in ~/DATA/IT/vm-configs)
 mkdir -vp ~/vms
 if [ ! -f ~/vms/AGENTS.md ]; then
@@ -619,3 +552,113 @@ else
 	echo "Skipping ~/IT and ~/cockpit-core symlinks until DATA/IT syncs."
 	read -p "Press enter to continue ... "
 fi
+
+############################################
+# SETUP AI CONFIGURATIONS
+############################################
+
+AI_GLOBAL=~/linux-files/ai/CLAUDE_GLOBAL_CONFIG.md
+LOGSEQ_WORK=~/logseq/logseq-work
+COCKPIT_CORE=~/cockpit-core
+if [ ! -d "$COCKPIT_CORE" ] && [ -d ~/DATA/cockpit-core ]; then
+	COCKPIT_CORE=~/DATA/cockpit-core
+fi
+WORK_SKILLS=$LOGSEQ_WORK/skills
+PERSONAL_SKILLS=$COCKPIT_CORE/skills
+
+# Shared global instructions
+[ -d ~/.claude ] && ln -sf "$AI_GLOBAL" ~/.claude/CLAUDE.md
+[ -d ~/.codex ] && ln -sf "$AI_GLOBAL" ~/.codex/AGENTS.md
+[ -d ~/.opencode ] && ln -sf "$AI_GLOBAL" ~/.opencode/AGENTS.md
+
+# OpenCode
+mkdir -vp ~/.config/opencode
+OPENCODE_CONFIG=~/linux-files/dotfiles/opencode/opencode.json
+ln -sf "$OPENCODE_CONFIG" ~/.config/opencode/opencode.json
+
+# Link every valid hub skill into an agent's global skills directory.
+# Usage: link_skill_dir HUB_SKILLS_DIR AGENT_SKILLS_DIR
+link_skill_dir() {
+	local source_dir=$1
+	local target_dir=$2
+	local skill target source_real target_real
+	if [ ! -d "$source_dir" ]; then
+		return 0
+	fi
+	mkdir -p "$target_dir"
+	for skill in "$source_dir"/*/; do
+		[ -f "$skill/SKILL.md" ] || continue
+		target="$target_dir/$(basename "$skill")"
+		# Keep agent-owned directories intact.
+		if [ -e "$target" ] && [ ! -L "$target" ]; then
+			echo "Skipping $target: it is not a symlink."
+			continue
+		fi
+		if [ -L "$target" ]; then
+			source_real=$(readlink -f "${skill%/}")
+			target_real=$(readlink -f "$target")
+			# A flat namespace cannot hold two skills with the same name.
+			if [ "$source_real" != "$target_real" ]; then
+				echo "Skipping duplicate skill: $(basename "$skill")"
+				continue
+			fi
+		fi
+		ln -sfn "${skill%/}" "$target"
+	done
+}
+
+# Hermes also uses one global skill namespace.
+if [ -d ~/.hermes ]; then
+	link_skill_dir "$WORK_SKILLS" ~/.hermes/skills
+	link_skill_dir "$PERSONAL_SKILLS" ~/.hermes/skills
+fi
+
+# Claude Code memories — logseq-work project
+CLAUDE_PROJ=~/.claude/projects/-home-artem-logseq-logseq-work
+CLAUDE_MEM=$CLAUDE_PROJ/memory
+LOGSEQ_MEM=$LOGSEQ_WORK/ai/claude-memories
+
+if [ ! -d "$LOGSEQ_WORK" ]; then
+	echo "logseq-work not found at $LOGSEQ_WORK."
+	echo "Skipping the Claude memory link."
+elif [ ! -d "$CLAUDE_PROJ" ]; then
+	echo "Claude project for logseq-work not yet created."
+	echo "Open Claude Code in $LOGSEQ_WORK once, then re-run setup.sh."
+elif [ -L "$CLAUDE_MEM" ]; then
+	echo "Claude memories already linked: $CLAUDE_MEM"
+else
+	proceed=y
+	MEM_REAL_HAS_FILES=n
+	MEM_SYNC_HAS_FILES=n
+	if [ -d "$CLAUDE_MEM" ]; then
+		if [ -n "$(ls -A "$CLAUDE_MEM")" ]; then
+			MEM_REAL_HAS_FILES=y
+		fi
+	fi
+	if [ -d "$LOGSEQ_MEM" ]; then
+		if [ -n "$(ls -A "$LOGSEQ_MEM")" ]; then
+			MEM_SYNC_HAS_FILES=y
+		fi
+	fi
+	if [ "$MEM_REAL_HAS_FILES" = y ] && [ "$MEM_SYNC_HAS_FILES" = y ]; then
+		echo "Both $CLAUDE_MEM and $LOGSEQ_MEM have content."
+		PROMPT="Merge $CLAUDE_MEM into $LOGSEQ_MEM and relink? [y/N]: "
+		read -r -p "$PROMPT" proceed
+	fi
+	case "${proceed,,}" in
+		y|yes)
+			mkdir -vp "$LOGSEQ_MEM"
+			if [ -d "$CLAUDE_MEM" ] && [ ! -L "$CLAUDE_MEM" ]; then
+				cp -rn "$CLAUDE_MEM"/. "$LOGSEQ_MEM"/
+				rm -rf "$CLAUDE_MEM"
+			fi
+			ln -sfn "$LOGSEQ_MEM" "$CLAUDE_MEM"
+			echo "Linked $CLAUDE_MEM -> $LOGSEQ_MEM"
+			;;
+		*)
+			echo "Skipped Claude memory linking."
+			;;
+	esac
+fi
+
+echo "Consider setting up: opencode, openclaw, hermes, homebrew, pi, tailscale"

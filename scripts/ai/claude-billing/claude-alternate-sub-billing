@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# claude-alternate-sub-billing  --  one-off Claude Code session billed to
+# the alternate Pro subscription (avovch.ext@gmail.com).
+#
+# Just a user-facing name for claude-alt: starts a session on the second
+# account without touching the main ~/.claude setup, so there is nothing
+# to switch back afterwards. Safe to run alongside Max/Fable sessions.
+#
+# Usage:
+#   claude-alternate-sub-billing            interactive session
+#   claude-alternate-sub-billing -p '...'   headless one-shot
+#
+# --verbose matches the interactive `claude` alias in dotfiles/bash/.shrc.part,
+# which a script cannot pick up on its own. Permission bypass comes from
+# claude-alt itself.
+
+DIR=$(dirname "$0")
+exec "$DIR/claude-alt" --verbose "$@"

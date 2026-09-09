@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# claude-alt  --  run Claude Code on the alternate Claude subscription
+# (avovch.ext@gmail.com, Pro) instead of the main Max account.
+#
+# Uses a separate config dir (~/.claude-alt) so both accounts stay logged
+# in at the same time: ~/.claude keeps the Max login, ~/.claude-alt keeps
+# the Pro login. That dir also roots the recorded sessions, so the session
+# stores are symlinked back to ~/.claude and --resume reaches the same
+# transcripts from either account. Everything else is a plain passthrough
+# to `claude`, so this works interactively, headless (claude-alt -p ...),
+# and for auth (claude-alt auth login / status).
+#
+# Usage:
+#   claude-alt                      interactive session on the Pro account
+#   claude-alt -p 'prompt' ...      headless run billed to the Pro account
+#   claude-alt auth status          check which account this wrapper uses
+#
+# Main use case: side agents (reviewers, testers, mechanical workers) run
+# through this wrapper so they do not eat the Max session window. See the
+# "Opus subagents" section in ~/linux-files/ai/CLAUDE_GLOBAL_CONFIG.md.
+
+export CLAUDE_CONFIG_DIR="$HOME/.claude-alt"
+
+# Transcripts and memories live in projects/; the rest are the per-session
+# side stores a resumed session reads (rewind checkpoints, shell snapshots,
+# captured env, background tasks). .claude.json and .credentials.json stay
+# local: they carry the account identity and the login.
+. "$HOME/linux-files/scripts/ai/alt-accounts/share-sessions.sh"
+share_sessions "$HOME/.claude" "$CLAUDE_CONFIG_DIR" \
+  dir:projects dir:file-history dir:shell-snapshots dir:session-env \
+  dir:tasks file:history.jsonl
+
+# These env vars outrank the OAuth login in Claude Code's auth precedence,
+# or redirect/rewrite requests before they reach the API. Scrub them so a
+# parent session's setup (Vertex, tokens, proxies) can never silently take
+# over billing for the alternate account.
+unset ANTHROPIC_API_KEY ANTHROPIC_AUTH_TOKEN CLAUDE_CODE_OAUTH_TOKEN
+unset ANTHROPIC_BASE_URL ANTHROPIC_CUSTOM_HEADERS ANTHROPIC_MODEL
+unset CLAUDE_CODE_USE_VERTEX CLAUDE_CODE_USE_BEDROCK CLAUDE_CODE_USE_FOUNDRY
+
+# A running Claude Code session exports its settings.json env block to child
+# processes, so when an agent calls this wrapper any model pins from the main
+# config (e.g. the Vertex profile's ANTHROPIC_DEFAULT_*_MODEL) leak through.
+# Drop them so aliases resolve to the account's own latest models here.
+unset ANTHROPIC_DEFAULT_OPUS_MODEL ANTHROPIC_DEFAULT_SONNET_MODEL
+unset ANTHROPIC_DEFAULT_HAIKU_MODEL ANTHROPIC_DEFAULT_FABLE_MODEL
+unset ANTHROPIC_SMALL_FAST_MODEL CLAUDE_CODE_SUBAGENT_MODEL
+unset CLAUDE_CODE_EFFORT_LEVEL
+
+# Bypass mode is passed as a flag, not left to ~/.claude-alt/settings.json.
+# On Pro and Max plans Claude Code offers once to move a non-auto defaultMode
+# to auto mode, and accepting that rewrites the file. A side agent would then
+# start prompting mid-run with nobody at the keyboard. The flag survives that.
+command -v claude >/dev/null || { echo "anomaly: claude not found" >&2; exit 1; }
+exec claude --dangerously-skip-permissions "$@"

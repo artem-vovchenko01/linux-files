@@ -9,6 +9,10 @@ or one-time links.
 
 - `setup.sh` is the primary maintained workflow: it symlinks `dotfiles/` into
   `~/.config/` and `~/`. Idempotent — safe to re-run.
+- Each agent hub owns one `skills/` source directory. Claude Code, Codex, and
+  OpenCode use project-local compatibility links under `.claude/skills/`,
+  `.agents/skills/`, and `.opencode/skills/`. `setup.sh` exposes both hubs to
+  Hermes globally. OpenClaw loads the two source directories directly.
 - `my-git-os/` is archived/legacy and not the primary path.
 
 ## Environment

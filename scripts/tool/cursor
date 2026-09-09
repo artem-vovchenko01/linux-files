@@ -1,0 +1,18 @@
+#!/bin/sh
+# Opens the Cursor IDE AppImage, which lives in ~/Applications and is not on PATH.
+#
+# Must NOT be moved to ~/.local/bin: the Cursor agent CLI installs its own
+# `cursor` shim there and would overwrite it. That shim searches PATH for any
+# other `cursor` and execs it, so this script only needs to sit later in PATH.
+set -eu
+
+APPIMAGE="$(ls -1v "$HOME"/Applications/Cursor-*.AppImage 2>/dev/null | tail -1)"
+
+if [ -z "$APPIMAGE" ]; then
+  echo "cursor: no Cursor AppImage found in ~/Applications" >&2
+  exit 1
+fi
+
+# The AppImage is the Electron binary, not a CLI wrapper, so it holds the
+# terminal until the window closes. Detach it.
+setsid "$APPIMAGE" "$@" >/dev/null 2>&1 &

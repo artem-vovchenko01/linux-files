@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# codex-alt  --  run Codex CLI on a second ChatGPT account instead of the
+# one `codex` uses.
+#
+# CODEX_HOME is the root for everything Codex keeps per account: config.toml,
+# auth.json, sessions, logs, skills. Pointing it at ~/.codex-alt keeps both
+# accounts logged in at once, so nothing has to be switched back afterwards.
+# CODEX_SQLITE_HOME then pulls the thread store back to the primary home, so
+# `codex resume` on either account lists and continues the same sessions.
+# https://learn.chatgpt.com/docs/config-file/environment-variables
+#
+# Usage:
+#   codex-alt login                 log the second account in (do this first)
+#   codex-alt login status          check which account this wrapper uses
+#   codex-alt                       interactive session on that account
+#   codex-alt exec 'prompt'         headless run on that account
+#
+# Main use case: side agents run through this wrapper so they do not eat the
+# primary account's usage window.
+
+export CODEX_HOME="$HOME/.codex-alt"
+mkdir -p "$CODEX_HOME"
+
+# Threads, thread history, memories and the queue live in SQLite; the rollout
+# transcripts they point at live in sessions/. Both go to the primary home,
+# along with session_index.jsonl, which holds the names the picker shows for
+# renamed and automation sessions, and the composer's prompt history.
+export CODEX_SQLITE_HOME="$HOME/.codex"
+. "$(dirname "$(readlink -f "$0")")/share-sessions.sh"
+share_sessions "$HOME/.codex" "$CODEX_HOME" \
+  dir:sessions dir:automations file:session_index.jsonl file:history.jsonl
+
+# These outrank the stored login or redirect requests before they reach the
+# API, so a parent session's setup can never take over billing here.
+unset CODEX_API_KEY CODEX_ACCESS_TOKEN OPENAI_API_KEY OPENAI_BASE_URL
+
+# Same full-access posture as claude-alt: an unattended agent must never stop
+# on an approval prompt. The tamer profile the `codex` alias uses is still one
+# command away: CODEX_HOME=~/.codex-alt codex -a on-request -s danger-full-access
+command -v codex >/dev/null || { echo "anomaly: codex not found" >&2; exit 1; }
+exec codex --dangerously-bypass-approvals-and-sandbox "$@"

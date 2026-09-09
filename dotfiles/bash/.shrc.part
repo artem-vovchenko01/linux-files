@@ -254,6 +254,35 @@ function vmip {
     printf '%s\n' "$IP"
 }
 
+# Run the Claude Code CLI against OpenCode Go models via claude-code-router.
+# ccr translates Anthropic <-> OpenAI so Claude Code can talk to the Go plan's
+# OpenAI-style endpoint. The API key is read live from OpenCode's auth store,
+# so no secret lives in this dotfile. Default model: opencode-go/deepseek-v4-pro
+# (switch in-session with `/model opencode-go,<name>`, e.g. kimi-k2.7-code).
+function opencode-go-claude {
+    local auth="$HOME/.local/share/opencode/auth.json"
+    local cfg="$HOME/.claude-code-router/config.json"
+    local key tmp
+    key=$(jq -r '."opencode-go".key // empty' "$auth" 2>/dev/null)
+    if [ -z "$key" ]; then
+        echo "opencode-go key not found in $auth" >&2
+        return 1
+    fi
+    if [ ! -f "$cfg" ]; then
+        echo "ccr config missing: $cfg (run 'ccr status' to scaffold)" >&2
+        return 1
+    fi
+    tmp=$(mktemp)
+    jq --arg k "$key" \
+        '(.Providers[]|select(.name=="opencode-go").api_key)=$k' \
+        "$cfg" > "$tmp" && mv "$tmp" "$cfg"
+    chmod 600 "$cfg"
+    if ! ccr status >/dev/null 2>&1; then
+        ccr restart
+    fi
+    ccr code --dangerously-skip-permissions "$@"
+}
+
 ##############################
 # COMPLETIONS
 ##############################
@@ -374,10 +403,24 @@ fi
 alias codex="codex -a on-request -s danger-full-access"
 alias codex-yolo="codex --dangerously-bypass-approvals-and-sandbox"
 alias claude="claude --verbose --dangerously-skip-permissions"
+# Latest Opus for this session only; the saved default model is untouched.
+alias claude-opus="claude --model opus"
 alias gemini="gemini --approval-mode yolo"
 alias agy="agy --dangerously-skip-permissions"
 alias agent="agent --yolo"
 alias grok="grok --always-approve"
+alias ollama-claude="ollama launch claude --model glm-5.2:cloud -- --dangerously-skip-permissions"
+
+# CodeMie wrappers forward unknown flags to the underlying CLI.
+# --silent is CodeMie's: skip version-pin prompts and the banner, keep
+# the installed harness. Use long Codex flags: CodeMie owns -s as --silent.
+# No one-flag bypass for codemie-opencode / codemie-code / codemie-pi.
+alias codemie-claude="codemie-claude --silent --dangerously-skip-permissions"
+alias codemie-codex="codemie-codex --silent --ask-for-approval on-request --sandbox danger-full-access"
+alias codemie-codex-yolo="codemie-codex --silent --dangerously-bypass-approvals-and-sandbox"
+alias codemie-gemini="codemie-gemini --silent --approval-mode yolo"
+alias codemie-copilot="codemie-copilot --silent --allow-all"
+alias codemie-kimi="codemie-kimi --silent --yolo"
 
 if [ -r "$HOME/.grok-api-key" ]; then
     export GROK_API_KEY="$(cat "$HOME/.grok-api-key")"

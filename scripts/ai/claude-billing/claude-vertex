@@ -1,0 +1,94 @@
+#!/bin/bash
+
+# claude-vertex  --  one-off Claude Code session billed to a work Vertex AI
+# project instead of a Claude subscription.
+#
+# The Vertex settings live in this process only, so they disappear when the
+# session ends and no other `claude` invocation is affected. That is the
+# difference from claude-billing.sh, which rewrites the env block of
+# ~/.claude/settings.json and so changes billing for every later session.
+#
+# Vertex authenticates with Google Application Default Credentials, not with
+# a Claude login. ADC refresh tokens expire, so the script checks them first
+# and offers the browser login when they no longer work.
+#
+# Usage:
+#   claude-vertex                  interactive session on the work project
+#   claude-vertex -p 'prompt'      headless one-shot
+#   claude-vertex --model <id>     override the model chosen below
+
+PROJECT_FILE="$HOME/.work-gcp-project-name"
+if [ ! -r "$PROJECT_FILE" ]; then
+  echo "anomaly: $PROJECT_FILE missing" >&2
+  exit 1
+fi
+PROJECT_ID=$(head -n 1 "$PROJECT_FILE")
+if [ -z "$PROJECT_ID" ]; then
+  echo "anomaly: $PROJECT_FILE is empty" >&2
+  exit 1
+fi
+
+# Opus 5 with the 1M context window. Both are enabled for this project in
+# Model Garden; the models pinned below are enabled there too.
+DEFAULT_MODEL='claude-opus-5[1m]'
+
+command -v gcloud >/dev/null || { echo "anomaly: gcloud not found" >&2; exit 1; }
+command -v claude >/dev/null || { echo "anomaly: claude not found" >&2; exit 1; }
+
+# Minting an access token fails in exactly the cases Claude Code would fail
+# on its first request, which makes it a cheap and accurate liveness check.
+adc_alive() { gcloud auth application-default print-access-token >/dev/null 2>&1; }
+
+if ! adc_alive; then
+  echo "Google credentials for Vertex are missing or expired."
+  read -rp "Sign in to Google again? [Y/n] " reply
+  case "$reply" in
+    [Nn]*) echo "Aborted; no session started."; exit 1 ;;
+  esac
+  gcloud auth application-default login || exit 1
+  adc_alive || { echo "anomaly: credentials still unusable" >&2; exit 1; }
+fi
+
+# Read the main config rather than whatever config dir the parent shell had.
+# A Vertex session ignores the Claude login stored there, but it still wants
+# the global CLAUDE.md, skills, and permissions that live alongside it.
+export CLAUDE_CONFIG_DIR="$HOME/.claude"
+
+export CLAUDE_CODE_USE_VERTEX=1
+export ANTHROPIC_VERTEX_PROJECT_ID="$PROJECT_ID"
+export CLOUD_ML_REGION=global
+
+# Unpinned aliases fall back to Claude Code's own Vertex defaults, which trail
+# the current releases: `sonnet` still lands on 4.5. Name the versions instead.
+export ANTHROPIC_DEFAULT_OPUS_MODEL=claude-opus-5
+export ANTHROPIC_DEFAULT_SONNET_MODEL=claude-sonnet-5
+export ANTHROPIC_DEFAULT_HAIKU_MODEL=claude-haiku-4-5@20251001
+
+# A running Claude Code session exports its own provider setup to child
+# processes. Drop anything that would send these requests somewhere other
+# than Vertex, or pin a model the project does not serve.
+unset ANTHROPIC_API_KEY ANTHROPIC_AUTH_TOKEN CLAUDE_CODE_OAUTH_TOKEN
+unset ANTHROPIC_BASE_URL ANTHROPIC_CUSTOM_HEADERS ANTHROPIC_MODEL
+unset CLAUDE_CODE_USE_BEDROCK CLAUDE_CODE_USE_FOUNDRY
+unset ANTHROPIC_SMALL_FAST_MODEL CLAUDE_CODE_SUBAGENT_MODEL
+unset CLAUDE_CODE_EFFORT_LEVEL
+
+# settings.json selects Fable, which Vertex does not serve, and a settings
+# model outranks every environment variable. Only the command line beats it,
+# so pass one — unless the caller already named a model.
+model_given=false
+for arg in "$@"; do
+  case "$arg" in
+    --model|--model=*) model_given=true; break ;;
+  esac
+done
+
+# The flags match the interactive `claude` alias in dotfiles/bash/.shrc.part,
+# which a script cannot pick up on its own.
+FLAGS=(--verbose --dangerously-skip-permissions)
+
+if $model_given; then
+  exec claude "${FLAGS[@]}" "$@"
+else
+  exec claude "${FLAGS[@]}" --model "$DEFAULT_MODEL" "$@"
+fi

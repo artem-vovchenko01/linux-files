@@ -14,16 +14,37 @@ set -euo pipefail
 SETTINGS="$HOME/.claude/settings.json"
 PROFILE_DIR="$HOME/.claude/billing-profiles"
 PROFILE="$PROFILE_DIR/provider.json"
+WORK_GCP_PROJECT_FILE="$HOME/.work-gcp-project-name"
 
-# Provider-neutral model aliases kept while on subscription (resolve on either
-# backend). Vertex-form ids like claude-haiku-4-5@date do NOT work here.
-SUB_ENV='{"ANTHROPIC_DEFAULT_SONNET_MODEL":"claude-sonnet-4-6","ANTHROPIC_DEFAULT_OPUS_MODEL":"claude-opus-4-8"}'
-
-# Fallback provider env if no snapshot exists yet (Artem's Vertex setup).
-DEFAULT_PROVIDER_ENV='{"CLAUDE_CODE_USE_VERTEX":"1","ANTHROPIC_VERTEX_PROJECT_ID":"hl2-epmp-mvis-t1iylu","CLOUD_ML_REGION":"global","ANTHROPIC_DEFAULT_SONNET_MODEL":"claude-sonnet-4-6","ANTHROPIC_DEFAULT_OPUS_MODEL":"claude-opus-4-8","ANTHROPIC_DEFAULT_HAIKU_MODEL":"claude-haiku-4-5@20251001"}'
+# Subscription mode sets no model pins: the opus/sonnet aliases then resolve
+# to the newest recommended models, and pinning would freeze them (that is
+# what ANTHROPIC_DEFAULT_*_MODEL is for). Only the Vertex profile pins models.
+SUB_ENV='{}'
 
 command -v jq >/dev/null || { echo "anomaly: jq not found" >&2; exit 1; }
 [ -f "$SETTINGS" ] || { echo "anomaly: $SETTINGS missing" >&2; exit 1; }
+
+default_provider_env() {
+  local project filter
+  if [ ! -r "$WORK_GCP_PROJECT_FILE" ]; then
+    echo "anomaly: $WORK_GCP_PROJECT_FILE missing" >&2
+    return 1
+  fi
+  project=$(head -n 1 "$WORK_GCP_PROJECT_FILE")
+  if [ -z "$project" ]; then
+    echo "anomaly: $WORK_GCP_PROJECT_FILE is empty" >&2
+    return 1
+  fi
+  filter='{
+    CLAUDE_CODE_USE_VERTEX: "1",
+    ANTHROPIC_VERTEX_PROJECT_ID: $project,
+    CLOUD_ML_REGION: "global",
+    ANTHROPIC_DEFAULT_SONNET_MODEL: "claude-sonnet-4-6",
+    ANTHROPIC_DEFAULT_OPUS_MODEL: "claude-opus-4-8",
+    ANTHROPIC_DEFAULT_HAIKU_MODEL: "claude-haiku-4-5@20251001"
+  }'
+  jq -cn --arg project "$project" "$filter"
+}
 
 current_mode() {
   local v
@@ -53,8 +74,8 @@ to_provider() {
   if [ -f "$PROFILE" ]; then
     penv=$(cat "$PROFILE")
   else
-    penv="$DEFAULT_PROVIDER_ENV"
-    echo "No snapshot found; using built-in default provider env."
+    penv=$(default_provider_env)
+    echo "No snapshot found; using the local Vertex project."
   fi
   apply_env "$penv"
   echo "Claude Code -> third-party provider billing (Vertex/Bedrock)."
