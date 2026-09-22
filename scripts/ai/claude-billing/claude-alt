@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # claude-alt  --  run Claude Code on the alternate Claude subscription
-# (avovch.ext@gmail.com, Pro) instead of the main Max account.
+# (Pro, ~/.claude-alt) instead of the main Max account.
 #
 # Uses a separate config dir (~/.claude-alt) so both accounts stay logged
 # in at the same time: ~/.claude keeps the Max login, ~/.claude-alt keeps

@@ -1,0 +1,6 @@
+{
+  "lastChangelogVersion": "0.79.10",
+  "theme": "dark",
+  "defaultProvider": "vertex-claude",
+  "defaultModel": "claude-sonnet-4-6"
+}

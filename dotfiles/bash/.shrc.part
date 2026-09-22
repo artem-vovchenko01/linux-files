@@ -256,12 +256,17 @@ function vmip {
 
 # Run the Claude Code CLI against OpenCode Go models via claude-code-router.
 # ccr translates Anthropic <-> OpenAI so Claude Code can talk to the Go plan's
-# OpenAI-style endpoint. The API key is read live from OpenCode's auth store,
-# so no secret lives in this dotfile. Default model: opencode-go/deepseek-v4-pro
-# (switch in-session with `/model opencode-go,<name>`, e.g. kimi-k2.7-code).
+# OpenAI-style endpoint. OpenCode Go rejects requests without an
+# x-opencode-session header, so the opencode-session plugin adds one per
+# conversation (switch models in-session with `/model opencode-go,<name>`, e.g.
+# kimi-k2.7-code). The API key is read live from OpenCode's auth store, so no
+# secret lives in this dotfile. This reasserts the ccr settings the Go endpoint
+# needs, because the ccr UI can rewrite config.json. Default model:
+# opencode-go/deepseek-flash.
 function opencode-go-claude {
     local auth="$HOME/.local/share/opencode/auth.json"
     local cfg="$HOME/.claude-code-router/config.json"
+    local plugin="$HOME/.claude-code-router/plugins/opencode-session.js"
     local key tmp
     key=$(jq -r '."opencode-go".key // empty' "$auth" 2>/dev/null)
     if [ -z "$key" ]; then
@@ -272,10 +277,20 @@ function opencode-go-claude {
         echo "ccr config missing: $cfg (run 'ccr status' to scaffold)" >&2
         return 1
     fi
+    if [ ! -f "$plugin" ]; then
+        echo "ccr plugin missing: $plugin (run setup.sh to link it)" >&2
+        return 1
+    fi
     tmp=$(mktemp)
-    jq --arg k "$key" \
-        '(.Providers[]|select(.name=="opencode-go").api_key)=$k' \
-        "$cfg" > "$tmp" && mv "$tmp" "$cfg"
+    jq --arg k "$key" --arg p "$plugin" '
+        (.Providers[] | select(.name == "opencode-go").api_key) = $k
+        | .transformers = ([{ "path": $p }] + ((.transformers // []) | map(select(.path != $p))))
+        | .Providers = (.Providers | map(if .name == "opencode-go" then
+              .models = ((.models + ["deepseek-flash"]) | unique)
+              | .transformer = (((.transformer // {}) | .use = (((.use // []) + ["opencode-session"]) | unique)))
+            else . end))
+        | .Router.default = "opencode-go,deepseek-flash"
+    ' "$cfg" > "$tmp" && mv "$tmp" "$cfg"
     chmod 600 "$cfg"
     if ! ccr status >/dev/null 2>&1; then
         ccr restart

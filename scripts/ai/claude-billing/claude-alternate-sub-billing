@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # claude-alternate-sub-billing  --  one-off Claude Code session billed to
-# the alternate Pro subscription (avovch.ext@gmail.com).
+# the alternate Pro subscription (~/.claude-alt).
 #
 # Just a user-facing name for claude-alt: starts a session on the second
 # account without touching the main ~/.claude setup, so there is nothing

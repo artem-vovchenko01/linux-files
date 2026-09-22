@@ -43,3 +43,6 @@ plugin/packer_compiled.lua
 
 tempfiles/
 SHORTCOMINGS
+
+# Local-only account details. Never commit.
+ai/private/

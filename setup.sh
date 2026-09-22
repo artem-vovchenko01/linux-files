@@ -75,6 +75,10 @@ install_root_file() {
 ln -sf ~/linux-files/dotfiles/bash/.shrc.part ~/.shrc.part.sh
 grep .shrc.part.sh ~/.bashrc || echo "source ~/.shrc.part.sh" >> ~/.bashrc
 
+# Claude Code Router plugin (adds the OpenCode Go session header)
+mkdir -vp ~/.claude-code-router/plugins
+ln -sf ~/linux-files/dotfiles/claude-code-router/plugins/opencode-session.js ~/.claude-code-router/plugins/opencode-session.js
+
 # SSH
 mkdir -vp ~/.ssh
 ln -sf ~/linux-files/dotfiles/ssh/.ssh/config ~/.ssh/config
@@ -489,25 +493,43 @@ fi
 # SETUP FOLDERS
 ############################################
 
-# Local git
-mkdir -p ~/local-git-server
-echo "Example git file for client repo:"
-echo =========================================
-cat <<EOF
-[core]
-	repositoryformatversion = 0
-	filemode = true
-	bare = false
-	logallrefupdates = true
-[remote "pc"]
-	url = artem@192.168.0.84:/home/artem/local-git-server/logseq-personal
-	fetch = +refs/heads/*:refs/remotes/pc/*
-[branch "main"]
-	remote = pc
-	merge = refs/heads/main
-EOF
-echo =========================================
-read -p "Press enter to continue ... "
+# Local git backup remotes
+# Bare repos live in the Syncthing folder ~/DATA/local-git.
+# ~/g/<name>.git is a short alias so Cursor titles stay readable.
+# A Logseq or GitHub clone often has only origin and drops remote `local`.
+# Full attach-when-no-.git steps: ~/DATA/local-git/README.md
+LOCAL_GIT=~/DATA/local-git
+mkdir -vp ~/g
+if [ -d "$LOCAL_GIT" ]; then
+	for name in cockpit-core logseq-personal logseq-work; do
+		if [ -d "$LOCAL_GIT/$name.git" ]; then
+			ln -sfn "$LOCAL_GIT/$name.git" "$HOME/g/$name.git"
+		fi
+	done
+else
+	echo "WARNING: $LOCAL_GIT not found — skip ~/g aliases until it syncs."
+fi
+
+ensure_local_git_remote() {
+	local repo=$1
+	local name=$2
+	local url="$HOME/g/$name.git"
+	if [ ! -d "$repo/.git" ]; then
+		return 0
+	fi
+	if [ ! -e "$url" ]; then
+		return 0
+	fi
+	if git -C "$repo" remote get-url local >/dev/null 2>&1; then
+		git -C "$repo" remote set-url local "$url"
+	else
+		git -C "$repo" remote add local "$url"
+	fi
+}
+
+ensure_local_git_remote ~/DATA/cockpit-core cockpit-core
+ensure_local_git_remote ~/logseq/logseq-personal logseq-personal
+ensure_local_git_remote ~/logseq/logseq-work logseq-work
 
 # Playground
 mkdir -p ~/Playground
@@ -563,7 +585,7 @@ COCKPIT_CORE=~/cockpit-core
 if [ ! -d "$COCKPIT_CORE" ] && [ -d ~/DATA/cockpit-core ]; then
 	COCKPIT_CORE=~/DATA/cockpit-core
 fi
-WORK_SKILLS=$LOGSEQ_WORK/skills
+WORK_SKILLS=$LOGSEQ_WORK/.agents/skills
 PERSONAL_SKILLS=$COCKPIT_CORE/skills
 
 # Shared global instructions
@@ -575,6 +597,30 @@ PERSONAL_SKILLS=$COCKPIT_CORE/skills
 mkdir -vp ~/.config/opencode
 OPENCODE_CONFIG=~/linux-files/dotfiles/opencode/opencode.json
 ln -sf "$OPENCODE_CONFIG" ~/.config/opencode/opencode.json
+
+# Portable agent preferences. Skip a link when the repo file is absent
+# so a partial sync cannot replace a real file with a dangling symlink.
+# Auth, sessions, and Codex config.toml stay in $HOME.
+link_agent_settings() {
+	local source=$1
+	local dest=$2
+	if [ ! -f "$source" ]; then
+		echo "Missing $source; leaving $dest unchanged."
+		return 0
+	fi
+	mkdir -vp "$(dirname "$dest")"
+	ln -sf "$source" "$dest"
+}
+link_agent_settings ~/linux-files/dotfiles/claude/settings.json \
+	~/.claude/settings.json
+link_agent_settings ~/linux-files/dotfiles/claude-alt/settings.json \
+	~/.claude-alt/settings.json
+link_agent_settings ~/linux-files/dotfiles/grok/config.toml \
+	~/.grok/config.toml
+link_agent_settings ~/linux-files/dotfiles/grok-alt/config.toml \
+	~/.grok-alt/config.toml
+link_agent_settings ~/linux-files/dotfiles/pi/settings.json \
+	~/.pi/agent/settings.json
 
 # Link every valid hub skill into an agent's global skills directory.
 # Usage: link_skill_dir HUB_SKILLS_DIR AGENT_SKILLS_DIR
@@ -616,7 +662,7 @@ fi
 # Claude Code memories — logseq-work project
 CLAUDE_PROJ=~/.claude/projects/-home-artem-logseq-logseq-work
 CLAUDE_MEM=$CLAUDE_PROJ/memory
-LOGSEQ_MEM=$LOGSEQ_WORK/ai/claude-memories
+LOGSEQ_MEM=$LOGSEQ_WORK/.ai/claude-memories
 
 if [ ! -d "$LOGSEQ_WORK" ]; then
 	echo "logseq-work not found at $LOGSEQ_WORK."
