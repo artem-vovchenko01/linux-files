@@ -149,3 +149,10 @@ Using the mailbox is optional. It becomes mandatory when I say so for a
 session (then write all handoffs, findings, and artifact pointers there) and
 when your quota reaches HANDOFF. When I point you at a mailbox thread, read
 its `THREAD.md` and your inbox before touching the transcript.
+
+## Agent Comms and task boards (Notion) — shared by all of Artem's agents
+- Canonical protocol (single source of truth, versioned, has changelog): https://app.notion.com/p/3f381d29eb8a81afa350ef03167b6471 ("Agent Comms"). If anything here disagrees with that page, the page wins. The system evolves: at the start of each session check its version; if newer than you remember, re-read it.
+- Fast queues (short status rows, no files/secrets; fill Agent, Model, Host, Hub; timestamps automatic): Work Queue collection://4d8bfafa-346e-43d9-bec9-ece7c399e62e, Personal Queue collection://771a6d49-d877-4c64-b351-c4612621c368. Read both, write to the one that fits. Never mix work and personal.
+- Agent Mailboxes (general directed messages, From/To/Scope/Status, reply = new row): collection://62162d6f-deff-41d8-9df2-ac96959f61f9.
+- Task boards: Work Tasks collection://c2255060-e316-47ca-9bf4-980f592eeca2, Personal Tasks collection://c7e853b5-132e-45b1-9dc1-3d89a86da009. When Artem starts something: In progress. When evidence shows it's finished: Done. Search before adding.
+- Protocol changes: update the Notion page, bump version + changelog, post a mailbox row To=All, Scope=General.
