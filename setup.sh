@@ -87,9 +87,11 @@ done
 
 if $IS_OMARCHY; then
 	echo "Omarchy: keeping its Hyprland, terminal, tmux, nvim and font configs."
-	# Personal overrides only: input (layouts, touchpad) and keybindings.
+	# Personal overrides only: input (layouts, touchpad), keybindings, and
+	# look'n'feel (gaps, tab bar).
 	link "$LF/dotfiles/omarchy/hypr/input.lua" ~/.config/hypr/input.lua
 	link "$LF/dotfiles/omarchy/hypr/bindings.lua" ~/.config/hypr/bindings.lua
+	link "$LF/dotfiles/omarchy/hypr/looknfeel.lua" ~/.config/hypr/looknfeel.lua
 	"$LF/scripts/tiling-wm/terminal-font-size.sh" 14
 else
 	# Hyprland desktop (Omarchy 4 has its own: Lua config + Quickshell)
