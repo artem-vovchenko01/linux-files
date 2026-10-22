@@ -308,6 +308,7 @@ apply_syncthing_redirect() {
 	current=$(readlink ~/.config/systemd/user/syncthing.service.d/override.conf || true)
 	if [ "$current" = "$SYNCTHING_DROPIN" ]; then
 		echo "Syncthing already reads its config from $SYNCTHING_SRC."
+		python3 "$LF/scripts/syncthing/st-folders.py" save
 		return
 	fi
 	# Don't silently shadow a different identity already in the default location.
@@ -322,6 +323,8 @@ apply_syncthing_redirect() {
 		fi
 	done
 	systemctl --user stop syncthing 2>/dev/null || true
+	# Syncthing refuses missing folder paths and never syncs .stignore files.
+	python3 "$LF/scripts/syncthing/st-folders.py" restore
 	link "$SYNCTHING_DROPIN" ~/.config/systemd/user/syncthing.service.d/override.conf
 	systemctl --user daemon-reload
 	systemctl --user enable --now syncthing 2>/dev/null || true
@@ -1080,6 +1083,17 @@ else
 	echo "$AGENTIC_CONTEXT not synced yet: accept the agentic-context folder"
 	echo "in Syncthing, then re-run setup.sh."
 fi
+
+# Browser bookmarks: copies live in ~/DATA/IT/browser-bookmarks, refreshed
+# daily by bookmarks-save.timer. Firefox needs a profile first: start it once.
+BOOKMARKS_STORE=~/DATA/IT/browser-bookmarks
+if [ -d "$BOOKMARKS_STORE" ] && ask "Restore browser bookmarks (close Chromium and Firefox first)?"; then
+	python3 "$LF/scripts/browser/bookmarks.py" restore || true
+fi
+link "$LF/systemd-units/bookmarks-save.service" "$USER_UNITS/bookmarks-save.service"
+link "$LF/systemd-units/bookmarks-save.timer" "$USER_UNITS/bookmarks-save.timer"
+systemctl --user daemon-reload || true
+systemctl --user enable --now bookmarks-save.timer || true
 
 echo "Manual steps: log in to each agent CLI; sudo tailscale up (outside Omarchy);"
 echo "Grok Bot AppImage from https://x.ai/bot; the Windows 11 ISO for the VM."
