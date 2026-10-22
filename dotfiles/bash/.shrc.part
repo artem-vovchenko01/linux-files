@@ -84,17 +84,31 @@ EOF
 fi
 
 # EPAM scripts
-_shrc_path_append "$HOME/DATA/EPAM_resources/scripts"
+_shrc_path_append "$HOME/DATA/work-resources/scripts"
 export PATH
 
 ##############################
 # OPTIONAL PROGRAMMING TOOLS
 ##############################
 
+# mise (Omarchy activates it in its own bashrc)
+if [ -z "${MISE_SHELL:-}" ] && command -v mise >/dev/null 2>&1; then
+    eval "$(mise activate "$_SHRC_SHELL")"
+fi
+
 # npm
 if [ -d "$HOME/.npm-global/bin" ]; then
     _shrc_path_prepend "$HOME/.npm-global/bin"
 fi
+
+# Agent CLIs that install outside ~/.local/bin
+_shrc_path_prepend "$HOME/.grok/bin"
+_shrc_path_prepend "$HOME/.opencode/bin"
+[ "$_SHRC_SHELL" = bash ] && _shrc_source_if_readable "$HOME/.grok/completions/bash/grok.bash"
+
+# Google Cloud SDK
+_shrc_source_if_readable "$HOME/google-cloud-sdk/path.$_SHRC_SHELL.inc"
+_shrc_source_if_readable "$HOME/google-cloud-sdk/completion.$_SHRC_SHELL.inc"
 
 # Flutter/Dart
 if [ -d "$HOME/Pobrane/flutter/flutter" ]; then
@@ -356,6 +370,12 @@ command -v lvim > /dev/null 2>&1 && {
     alias vim="lvim"
     alias nvim="lvim"
 }
+# nsg-guard keeps the dev NSG whitelist restored (work hub .ai/nsg/)
+_SHRC_NSG_GUARD=$HOME/obsidian/obsidian-work/.ai/nsg/nsg-guard.sh
+if [ -x "$_SHRC_NSG_GUARD" ]; then
+    alias nsg-guard-start="setsid nohup $_SHRC_NSG_GUARD loop >/dev/null 2>&1 & echo started"
+    alias nsg-guard-stop='pkill -f "nsg-guard.sh loop"'
+fi
 alias g="git"
 alias gs="g status"
 alias gc="git commit"
@@ -415,8 +435,8 @@ fi
 # eval "$(pyenv init - bash)"
 
 
-alias codex="codex -a on-request -s danger-full-access"
-alias codex-yolo="codex --dangerously-bypass-approvals-and-sandbox"
+alias codex="codex --dangerously-bypass-approvals-and-sandbox"
+alias codex-yolo="codex"
 alias claude="claude --verbose --dangerously-skip-permissions"
 # Latest Opus for this session only; the saved default model is untouched.
 alias claude-opus="claude --model opus"
@@ -424,6 +444,8 @@ alias gemini="gemini --approval-mode yolo"
 alias agy="agy --dangerously-skip-permissions"
 alias agent="agent --yolo"
 alias grok="grok --always-approve"
+# --yolo: no approval prompts, no sandbox, trust this workspace for the run.
+alias muse="muse --yolo"
 alias ollama-claude="ollama launch claude --model glm-5.2:cloud -- --dangerously-skip-permissions"
 
 # CodeMie wrappers forward unknown flags to the underlying CLI.

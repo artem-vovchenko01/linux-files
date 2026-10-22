@@ -8,6 +8,21 @@ if [ -n "${HOME:-}" ]; then
 fi
 export PATH
 
+# Private copy. Bash keeps reading this file while the review runs,
+# so a rewrite mid-review is parsed as a syntax error.
+if [ -z "${PRECOMMIT_SNAPSHOT:-}" ]; then
+  _snap=$(mktemp "${TMPDIR:-/tmp}/pre-commit.XXXXXX" 2>/dev/null) || _snap=
+  if [ -n "$_snap" ] && cp -- "$0" "$_snap" 2>/dev/null; then
+    PRECOMMIT_SNAPSHOT=$_snap
+    export PRECOMMIT_SNAPSHOT
+    exec /bin/sh "$_snap"
+  fi
+  [ -n "$_snap" ] && rm -f "$_snap"
+fi
+if [ -n "${PRECOMMIT_SNAPSHOT:-}" ]; then
+  trap 'rm -f -- "$PRECOMMIT_SNAPSHOT"' EXIT
+fi
+
 case "${CODE_REVIEW_SKIP:-}" in
   1|true|TRUE|yes|YES|y|Y)
     exit 0
@@ -27,68 +42,193 @@ if [ ! -r /dev/tty ] || [ ! -w /dev/tty ]; then
   exit 1
 fi
 
+has_grok=0
 has_codex=0
 has_claude=0
+grok_bin=$(command -v grok 2>/dev/null || true)
 codex_bin=$(command -v codex 2>/dev/null || true)
 claude_bin=$(command -v claude 2>/dev/null || true)
+[ -n "$grok_bin" ] && has_grok=1
 [ -n "$codex_bin" ] && has_codex=1
 [ -n "$claude_bin" ] && has_claude=1
 
-if [ "$has_codex" -eq 0 ] && [ "$has_claude" -eq 0 ]; then
-  echo "No supported reviewer found. Install codex or claude, or bypass with CODE_REVIEW_SKIP=1." >/dev/tty
+if [ "$has_grok" -eq 0 ] && [ "$has_codex" -eq 0 ] && [ "$has_claude" -eq 0 ]; then
+  echo "No supported reviewer found. Install grok, codex, or claude, or bypass with CODE_REVIEW_SKIP=1." >/dev/tty
   exit 1
 fi
+
+default_reviewer=claude
+if [ "$has_grok" -eq 1 ]; then
+  default_reviewer=grok
+elif [ "$has_codex" -eq 1 ]; then
+  default_reviewer=codex
+fi
+
+reviewer_installed() {
+  case "$1" in
+    grok) [ "$has_grok" -eq 1 ] ;;
+    codex) [ "$has_codex" -eq 1 ] ;;
+    claude) [ "$has_claude" -eq 1 ] ;;
+    *) return 1 ;;
+  esac
+}
+
+alt_account_ready() {
+  command -v "${reviewer}-alt" >/dev/null 2>&1
+}
+
+# Point the chosen CLI at its second login. Flags stay the same as primary.
+# These variables outrank that login, so drop them or the parent shell's key
+# is billed instead. The names match the *-alt wrappers.
+apply_alt_account() {
+  if [ -z "${HOME:-}" ]; then
+    echo "Alt billing needs HOME set." >/dev/tty
+    return 1
+  fi
+  case "$reviewer" in
+    grok)
+      export GROK_HOME="$HOME/.grok-alt"
+      mkdir -p "$GROK_HOME" || return 1
+      unset XAI_API_KEY GROK_API_KEY
+      ;;
+    codex)
+      export CODEX_HOME="$HOME/.codex-alt"
+      mkdir -p "$CODEX_HOME" || return 1
+      # sessions/ is a symlink once codex-alt has shared history. The thread
+      # index lives elsewhere, so point it at the same home as that link.
+      if [ -L "$CODEX_HOME/sessions" ]; then
+        export CODEX_SQLITE_HOME="$HOME/.codex"
+      fi
+      unset CODEX_API_KEY CODEX_ACCESS_TOKEN OPENAI_API_KEY OPENAI_BASE_URL
+      ;;
+    claude)
+      export CLAUDE_CONFIG_DIR="$HOME/.claude-alt"
+      mkdir -p "$CLAUDE_CONFIG_DIR" || return 1
+      unset ANTHROPIC_API_KEY ANTHROPIC_AUTH_TOKEN CLAUDE_CODE_OAUTH_TOKEN
+      unset ANTHROPIC_BASE_URL ANTHROPIC_CUSTOM_HEADERS ANTHROPIC_MODEL
+      unset CLAUDE_CODE_USE_VERTEX CLAUDE_CODE_USE_BEDROCK CLAUDE_CODE_USE_FOUNDRY
+      unset ANTHROPIC_DEFAULT_OPUS_MODEL ANTHROPIC_DEFAULT_SONNET_MODEL
+      unset ANTHROPIC_DEFAULT_HAIKU_MODEL ANTHROPIC_DEFAULT_FABLE_MODEL
+      unset ANTHROPIC_SMALL_FAST_MODEL CLAUDE_CODE_SUBAGENT_MODEL
+      unset CLAUDE_CODE_EFFORT_LEVEL
+      ;;
+  esac
+}
 
 reviewer=${CODE_REVIEW_TOOL:-}
 if [ -n "$reviewer" ]; then
   case "$reviewer" in
-    codex)
-      if [ "$has_codex" -eq 0 ]; then
-        echo "CODE_REVIEW_TOOL=codex, but codex is not available." >/dev/tty
-        exit 1
-      fi
-      ;;
-    claude)
-      if [ "$has_claude" -eq 0 ]; then
-        echo "CODE_REVIEW_TOOL=claude, but claude is not available." >/dev/tty
+    grok|codex|claude)
+      if ! reviewer_installed "$reviewer"; then
+        echo "CODE_REVIEW_TOOL=$reviewer, but $reviewer is not available." >/dev/tty
         exit 1
       fi
       ;;
     *)
-      echo "Unsupported CODE_REVIEW_TOOL=$reviewer. Use codex or claude." >/dev/tty
+      echo "Unsupported CODE_REVIEW_TOOL=$reviewer. Use grok, codex, or claude." >/dev/tty
       exit 1
       ;;
   esac
-elif [ "$has_codex" -eq 1 ] && [ "$has_claude" -eq 1 ]; then
-  while :; do
-    printf '\nPre-commit review: [c]odex, [l]aude, [s]kip, [a]bort? (default: codex) ' >/dev/tty
-    IFS= read -r choice </dev/tty || exit 1
-    case "$choice" in
-      ''|c|C|codex|Codex)
-        reviewer=codex
-        break
+else
+  count=0
+  [ "$has_grok" -eq 1 ] && count=$((count + 1))
+  [ "$has_codex" -eq 1 ] && count=$((count + 1))
+  [ "$has_claude" -eq 1 ] && count=$((count + 1))
+  if [ "$count" -eq 1 ]; then
+    reviewer=$default_reviewer
+  else
+    menu=""
+    [ "$has_grok" -eq 1 ] && menu="${menu}[g]rok, "
+    [ "$has_codex" -eq 1 ] && menu="${menu}[c]odex, "
+    [ "$has_claude" -eq 1 ] && menu="${menu}[l]aude, "
+    menu="${menu}[s]kip, [a]bort"
+    while :; do
+      printf '\nPre-commit review: %s? (default: %s) ' "$menu" "$default_reviewer" >/dev/tty
+      IFS= read -r choice </dev/tty || exit 1
+      case "$choice" in
+        '')
+          reviewer=$default_reviewer
+          break
+          ;;
+        g|G|grok|Grok)
+          if [ "$has_grok" -eq 1 ]; then
+            reviewer=grok
+            break
+          fi
+          ;;
+        c|C|codex|Codex)
+          if [ "$has_codex" -eq 1 ]; then
+            reviewer=codex
+            break
+          fi
+          ;;
+        l|L|claude|Claude)
+          if [ "$has_claude" -eq 1 ]; then
+            reviewer=claude
+            break
+          fi
+          ;;
+        s|S|skip|Skip)
+          echo "Skipping pre-commit review." >/dev/tty
+          exit 0
+          ;;
+        a|A|abort|Abort|q|Q|quit|Quit)
+          echo "Commit aborted before review." >/dev/tty
+          exit 1
+          ;;
+      esac
+      echo "Please choose one of: $menu." >/dev/tty
+    done
+  fi
+fi
+
+account=primary
+if alt_account_ready; then
+  requested=${CODE_REVIEW_ACCOUNT:-}
+  if [ -n "$requested" ]; then
+    case "$requested" in
+      primary|Primary|PRIMARY|p|P)
+        account=primary
         ;;
-      l|L|claude|Claude)
-        reviewer=claude
-        break
-        ;;
-      s|S|skip|Skip)
-        echo "Skipping pre-commit review." >/dev/tty
-        exit 0
-        ;;
-      a|A|abort|Abort|q|Q|quit|Quit)
-        echo "Commit aborted before review." >/dev/tty
-        exit 1
+      alt|Alt|ALT|a|A)
+        account=alt
         ;;
       *)
-        echo "Please choose c, l, s, or a." >/dev/tty
+        echo "Unsupported CODE_REVIEW_ACCOUNT=$requested. Use primary or alt." >/dev/tty
+        exit 1
         ;;
     esac
-  done
-elif [ "$has_codex" -eq 1 ]; then
-  reviewer=codex
-else
-  reviewer=claude
+  else
+    while :; do
+      printf '\nBilling account for %s: [p]rimary, [a]lt? (default: primary) ' "$reviewer" >/dev/tty
+      IFS= read -r choice </dev/tty || exit 1
+      case "$choice" in
+        ''|p|P|primary|Primary|PRIMARY)
+          account=primary
+          break
+          ;;
+        a|A|alt|Alt|ALT)
+          account=alt
+          break
+          ;;
+      esac
+      echo "Please choose primary or alt." >/dev/tty
+    done
+  fi
+elif [ -n "${CODE_REVIEW_ACCOUNT:-}" ]; then
+  case "$CODE_REVIEW_ACCOUNT" in
+    primary|Primary|PRIMARY|p|P)
+      account=primary
+      ;;
+    *)
+      echo "CODE_REVIEW_ACCOUNT=$CODE_REVIEW_ACCOUNT, but ${reviewer}-alt is not available." >/dev/tty
+      exit 1
+      ;;
+  esac
+fi
+
+if [ "$account" = alt ]; then
+  apply_alt_account || exit 1
 fi
 
 prompt="You are running a local pre-commit review/fix pass.
@@ -102,22 +242,62 @@ You may edit files, run local validation commands, and stage only fixes that sho
 When finished, give concise findings and fixes with file references where possible, then state whether you think the commit should proceed."
 
 echo "" >/dev/tty
-echo "Starting interactive $reviewer review. Exit the reviewer when done." >/dev/tty
+echo "Starting interactive $reviewer review on the $account account. Exit the reviewer when done." >/dev/tty
+echo "Ctrl-C cancels the review and returns here so the commit can proceed." >/dev/tty
 echo "" >/dev/tty
+
+# The reviewer is the terminal's foreground group. Ctrl-C hits that
+# group only. Git stays in this one and keeps waiting.
+run_review() {
+  if ! command -v python3 >/dev/null 2>&1 || ! set -m; then
+    "$@" </dev/tty >/dev/tty 2>&1
+    return $?
+  fi
+  python3 -c '
+import os, signal, sys
+signal.signal(signal.SIGINT, signal.SIG_IGN)
+pid = os.fork()
+if pid == 0:
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+    try:
+        os.execvp(sys.argv[1], sys.argv[1:])
+    except OSError as exc:
+        sys.stderr.write("%s\n" % exc)
+        os._exit(127)
+while True:
+    try:
+        wpid, status = os.waitpid(pid, 0)
+    except InterruptedError:
+        continue
+    if os.WIFSTOPPED(status) or os.WIFCONTINUED(status):
+        continue
+    if os.WIFSIGNALED(status):
+        os._exit(128 + os.WTERMSIG(status))
+    os._exit(os.WEXITSTATUS(status))
+' "$@" </dev/tty >/dev/tty 2>&1
+  _rc=$?
+  set +m
+  return $_rc
+}
 
 status=0
 case "$reviewer" in
+  grok)
+    run_review "$grok_bin" --cwd "$repo_root" --sandbox off --always-approve --no-alt-screen "$prompt" || status=$?
+    ;;
   codex)
-    "$codex_bin" --cd "$repo_root" --sandbox danger-full-access --ask-for-approval on-request --no-alt-screen "$prompt" </dev/tty >/dev/tty 2>&1 || status=$?
+    run_review "$codex_bin" --cd "$repo_root" --sandbox danger-full-access --ask-for-approval on-request --no-alt-screen "$prompt" || status=$?
     ;;
   claude)
-    "$claude_bin" --dangerously-skip-permissions --name pre-commit-review "$prompt" </dev/tty >/dev/tty 2>&1 || status=$?
+    run_review "$claude_bin" --dangerously-skip-permissions --name pre-commit-review "$prompt" || status=$?
     ;;
 esac
 
 echo "" >/dev/tty
-if [ "$status" -ne 0 ]; then
-  echo "$reviewer exited with status $status." >/dev/tty
+if [ "$status" -eq 130 ]; then
+  echo "Review cancelled." >/dev/tty
+elif [ "$status" -ne 0 ]; then
+  echo "$reviewer ($account account) exited with status $status." >/dev/tty
   printf 'Continue commit anyway? [y/N] ' >/dev/tty
   IFS= read -r answer </dev/tty || exit 1
   case "$answer" in

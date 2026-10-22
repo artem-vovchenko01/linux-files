@@ -1,0 +1,10 @@
+[Unit]
+Description=Keep the laptop running when the lid is closed
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/systemd-inhibit --what=handle-lid-switch --who=lid-no-suspend --why="Keep working with the lid closed" --mode=block sleep infinity
+
+[Install]
+WantedBy=graphical-session.target

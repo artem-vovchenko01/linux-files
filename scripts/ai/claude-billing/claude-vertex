@@ -28,9 +28,9 @@ if [ -z "$PROJECT_ID" ]; then
   exit 1
 fi
 
-# Opus 5 with the 1M context window. Both are enabled for this project in
-# Model Garden; the models pinned below are enabled there too.
-DEFAULT_MODEL='claude-opus-5[1m]'
+# Opus 5.5. Its context window is 1M by default; the [1m] suffix is rejected.
+# The models pinned below are enabled for this project in Model Garden.
+DEFAULT_MODEL='claude-opus-5-5'
 
 command -v gcloud >/dev/null || { echo "anomaly: gcloud not found" >&2; exit 1; }
 command -v claude >/dev/null || { echo "anomaly: claude not found" >&2; exit 1; }
@@ -60,7 +60,7 @@ export CLOUD_ML_REGION=global
 
 # Unpinned aliases fall back to Claude Code's own Vertex defaults, which trail
 # the current releases: `sonnet` still lands on 4.5. Name the versions instead.
-export ANTHROPIC_DEFAULT_OPUS_MODEL=claude-opus-5
+export ANTHROPIC_DEFAULT_OPUS_MODEL=claude-opus-5-5
 export ANTHROPIC_DEFAULT_SONNET_MODEL=claude-sonnet-5
 export ANTHROPIC_DEFAULT_HAIKU_MODEL=claude-haiku-4-5@20251001
 

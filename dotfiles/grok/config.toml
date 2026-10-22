@@ -16,9 +16,10 @@ fork_secondary_model = "grok-build"
 yolo = false
 compact_mode = true
 permission_mode = "ask"
+tool_call_density = "compact-grouped"
 
 [models]
-default = "grok-4.7"
+default = "grok-4.7-build-fast"
 default_reasoning_effort = "medium"
 
 [privacy]

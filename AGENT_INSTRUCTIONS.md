@@ -28,7 +28,7 @@ secrets, tokens, or one-time links.
 
 ## Project Overview
 
-Personal Linux dotfiles and automation repository for Arch Linux, centered around Hyprland (Wayland compositor) as the primary desktop environment. Contains configuration files for 25+ applications and 80+ utility scripts. The primary maintained workflow is `setup.sh`; `my-git-os` and Arch install flows are in archived legacy state.
+Personal dotfiles and automation repository for Linux (the laptop runs Fedora and moves to Omarchy, the Arch-based Hyprland setup), centered around Hyprland (Wayland compositor) as the primary desktop environment. Contains configuration files for 25+ applications and 80+ utility scripts. The primary maintained workflow is `setup.sh`; `my-git-os` and Arch install flows are in archived legacy state.
 
 ## Key Commands
 
@@ -48,7 +48,7 @@ There are no build, lint, or test commands — this is a collection of shell scr
 ## Architecture
 
 ### Dotfile Deployment
-`setup.sh` creates symlinks from `dotfiles/` into `~/.config/` and `~/`. Configs live in the repo and are linked, not copied. It is designed to be idempotent (safe to run many times). This is the main maintained workflow. Adding a new config means adding the file under `dotfiles/<app>/` and a corresponding `ln -sf` line in `setup.sh`. Agent preference files that contain no secrets and no machine paths live there too: Claude `settings.json` (primary and alt), Grok `config.toml` (primary and alt), Pi `settings.json`, and OpenCode `opencode.json`. Auth, session stores, and Codex `config.toml` stay in `$HOME`. Codex rewrites absolute paths and local plugin state into that file. It also recreates `~/g/<name>.git` aliases into `~/DATA/local-git` and adds a missing git remote `local` on cockpit-core / logseq-personal / logseq-work when those working trees already have `.git`. It does not `git init` a tree that has no `.git`; that attach path is in `~/DATA/local-git/README.md`.
+`setup.sh` creates symlinks from `dotfiles/` into `~/.config/` and `~/`. Configs live in the repo and are linked, not copied. It is designed to be idempotent (safe to run many times). This is the main maintained workflow. Adding a new config means adding the file under `dotfiles/<app>/` and a `link SRC DEST` line in `setup.sh`. `link` moves a real file in the way to `DEST.bak-<time>` first. Every install or system change sits behind `ask` (no terminal = no), and installs skip what is present. On Omarchy, `setup.sh` leaves Omarchy's own configs alone: Hyprland, terminals, tmux, nvim, fontconfig. Agent preference files that contain no secrets and no machine paths live there too: Claude `settings.json` (primary and alt), Grok `config.toml` (primary and alt), Pi `settings.json`, and OpenCode `opencode.json`. Auth, session stores, and Codex `config.toml` stay in `$HOME`. Codex rewrites absolute paths and local plugin state into that file. It also recreates `~/g/<name>.git` aliases into `~/DATA/local-git` and adds a missing git remote `local` on cockpit-core / obsidian-personal / obsidian-work when those working trees already have `.git`. It does not `git init` a tree that has no `.git`; that attach path is in `~/DATA/local-git/README.md`.
 
 ### Script Organization (`scripts/`)
 Scripts are grouped by function: `admin/`, `devices/`, `media/`, `tiling-wm/`, `files/`, `pomodoro/`, `tool/`, `epam/`, etc. The wofi menu (`scripts/menu.sh`) provides a GUI launcher that recursively browses these directories. Per-directory `.menu_config` files control which scripts get a terminal (`SPAWN_TERMINAL=`) and which are hidden (`IGNORE=`).
@@ -72,7 +72,7 @@ Hyprland-specific utilities: monitor hotplug handling, wallpaper selection via w
 - All scripts use `#!/usr/bin/env bash` and typically `set -euxo pipefail` or `set -x`
 - Primary language is Bash; Python used sparingly for specialized tools (Spotify, weather, backup)
 - Hyprland is the primary WM; Sway configs exist as an alternative
-- Target platform is Arch Linux with pacman; legacy multi-distro setup support remains in the archived OS framework
+- `setup.sh` detects pacman, apt, or dnf, and Omarchy (`/usr/share/omarchy`). AUR packages go through `yay`. Legacy Arch-only setup remains in the archived OS framework
 - Config files follow each app's native format (Lua for nvim, JSON for waybar/vscode, INI-like for most others)
 
 

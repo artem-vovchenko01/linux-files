@@ -6,8 +6,9 @@
 # GROK_HOME is the root for everything Grok keeps per account: config.toml,
 # auth.json, sessions, rules. Pointing it at ~/.grok-alt keeps both accounts
 # logged in at once, so nothing has to be switched back afterwards. It is the
-# only path override Grok has, so sessions/ is symlinked back to the primary
-# home to keep `grok --resume` working across both accounts.
+# only path override Grok has, so sessions/ in both homes is a symlink into
+# ~/DATA/agentic-context (made by its link-contexts.sh), which keeps
+# `grok --resume` working across both accounts.
 # Documented in ~/.grok/docs/user-guide/05-configuration.md ("Paths").
 #
 # Usage:
@@ -21,9 +22,6 @@
 
 export GROK_HOME="$HOME/.grok-alt"
 mkdir -p "$GROK_HOME"
-
-. "$(dirname "$(readlink -f "$0")")/share-sessions.sh"
-share_sessions "$HOME/.grok" "$GROK_HOME" dir:sessions
 
 # XAI_API_KEY authenticates Grok on its own, ahead of the stored browser
 # login, so leaving it set would bill the key's account instead of the one

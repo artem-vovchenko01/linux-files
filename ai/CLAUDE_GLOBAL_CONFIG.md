@@ -1,6 +1,6 @@
 # Global agent instructions
 
-Every CLI agent on my machines loads this file: Claude Code
+These CLI agents load this file directly: Claude Code
 (`~/.claude/CLAUDE.md`, `~/.claude-alt/CLAUDE.md`), Codex
 (`~/.codex/AGENTS.md`, `~/.codex-alt/AGENTS.md`), and Grok CLI (through its
 Claude-compatibility scan of `~/.claude/`). All of them are symlinks to
@@ -11,6 +11,24 @@ in `~/linux-files/ai/global-instructions/<file>.md`. Open that file when the
 task touches the topic, and before you first do the thing it governs in a
 session (first recap, first PR, first side agent). The paragraph here is not
 a substitute for the file.
+
+## AI agents in my setup → `ai-agents.md`
+
+Many agents share my files. Locally: Claude Code, Codex, Grok CLI,
+OpenCode, Cursor agent CLI, Muse CLI, and Google Antigravity (`agy`), plus
+Cursor from the GUI. The local machine is usually `fedora`, but the OS may
+change; check, don't assume. Grok Bot runs on its own VMs under three
+accounts: one corporate (EPAM, only the work hub `obsidian-work`, no personal hubs) and two
+personal. I may use it from my phone, with or without the local machine
+reachable. Hermes and OpenClaw are retired: do not use them unless I ask.
+
+## Grok Bot → `grok-bot.md`
+
+Grok Bot works in a hub folder and may not load this file. Each hub's
+`AGENT_INSTRUCTIONS.md` tells it to read this file first. If its folder has
+no pointer (`GROK.md`), it creates one. Its own rules sit in `grok-bot.md`:
+read order, Telegram tasks and learning notes, and the facts it often
+misses. When a workflow changes, add it to that file's list, so bots learn it.
 
 ## Shell commands: one line, one terminal row
 
@@ -67,9 +85,11 @@ I want to learn from the work. End a reply with these sections when they
 apply, in this order: `## Commands run` (2+ meaningful commands),
 `## Systems touched` (services exercised in non-obvious ways),
 `## Infrastructure changes` (any state changed outside the repo),
-`## Teaching notes` (genuinely instructive insights), and `## Sources`
-(external sources the reply rests on). Read the file for the exact format
-before your first recap in a session.
+`## Teaching notes` (genuinely instructive insights), `## Explore it
+yourself and play around` (URLs and read-only commands I can use to see the
+result with my own eyes and experiment with it), and `## Sources` (external
+sources the reply rests on). Read the file for the exact format before your
+first recap in a session.
 
 ## Container runtime: podman or docker
 
@@ -109,11 +129,11 @@ yourself before acting on it.
 ## Alternate accounts → `alt-accounts.md`
 
 I keep a second account for each CLI: `claude-alt`, `codex-alt`, `grok-alt`
-(wrappers in `~/linux-files/scripts/ai/`). In Claude Code, side agents that
-would run on Opus run headless on the Pro account through `claude-alt -p`.
-Fable-grade agents stay native. Every report names each side agent, its
-model, and the account it billed. Login addresses are in gitignored
-`ai/private/account-emails.md`.
+(wrappers in `~/linux-files/scripts/ai/`). Both Claude accounts are Pro. In
+Claude Code, side agents that would run on Opus run headless on the second
+account through `claude-alt -p`; judgment-critical agents stay native.
+Every report names each side agent, its model, and the account it billed.
+`agent-quota claude` shows which address sits behind each account.
 
 ## Quota usage → skill `check-agent-quota-usage`
 
@@ -137,18 +157,51 @@ delegate.
 
 Agents can message each other through files: ask for a review, hand off a
 task ("this is hard, give it to Codex"), or leave a handoff when quota runs
-out. The mailbox lives where the work happens: `ai/agent-mailbox/` in
-cockpit-core, `.ai/agent-mailbox/` in any other repo or hub. Each piece of
-work gets a thread folder (`2026-09-22-short-slug/`), each agent has an
-inbox folder in it (`to-codex/`, `to-any/`), and each message is one
-time-stamped file. Use the `agent-mailbox` command (on PATH; no arguments
-prints usage), not hand-made files. The script itself is
-`~/cockpit-core/skills/agent-mailbox/mailbox.sh`.
+out. The mailbox lives where the work happens: `.ai/agent-mailbox/` at the
+top of the repo or hub. Each piece of work gets a thread folder
+(`2026-09-22-short-slug/`), each agent has an inbox folder in it
+(`to-codex/`, `to-any/`), and each message is one time-stamped file. Use the
+`agent-mailbox` command (on PATH; no arguments prints usage), not hand-made
+files. The script itself is `~/cockpit-core/skills/agent-mailbox/mailbox.sh`.
 
 Using the mailbox is optional. It becomes mandatory when I say so for a
 session (then write all handoffs, findings, and artifact pointers there) and
 when your quota reaches HANDOFF. When I point you at a mailbox thread, read
 its `THREAD.md` and your inbox before touching the transcript.
+
+## Agent sessions and memories → `~/DATA/agentic-context/README.md`
+
+Every agent's transcripts and auto-memory live in the Syncthing folder
+`~/DATA/agentic-context` (laptop and the two personal Grok Bot boxes, not
+the EPAM box). The usual home paths (`~/.claude/projects`,
+`~/.codex/sessions`, `~/.grok/sessions`, ...) are symlinks into it. Never
+replace those links with real directories. On a new machine, or after
+installing an agent, run `~/DATA/agentic-context/link-contexts.sh`.
+OpenCode and the Cursor editor database stay local by design.
+
+## Knowledge sources → `knowledge-sources.md`
+
+My context lives in three hubs: `~/obsidian/obsidian-personal` (personal
+knowledge: life, people, documents, learning), `~/cockpit-core` (machine and
+agent ops, shared skills library), and `~/obsidian/obsidian-work` (work, EPAM
+skills; an Obsidian vault since 2026-10-22, the Logseq graph
+`~/logseq/logseq-work` is a frozen archive). Write notes in the hub that
+owns the topic. Look in cockpit-core and obsidian-work for integration
+skills before you call an access missing. Work-only setups have only
+`obsidian-work`.
+
+## Integrations → `integrations.md`
+
+EPAM services go through `obsidian-work/.ai/epam/`. When I ask you to send me
+something or notify me on Telegram, send it through the bot
+`@my_assistant_grok_bot`, not my own account.
+
+The same bot is in my Telegram groups for AI productivity (`AI productivity`,
+with the task backlogs), AI-assisted learning (`AI assisted learning`),
+quick-capture tasks (`Productivity`), and learning notes (`Learning`). Every
+agent may use them when a task needs them: read first, post only when the
+task calls for it or I ask. The list and rules are in `integrations.md`.
+The skill `use-telegram` holds the full Telegram knowledge.
 
 ## Agent Comms and task boards (Notion) — shared by all of Artem's agents
 - Canonical protocol (single source of truth, versioned, has changelog): https://app.notion.com/p/3f381d29eb8a81afa350ef03167b6471 ("Agent Comms"). If anything here disagrees with that page, the page wins. The system evolves: at the start of each session check its version; if newer than you remember, re-read it.

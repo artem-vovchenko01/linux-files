@@ -1,14 +1,119 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 
+# Safe to re-run on any distro: links are refreshed, a real file in the way
+# is moved aside first, installs skip what is present, and every step that
+# installs software or changes the system asks first. No answer means no.
+
+if (( EUID == 0 )); then
+	echo "Run setup.sh as your user, not root. It calls sudo where needed." >&2
+	exit 1
+fi
+LF=~/linux-files
+if [ ! -d "$LF/dotfiles" ]; then
+	echo "Clone this repo to $LF first: every link points there." >&2
+	exit 1
+fi
+
 DATA_DIR=/mnt/data/data
+
+# Find tools that user-level installers put outside the default PATH.
+PATH=~/.local/bin:~/.grok/bin:~/.opencode/bin:~/.npm-global/bin:$PATH
+
+# Omarchy 4 ships as a package under /usr/share/omarchy; 3.x lived in
+# ~/.local/share/omarchy. Omarchy owns its desktop, terminal and editor
+# configs, so setup.sh leaves those alone there.
+IS_OMARCHY=false
+if [ -d /usr/share/omarchy ] || [ -d ~/.local/share/omarchy ]; then
+	IS_OMARCHY=true
+fi
+echo "Omarchy: $IS_OMARCHY"
+
+############################################
+# HELPERS
+############################################
+
+# ask QUESTION: true on y/yes. Without a terminal the answer is no.
+ask() {
+	local ans=""
+	if [ -t 0 ]; then
+		read -r -p "$1 [y/N]: " ans || true
+	fi
+	case "${ans,,}" in
+		y|yes) return 0 ;;
+		*) return 1 ;;
+	esac
+}
+
+# link SRC DEST: point DEST at SRC. A real file or directory at DEST is
+# renamed to DEST.bak-<time> first. A missing SRC leaves DEST alone, so a
+# partial sync can't leave a dangling link.
+link() {
+	local src=$1
+	local dest=$2
+	if [ ! -e "$src" ]; then
+		echo "Missing $src; leaving $dest unchanged."
+		return 0
+	fi
+	mkdir -p "$(dirname "$dest")"
+	if [ -e "$dest" ] && [ ! -L "$dest" ]; then
+		mv -v "$dest" "$dest.bak-$(date +%Y%m%d%H%M%S)"
+	fi
+	ln -sfn "$src" "$dest"
+}
+
+# run_installer URL [INTERPRETER] [ARGS...]: run a vendor's install script.
+# The whole script is downloaded before it runs, never a truncated one.
+run_installer() {
+	local url=$1
+	local interp=${2:-bash}
+	local tmp
+	tmp=$(mktemp)
+	curl -fsSL "$url" -o "$tmp"
+	"$interp" "$tmp" "${@:3}"
+	rm -f "$tmp"
+}
+
+# have_app CMD NAME: CMD is on PATH or ~/Applications holds a NAME*.AppImage.
+have_app() {
+	command -v "$1" &>/dev/null || compgen -G ~/Applications/"$2"'*.AppImage' >/dev/null
+}
+
+# fetch_appimage URL NAME: download to ~/Applications/NAME.AppImage once.
+fetch_appimage() {
+	local dest=~/Applications/$2.AppImage
+	if have_app "$2" "$2"; then
+		echo "Already present: $2"
+		return 0
+	fi
+	mkdir -p ~/Applications
+	curl -fSL "$1" -o "$dest.part"
+	chmod +x "$dest.part"
+	mv "$dest.part" "$dest"
+}
 
 ############################################
 # PACKAGE MANAGER DETECTION
 ############################################
 if command -v pacman &>/dev/null; then
 	PKG_MGR=pacman
-	pkg_install() { sudo pacman -Sy "$@"; }
+	# Plain -S with --needed, like Omarchy's own pkg-add: -Sy without -u
+	# risks a partial upgrade. Names the repos don't know are skipped, the
+	# same as dnf --skip-unavailable.
+	pkg_install() {
+		local pkg
+		local known=()
+		for pkg in "$@"; do
+			if pacman -Si "$pkg" &>/dev/null; then
+				known+=("$pkg")
+			else
+				echo "Not in the repos, skipped: $pkg"
+			fi
+		done
+		if (( ${#known[@]} > 0 )); then
+			sudo pacman -S --needed "${known[@]}"
+		fi
+	}
 elif command -v apt &>/dev/null; then
 	PKG_MGR=apt
 	pkg_install() { sudo apt update && sudo apt install -y "$@"; }
@@ -59,6 +164,22 @@ pkg_ensure_installed() {
 	fi
 }
 
+# AUR packages go through yay, which Omarchy ships.
+aur_ensure_installed() {
+	local missing=()
+	local pkg
+	if ! command -v yay &>/dev/null; then
+		echo "yay not found. Install from the AUR by hand: $*"
+		return 0
+	fi
+	for pkg in "$@"; do
+		pkg_is_installed "$pkg" || missing+=("$pkg")
+	done
+	if (( ${#missing[@]} > 0 )); then
+		yay -S --needed "${missing[@]}"
+	fi
+}
+
 install_root_file() {
 	local src="$1"
 	local dst="$2"
@@ -72,40 +193,25 @@ install_root_file() {
 ############################################
 
 # Shell
-ln -sf ~/linux-files/dotfiles/bash/.shrc.part ~/.shrc.part.sh
-grep .shrc.part.sh ~/.bashrc || echo "source ~/.shrc.part.sh" >> ~/.bashrc
+link "$LF/dotfiles/bash/.shrc.part" ~/.shrc.part.sh
+grep -qF .shrc.part.sh ~/.bashrc || echo "source ~/.shrc.part.sh" >> ~/.bashrc
 
 # Claude Code Router plugin (adds the OpenCode Go session header)
-mkdir -vp ~/.claude-code-router/plugins
-ln -sf ~/linux-files/dotfiles/claude-code-router/plugins/opencode-session.js ~/.claude-code-router/plugins/opencode-session.js
+link "$LF/dotfiles/claude-code-router/plugins/opencode-session.js" ~/.claude-code-router/plugins/opencode-session.js
 
 # SSH
-mkdir -vp ~/.ssh
-ln -sf ~/linux-files/dotfiles/ssh/.ssh/config ~/.ssh/config
-
-# Hyprland
-mkdir -vp ~/.config/hypr
-ln -sf ~/linux-files/dotfiles/hyprland/hyprland.conf ~/.config/hypr/hyprland.conf
-ln -sf ~/linux-files/dotfiles/hyprland/hypridle.conf ~/.config/hypr/hypridle.conf
-ln -sf ~/linux-files/dotfiles/hyprland/hyprpaper.conf ~/.config/hypr/hyprpaper.conf
-
-# Mako
-mkdir -vp ~/.config/mako
-ln -sf ~/linux-files/dotfiles/mako/.config/mako/config ~/.config/mako/config
-
-# Dunst
-mkdir -vp ~/.config/dunst
-ln -sf ~/linux-files/dotfiles/dunst/dunstrc ~/.config/dunst/dunstrc
-
-# Lunarvim
-mkdir -vp ~/.config/lvim
-ln -sf ~/linux-files/dotfiles/lunarvim/.config/lvim/config.lua ~/.config/lvim/config.lua
-
-# Neovim
-ln -sfn ~/linux-files/dotfiles/nvim/.config/nvim ~/.config/nvim
+link "$LF/dotfiles/ssh/.ssh/config" ~/.ssh/config
 
 # Git
-ln -sf ~/linux-files/dotfiles/git/.gitconfig ~/.gitconfig
+link "$LF/dotfiles/git/.gitconfig" ~/.gitconfig
+# ~/.gitconfig includes ~/.gitconfig-work: work email and EPAM Azure DevOps
+# tenants. It stays out of this public repo, in the synced work-resources.
+GIT_WORK=~/DATA/work-resources/GENERAL/gitconfig-work
+if [ -f "$GIT_WORK" ]; then
+	link "$GIT_WORK" ~/.gitconfig-work
+else
+	echo "WARNING: $GIT_WORK not synced yet; git has no work identity."
+fi
 
 # Git credential helper: ~/.gitconfig sets `credential.helper = libsecret` so
 # HTTPS credentials land in the Secret Service keyring (gnome-keyring/KWallet)
@@ -128,34 +234,44 @@ if [ ! -x "$(git --exec-path)/git-credential-libsecret" ] && ! command -v git-cr
 	echo "  sudo make -C /usr/share/doc/git/contrib/credential/libsecret"
 fi
 
-# Wofi
-mkdir -vp ~/.config/wofi
-ln -sf ~/linux-files/dotfiles/wofi/.config/wofi/config ~/.config/wofi/config
-ln -sf ~/linux-files/dotfiles/wofi/.config/wofi/config-app ~/.config/wofi/config-app
-ln -sf ~/linux-files/dotfiles/wofi/.config/wofi/config-wallpapers ~/.config/wofi/config-wallpapers
-ln -sf ~/linux-files/dotfiles/wofi/.config/wofi/style.css ~/.config/wofi/style.css
-
-# Waybar
-mkdir -vp ~/.config/waybar
-ln -sf ~/linux-files/dotfiles/waybar/.config/waybar/config.jsonc ~/.config/waybar/config.jsonc
-ln -sf ~/linux-files/dotfiles/waybar/.config/waybar/style.css ~/.config/waybar/style.css
+# Lunarvim
+link "$LF/dotfiles/lunarvim/.config/lvim/config.lua" ~/.config/lvim/config.lua
 
 # lf
-mkdir -p ~/.config/lf
-ln -sf ~/linux-files/dotfiles/lf/.config/lf/lfrc ~/.config/lf/lfrc
+link "$LF/dotfiles/lf/.config/lf/lfrc" ~/.config/lf/lfrc
 
-# Kitty
-mkdir -p ~/.config/kitty
-ln -sf ~/linux-files/dotfiles/kitty/.config/kitty/kitty.conf ~/.config/kitty/kitty.conf
+# VSCode
+for app in "Code - OSS" Code Cursor; do
+	link "$LF/dotfiles/code/settings.json" ~/.config/"$app"/User/settings.json
+	link "$LF/dotfiles/code/keybindings.json" ~/.config/"$app"/User/keybindings.json
+done
 
-# Foot
-mkdir -p ~/.config/foot
-ln -sf ~/linux-files/dotfiles/foot/.config/foot/foot.ini ~/.config/foot/foot.ini
+if $IS_OMARCHY; then
+	echo "Omarchy: keeping its Hyprland, terminal, tmux, nvim and font configs."
+else
+	# Hyprland desktop (Omarchy 4 has its own: Lua config + Quickshell)
+	link "$LF/dotfiles/hyprland/hyprland.conf" ~/.config/hypr/hyprland.conf
+	link "$LF/dotfiles/hyprland/hypridle.conf" ~/.config/hypr/hypridle.conf
+	link "$LF/dotfiles/hyprland/hyprpaper.conf" ~/.config/hypr/hyprpaper.conf
+	link "$LF/dotfiles/mako/.config/mako/config" ~/.config/mako/config
+	link "$LF/dotfiles/dunst/dunstrc" ~/.config/dunst/dunstrc
+	for f in config config-app config-wallpapers style.css; do
+		link "$LF/dotfiles/wofi/.config/wofi/$f" ~/.config/wofi/$f
+	done
+	link "$LF/dotfiles/waybar/.config/waybar/config.jsonc" ~/.config/waybar/config.jsonc
+	link "$LF/dotfiles/waybar/.config/waybar/style.css" ~/.config/waybar/style.css
+
+	# Terminals, tmux and Neovim (Omarchy themes its own copies)
+	link "$LF/dotfiles/kitty/.config/kitty/kitty.conf" ~/.config/kitty/kitty.conf
+	link "$LF/dotfiles/foot/.config/foot/foot.ini" ~/.config/foot/foot.ini
+	link "$LF/dotfiles/tmux/tmux.conf" ~/.tmux.conf
+	link "$LF/dotfiles/nvim/.config/nvim" ~/.config/nvim
+fi
 
 # Ptyxis (Fedora default terminal): settings live in dconf, not a file, so we
 # write the 10M-line scrollback into the default profile instead of symlinking.
-if command -v dconf >/dev/null; then
-  PTYXIS_UUID=$(dconf read /org/gnome/Ptyxis/default-profile-uuid | tr -d "'")
+if command -v ptyxis >/dev/null && command -v dconf >/dev/null; then
+  PTYXIS_UUID=$(dconf read /org/gnome/Ptyxis/default-profile-uuid | tr -d "'" || true)
   if [ -n "$PTYXIS_UUID" ]; then
     PTYXIS_P=/org/gnome/Ptyxis/Profiles/$PTYXIS_UUID/
     dconf write "${PTYXIS_P}limit-scrollback" true
@@ -163,27 +279,19 @@ if command -v dconf >/dev/null; then
   fi
 fi
 
-# VSCode
-mkdir -p ~/.config/{"Code - OSS",Code,Cursor}/User/
-ln -sf ~/linux-files/dotfiles/code/settings.json ~/.config/"Code - OSS"/User/settings.json
-ln -sf ~/linux-files/dotfiles/code/keybindings.json ~/.config/"Code - OSS"/User/keybindings.json
-ln -sf ~/linux-files/dotfiles/code/settings.json ~/.config/Code/User/settings.json
-ln -sf ~/linux-files/dotfiles/code/keybindings.json ~/.config/Code/User/keybindings.json
-ln -sf ~/linux-files/dotfiles/code/settings.json ~/.config/Cursor/User/settings.json
-ln -sf ~/linux-files/dotfiles/code/keybindings.json ~/.config/Cursor/User/keybindings.json
-
-# Tmux
-ln -sf ~/linux-files/dotfiles/tmux/tmux.conf ~/.tmux.conf
-
 # Syncthing (config + device keys live in ~/DATA/IT, database stays local)
 # config.xml is NOT symlinked: Syncthing rewrites it via atomic rename, which
 # replaces a symlink with a real file. Instead we point its config dir
 # (STCONFDIR) at ~/DATA/IT via a systemd drop-in and keep the database
 # (STDATADIR) on local storage. On a fresh machine the config + device identity
-# can also be restored from a backup left on the HDD (see syncthing-config-backup).
+# can also be restored from a backup left on the HDD (see syncthing-config-backup)
+# or from the encrypted restore kit (bootstrap.sh unpacks it into ~/DATA).
 mkdir -vp ~/DATA
+if ! command -v syncthing &>/dev/null && ask "Install Syncthing now (needed to restore it)?"; then
+	pkg_ensure_installed syncthing
+fi
 SYNCTHING_SRC=~/DATA/IT/configs/syncthing
-SYNCTHING_DROPIN=~/linux-files/systemd-units/syncthing.service.d/override.conf
+SYNCTHING_DROPIN=$LF/systemd-units/syncthing.service.d/override.conf
 SYNCTHING_BACKUP_NAME=syncthing-config-backup
 
 # Look for a config backup on any mounted HDD partition.
@@ -196,21 +304,25 @@ for m in /run/media/"$USER"/*/; do
 done
 
 apply_syncthing_redirect() {
+	local current
+	current=$(readlink ~/.config/systemd/user/syncthing.service.d/override.conf || true)
+	if [ "$current" = "$SYNCTHING_DROPIN" ]; then
+		echo "Syncthing already reads its config from $SYNCTHING_SRC."
+		return
+	fi
 	# Don't silently shadow a different identity already in the default location.
 	for d in ~/.local/state/syncthing ~/.config/syncthing; do
 		if [ -f "$d/config.xml" ]; then
 			echo "Existing Syncthing identity at $d would be shadowed by ~/DATA/IT."
-			read -r -p "Repoint Syncthing config to ~/DATA/IT and restart? [y/N]: " ans
-			case "${ans,,}" in
-				y|yes) ;;
-				*) echo "Left Syncthing untouched."; return ;;
-			esac
+			if ! ask "Repoint Syncthing config to ~/DATA/IT and restart?"; then
+				echo "Left Syncthing untouched."
+				return
+			fi
 			break
 		fi
 	done
 	systemctl --user stop syncthing 2>/dev/null || true
-	mkdir -vp ~/.config/systemd/user/syncthing.service.d
-	ln -sfv "$SYNCTHING_DROPIN" ~/.config/systemd/user/syncthing.service.d/override.conf
+	link "$SYNCTHING_DROPIN" ~/.config/systemd/user/syncthing.service.d/override.conf
 	systemctl --user daemon-reload
 	systemctl --user enable --now syncthing 2>/dev/null || true
 	echo "Syncthing config dir set to $SYNCTHING_SRC; service (re)started."
@@ -232,7 +344,7 @@ if [ -f "$SYNCTHING_DROPIN" ]; then
 		apply_syncthing_redirect
 	else
 		echo "Syncthing: backup not found — no HDD backup ($SYNCTHING_BACKUP_NAME) and no synced ~/DATA/IT."
-		echo "          Install syncthing, let the IT folder sync (or plug in the HDD backup), then re-run."
+		echo "          Run bootstrap.sh with the restore kit, or plug in the HDD backup, then re-run."
 	fi
 fi
 
@@ -241,14 +353,16 @@ fi
 # PACKAGES
 ############################################
 # Common packages (same name across distros)
-PACKAGES_COMMON="less git git-delta vifm neovim zoxide fzf direnv kitty foot imv nemo thunar tumbler ffmpegthumbnailer file-roller thunar-archive-plugin zip unzip gedit zathura tealdeer man-db syncthing htop btop"
+PACKAGES_COMMON="less git jq git-delta vifm neovim zoxide fzf direnv kitty foot imv nemo thunar tumbler ffmpegthumbnailer file-roller thunar-archive-plugin zip unzip gedit zathura tldr man-db syncthing htop btop"
 # thunar-archive-plugin - for enabling archiving options in thunar
 # tumbler ffmpegthumbnailer file-roller - for making thumbnails in thunar work
+# tldr, not tealdeer: Omarchy ships tldr and the two conflict on Arch.
 
 # Distro-specific packages (different names across distros)
 case "$PKG_MGR" in
 	pacman)
-		PACKAGES_DISTRO="pacman-contrib libnotify otf-font-awesome inetutils libgsf zathura-pdf-mupdf tesseract-data-eng man-pages starship"
+		# fuse2: type-2 AppImages link against the FUSE 2 ABI (libfuse.so.2).
+		PACKAGES_DISTRO="pacman-contrib libnotify otf-font-awesome inetutils libgsf zathura-pdf-mupdf tesseract-data-eng man-pages starship fuse2"
 		;;
 	apt)
 		PACKAGES_DISTRO="libnotify-bin fonts-font-awesome inetutils-tools libgsf-1-common zathura-pdf-poppler tesseract-ocr-eng man"
@@ -268,43 +382,32 @@ case "$PKG_MGR" in
 		;;
 esac
 PACKAGES="$PACKAGES_COMMON $PACKAGES_DISTRO"
-if [[ -n "$PACKAGES" ]]; then
-	echo "$PACKAGES"
-	read -r -p "Install the above packages? [y/N]: " ans
-	case "${ans,,}" in
-	  y|yes)
-	    pkg_install $PACKAGES
-	    ;;
-	  *)
-	    echo "Cancelled."
-	    ;;
-	esac
+echo "$PACKAGES"
+if ask "Install the above packages?"; then
+	pkg_install $PACKAGES
 fi
 
 ############################################
 # HYPRLAND PACKAGES
 ############################################
-HYPR_COMMON="brightnessctl wob grim slurp waybar socat cliphist blueman"
-case "$PKG_MGR" in
-	pacman)  HYPR_DISTRO="wl-clipboard hyprpaper hypridle" ;;
-	apt)     HYPR_DISTRO="wl-clipboard" ;;
-	# Fedora: hyprpaper/hypridle aren't in the main repos — enable COPR
-	# solopasha/hyprland (or use swaybg/swayidle) if you want them.
-	dnf)     HYPR_DISTRO="wl-clipboard" ;;
-	zypper)  HYPR_DISTRO="wl-clipboard" ;;
-	*)       HYPR_DISTRO="" ;;
-esac
-HYPR_PACKAGES="$HYPR_COMMON $HYPR_DISTRO"
-echo "$HYPR_PACKAGES"
-read -r -p "Install Hyprland packages? [y/N]: " ans
-case "${ans,,}" in
-  y|yes)
-    pkg_install $HYPR_PACKAGES
-    ;;
-  *)
-    echo "Cancelled."
-    ;;
-esac
+# Tools for the hand-made Hyprland desktop. Omarchy brings its own shell.
+if ! $IS_OMARCHY; then
+	HYPR_COMMON="brightnessctl wob grim slurp waybar socat cliphist blueman"
+	case "$PKG_MGR" in
+		pacman)  HYPR_DISTRO="wl-clipboard hyprpaper hypridle" ;;
+		apt)     HYPR_DISTRO="wl-clipboard" ;;
+		# Fedora: hyprpaper/hypridle aren't in the main repos — enable COPR
+		# solopasha/hyprland (or use swaybg/swayidle) if you want them.
+		dnf)     HYPR_DISTRO="wl-clipboard" ;;
+		zypper)  HYPR_DISTRO="wl-clipboard" ;;
+		*)       HYPR_DISTRO="" ;;
+	esac
+	HYPR_PACKAGES="$HYPR_COMMON $HYPR_DISTRO"
+	echo "$HYPR_PACKAGES"
+	if ask "Install Hyprland packages?"; then
+		pkg_install $HYPR_PACKAGES
+	fi
+fi
 
 ############################################
 # FONTS
@@ -316,65 +419,84 @@ case "$PKG_MGR" in
 	zypper)  FONT_PACKAGES="google-noto-sans-fonts google-noto-coloremoji-fonts" ;;
 	*)       FONT_PACKAGES="" ;;
 esac
-read -r -p "Install fonts? [y/N]: " ans
-case "${ans,,}" in
-  y|yes)
-    if [[ -n "$FONT_PACKAGES" ]]; then
-      pkg_install $FONT_PACKAGES
-    else
-      echo "Unknown package manager — install fonts manually."
-    fi
-    # Nerd Font for lvim/terminal/waybar icons. pacman ships ttf-hack-nerd;
-    # other distros don't package it, so fetch it into the user font dir.
-    if ! fc-list | grep -qi "Hack Nerd"; then
-      NERD_DIR=~/.local/share/fonts/HackNerd
-      mkdir -vp "$NERD_DIR"
-      NERD_URL=https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Hack.zip
-      curl -fsSL "$NERD_URL" -o /tmp/Hack.zip
-      unzip -o /tmp/Hack.zip -d "$NERD_DIR"
-      rm -f /tmp/Hack.zip
-    fi
-    mkdir -vp ~/.config/fontconfig
-    ln -sf ~/linux-files/dotfiles/fontconfig/.config/fontconfig/fonts.conf ~/.config/fontconfig/fonts.conf
-    fc-cache -fv
-    fc-match sans-serif
-    fc-match system-ui
-    fc-match monospace
-    ;;
-  *)
-    echo "Cancelled."
-    ;;
-esac
+if ask "Install fonts?"; then
+	if [[ -n "$FONT_PACKAGES" ]]; then
+		pkg_install $FONT_PACKAGES
+	else
+		echo "Unknown package manager — install fonts manually."
+	fi
+	# Nerd Font for lvim/terminal/waybar icons. pacman ships ttf-hack-nerd;
+	# other distros don't package it, so fetch it into the user font dir.
+	if ! fc-list | grep -qi "Hack Nerd"; then
+		NERD_DIR=~/.local/share/fonts/HackNerd
+		NERD_ZIP=$(mktemp)
+		mkdir -vp "$NERD_DIR"
+		NERD_URL=https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Hack.zip
+		curl -fsSL "$NERD_URL" -o "$NERD_ZIP"
+		unzip -o "$NERD_ZIP" -d "$NERD_DIR"
+		rm -f "$NERD_ZIP"
+	fi
+	# omarchy-font-set rewrites ~/.config/fontconfig/fonts.conf, which would
+	# write through a link into this repo.
+	if ! $IS_OMARCHY; then
+		link "$LF/dotfiles/fontconfig/.config/fontconfig/fonts.conf" ~/.config/fontconfig/fonts.conf
+	fi
+	fc-cache -fv
+	fc-match sans-serif
+	fc-match system-ui
+	fc-match monospace
+fi
+
+############################################
+# FIREWALL (ufw: Omarchy and other Arch setups)
+############################################
+# Omarchy blocks all incoming traffic except LocalSend. Each opening asks
+# first. Fedora uses firewalld, which this script doesn't touch.
+if command -v ufw &>/dev/null; then
+	if ask "Firewall: allow Syncthing from private networks only (22000, 21027/udp)?"; then
+		for net in 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16; do
+			sudo ufw allow from "$net" to any port 22000 proto tcp comment syncthing
+			sudo ufw allow from "$net" to any port 22000 proto udp comment syncthing
+			sudo ufw allow from "$net" to any port 21027 proto udp comment syncthing-discovery
+		done
+	fi
+	if ask "Firewall: allow all incoming on tailscale0 (VM VNC/RDP, ssh over the tailnet)?"; then
+		sudo ufw allow in on tailscale0 comment tailscale
+	fi
+	if ask "Enable the ssh server and open 22/tcp (rate-limited)?"; then
+		if command -v omarchy-setup-security-sshd &>/dev/null; then
+			omarchy-setup-security-sshd
+		else
+			pkg_ensure_installed openssh
+			sudo systemctl enable --now sshd.service
+			sudo ufw limit 22/tcp comment ssh
+		fi
+	fi
+fi
 
 ############################################
 # OOM KILLER
 ############################################
-read -r -p "Configure oom killer? [y/N]: " ans
-case "${ans,,}" in
-  y|yes)
-    case "$PKG_MGR" in
-      pacman|apt|dnf)
-        pkg_ensure_installed earlyoom
-        ;;
-      *)
-        echo "earlyoom package installation is not configured for $PKG_MGR. Install it manually."
-        ;;
-    esac
+if ask "Configure oom killer?"; then
+	case "$PKG_MGR" in
+		pacman|apt|dnf)
+			pkg_ensure_installed earlyoom
+			;;
+		*)
+			echo "earlyoom package installation is not configured for $PKG_MGR. Install it manually."
+			;;
+	esac
 
-    if command -v systemctl &>/dev/null; then
-      install_root_file ~/linux-files/system-config/earlyoom/etc/default/earlyoom /etc/default/earlyoom
-      install_root_file ~/linux-files/system-config/earlyoom/etc/systemd/system/earlyoom.service.d/override.conf /etc/systemd/system/earlyoom.service.d/override.conf
-      sudo systemctl daemon-reload
-      sudo systemctl enable --now earlyoom
-      sudo systemctl restart earlyoom
-    else
-      echo "systemctl not found; skipping service activation."
-    fi
-    ;;
-  *)
-    echo "Cancelled."
-    ;;
-esac
+	if command -v systemctl &>/dev/null; then
+		install_root_file "$LF/system-config/earlyoom/etc/default/earlyoom" /etc/default/earlyoom
+		install_root_file "$LF/system-config/earlyoom/etc/systemd/system/earlyoom.service.d/override.conf" /etc/systemd/system/earlyoom.service.d/override.conf
+		sudo systemctl daemon-reload
+		sudo systemctl enable --now earlyoom
+		sudo systemctl restart earlyoom
+	else
+		echo "systemctl not found; skipping service activation."
+	fi
+fi
 
 ############################################
 # APPIMAGELAUNCHER
@@ -383,64 +505,58 @@ esac
 # unconditionally so other tooling can rely on it.
 mkdir -vp ~/Applications
 
-read -r -p "Install AppImageLauncher? [y/N]: " ans
-case "${ans,,}" in
-  y|yes)
-    # Release asset names carry a build hash, so resolve the x86_64 AppImage
-    # URL from the latest release at runtime instead of hardcoding it.
-    AIL_API="https://api.github.com/repos/TheAssassin/AppImageLauncher/releases/latest"
-    AIL_GREP='https://[^"]*-lite-[^"]*x86_64.AppImage'
-    AIL_JSON=$(curl -fsSL "$AIL_API")
-    AIL_URL=$(printf '%s' "$AIL_JSON" | grep -m1 -o "$AIL_GREP")
-    if [[ -n "$AIL_URL" ]]; then
-      AIL_DEST=~/Applications/AppImageLauncher.AppImage
-      curl -fSL "$AIL_URL" -o "$AIL_DEST"
-      chmod +x "$AIL_DEST"
-      echo "Downloaded AppImageLauncher to $AIL_DEST"
-      # The lite AppImage integrates itself (binfmt hook + desktop entry) via
-      # its `install` subcommand; ~/.local/lib/appimagelauncher-lite marks it
-      # done, so skip the step when re-running setup.sh.
-      if [ -d ~/.local/lib/appimagelauncher-lite ]; then
-        echo "AppImageLauncher already integrated; skipping install."
-      else
-        "$AIL_DEST" install
-      fi
-    else
-      echo "Could not find AppImageLauncher AppImage asset; install manually."
-    fi
-    ;;
-  *)
-    echo "Cancelled."
-    ;;
-esac
+if ask "Install AppImageLauncher?"; then
+	AIL_DEST=~/Applications/AppImageLauncher.AppImage
+	if [ ! -e "$AIL_DEST" ]; then
+		# Release asset names carry a build hash, so resolve the x86_64 AppImage
+		# URL from the latest release at runtime instead of hardcoding it.
+		AIL_API="https://api.github.com/repos/TheAssassin/AppImageLauncher/releases/latest"
+		AIL_GREP='https://[^"]*-lite-[^"]*x86_64.AppImage'
+		AIL_URL=$(curl -fsSL "$AIL_API" | grep -m1 -o "$AIL_GREP" || true)
+		if [[ -n "$AIL_URL" ]]; then
+			curl -fSL "$AIL_URL" -o "$AIL_DEST"
+			chmod +x "$AIL_DEST"
+			echo "Downloaded AppImageLauncher to $AIL_DEST"
+		else
+			echo "Could not find AppImageLauncher AppImage asset; install manually."
+		fi
+	fi
+	# The lite AppImage integrates itself (binfmt hook + desktop entry) via
+	# its `install` subcommand; ~/.local/lib/appimagelauncher-lite marks it
+	# done, so skip the step when re-running setup.sh.
+	if [ -d ~/.local/lib/appimagelauncher-lite ]; then
+		echo "AppImageLauncher already integrated; skipping install."
+	elif [ -x "$AIL_DEST" ]; then
+		"$AIL_DEST" install
+	fi
+fi
 
 ############################################
 # JESSEDUFFIELD TUIS (lazygit, lazydocker)
 ############################################
-read -r -p "Install latest lazygit & lazydocker? [y/N]: " ans
-case "${ans,,}" in
-  y|yes)
-    mkdir -vp ~/.local/bin
-    # Resolve each release's x86_64 Linux tarball URL at runtime so versions
-    # aren't hardcoded. grep -i because the two repos disagree on casing
-    # (lazydocker uses Linux_x86_64, lazygit uses linux_x86_64).
-    for tool in lazygit lazydocker; do
-      api="https://api.github.com/repos/jesseduffield/$tool/releases/latest"
-      url=$(curl -fsSL "$api" | grep -m1 -io 'https://[^"]*linux_x86_64.tar.gz')
-      if [[ -n "$url" ]]; then
-        curl -fSL "$url" -o /tmp/$tool.tar.gz
-        tar -xzf /tmp/$tool.tar.gz -C ~/.local/bin "$tool"
-        rm -f /tmp/$tool.tar.gz
-        echo "Installed $tool to ~/.local/bin/$tool"
-      else
-        echo "Could not find $tool release asset; install manually."
-      fi
-    done
-    ;;
-  *)
-    echo "Cancelled."
-    ;;
-esac
+if ask "Install latest lazygit & lazydocker?"; then
+	if [ "$PKG_MGR" = pacman ]; then
+		pkg_ensure_installed lazygit lazydocker
+	else
+		mkdir -vp ~/.local/bin
+		# Resolve each release's x86_64 Linux tarball URL at runtime so versions
+		# aren't hardcoded. grep -i because the two repos disagree on casing
+		# (lazydocker uses Linux_x86_64, lazygit uses linux_x86_64).
+		for tool in lazygit lazydocker; do
+			api="https://api.github.com/repos/jesseduffield/$tool/releases/latest"
+			url=$(curl -fsSL "$api" | grep -m1 -io 'https://[^"]*linux_x86_64.tar.gz' || true)
+			if [[ -n "$url" ]]; then
+				tarball=$(mktemp)
+				curl -fSL "$url" -o "$tarball"
+				tar -xzf "$tarball" -C ~/.local/bin "$tool"
+				rm -f "$tarball"
+				echo "Installed $tool to ~/.local/bin/$tool"
+			else
+				echo "Could not find $tool release asset; install manually."
+			fi
+		done
+	fi
+fi
 
 ############################################
 # GIT CREDENTIAL MANAGER (Azure DevOps / EPAM)
@@ -452,41 +568,249 @@ esac
 # libs must sit beside the binary, hence the symlink (not a copied binary).
 # EPAM Azure DevOps over HTTPS only. Repo lives under git-ecosystem, not microsoft.
 if ! command -v git-credential-manager &>/dev/null; then
-  read -r -p "Install Git Credential Manager (Azure DevOps auth)? [y/N]: " ans
-  case "${ans,,}" in
-    y|yes)
-      GCM_API="https://api.github.com/repos/git-ecosystem/git-credential-manager/releases/latest"
-      GCM_GREP='https://[^"]*gcm-linux-x64[^"]*\.tar\.gz'
-      GCM_URL=$(curl -fsSL "$GCM_API" | grep -o "$GCM_GREP" | grep -v symbols | head -1)
-      if [[ -n "$GCM_URL" ]]; then
-        GCM_DIR=~/.local/share/git-credential-manager
-        mkdir -vp "$GCM_DIR" ~/.local/bin
-        curl -fSL "$GCM_URL" -o /tmp/gcm.tar.gz
-        tar -xzf /tmp/gcm.tar.gz -C "$GCM_DIR"
-        rm -f /tmp/gcm.tar.gz
-        ln -sf "$GCM_DIR/git-credential-manager" ~/.local/bin/git-credential-manager
-      else
-        echo "Could not resolve GCM tarball asset; install manually."
-      fi
-      ;;
-    *)
-      echo "Skipped GCM; Azure DevOps over HTTPS will prompt until installed."
-      ;;
-  esac
+	if ask "Install Git Credential Manager (Azure DevOps auth)?"; then
+		GCM_API="https://api.github.com/repos/git-ecosystem/git-credential-manager/releases/latest"
+		GCM_GREP='https://[^"]*gcm-linux-x64[^"]*\.tar\.gz'
+		GCM_URL=$(curl -fsSL "$GCM_API" | grep -o "$GCM_GREP" | grep -v symbols | head -1 || true)
+		if [[ -n "$GCM_URL" ]]; then
+			GCM_DIR=~/.local/share/git-credential-manager
+			GCM_TAR=$(mktemp)
+			mkdir -vp "$GCM_DIR" ~/.local/bin
+			curl -fSL "$GCM_URL" -o "$GCM_TAR"
+			tar -xzf "$GCM_TAR" -C "$GCM_DIR"
+			rm -f "$GCM_TAR"
+			ln -sf "$GCM_DIR/git-credential-manager" ~/.local/bin/git-credential-manager
+		else
+			echo "Could not resolve GCM tarball asset; install manually."
+		fi
+	else
+		echo "Skipped GCM; Azure DevOps over HTTPS will prompt until installed."
+	fi
 fi
 
 ############################################
-# GNOME KEYBOARD SHORTCUTS (Fedora)
+# DESKTOP APPS
 ############################################
-# Fedora ships GNOME by default, so apply the custom gsettings keybindings.
+# Google Chrome also runs the shared EPAM profile (epam-chrome.service).
+if ! command -v google-chrome-stable &>/dev/null && ask "Install Google Chrome?"; then
+	case "$PKG_MGR" in
+		pacman)
+			aur_ensure_installed google-chrome
+			;;
+		dnf)
+			# Fedora ships the repo file disabled in fedora-workstation-repositories.
+			pkg_ensure_installed fedora-workstation-repositories
+			sudo dnf config-manager setopt google-chrome.enabled=1
+			pkg_ensure_installed google-chrome-stable
+			;;
+		*)
+			echo "Install Chrome from https://www.google.com/chrome/"
+			;;
+	esac
+fi
+
+if ask "Install OnlyOffice and OBS Studio?"; then
+	case "$PKG_MGR" in
+		pacman)
+			aur_ensure_installed onlyoffice-bin
+			pkg_ensure_installed obs-studio
+			;;
+		dnf)
+			if ! pkg_is_installed onlyoffice-repo; then
+				pkg_install https://download.onlyoffice.com/repo/centos/main/noarch/onlyoffice-repo.noarch.rpm
+			fi
+			pkg_ensure_installed onlyoffice-desktopeditors obs-studio
+			;;
+		*)
+			pkg_ensure_installed obs-studio
+			echo "Install OnlyOffice from https://www.onlyoffice.com/download-desktop.aspx"
+			;;
+	esac
+fi
+
+# Editors and apps that come as AppImages outside Arch.
+if ! have_app cursor Cursor; then
+	if ask "Install Cursor?"; then
+		if [ "$PKG_MGR" = pacman ]; then
+			aur_ensure_installed cursor-bin
+		else
+			# Cursor's stable channel redirects to the current AppImage.
+			fetch_appimage https://api2.cursor.sh/updates/download/golden/linux-x64/cursor/latest Cursor
+		fi
+	fi
+fi
+
+# Omarchy ships Obsidian and LocalSend.
+if ! have_app obsidian Obsidian || ! have_app localsend LocalSend; then
+	if ask "Install Obsidian and LocalSend?"; then
+		if [ "$PKG_MGR" = pacman ]; then
+			pkg_ensure_installed obsidian
+			aur_ensure_installed localsend-bin
+		else
+			OBS_API=https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest
+			LS_API=https://api.github.com/repos/localsend/localsend/releases/latest
+			OBS_URL=$(curl -fsSL "$OBS_API" | grep -o 'https://[^"]*/Obsidian-[0-9.]*\.AppImage' | head -1 || true)
+			LS_URL=$(curl -fsSL "$LS_API" | grep -o 'https://[^"]*linux-x86-64\.AppImage' | head -1 || true)
+			if [ -n "$OBS_URL" ]; then
+				fetch_appimage "$OBS_URL" Obsidian
+			fi
+			if [ -n "$LS_URL" ]; then
+				fetch_appimage "$LS_URL" LocalSend
+			fi
+		fi
+	fi
+fi
+
+############################################
+# WORK AND CLOUD TOOLS
+############################################
+if ! command -v gpclient &>/dev/null && ask "Install GlobalProtect VPN client (EPAM)?"; then
+	case "$PKG_MGR" in
+		pacman)
+			pkg_ensure_installed globalprotect-openconnect
+			;;
+		dnf)
+			GP_API=https://api.github.com/repos/yuezk/GlobalProtect-openconnect/releases/latest
+			GP_URL=$(curl -fsSL "$GP_API" | grep -o 'https://[^"]*x86_64\.rpm' | head -1 || true)
+			if [ -n "$GP_URL" ]; then
+				pkg_install "$GP_URL"
+			else
+				echo "Could not resolve the GlobalProtect rpm; see https://github.com/yuezk/GlobalProtect-openconnect"
+			fi
+			;;
+		*)
+			echo "Install GlobalProtect from https://github.com/yuezk/GlobalProtect-openconnect"
+			;;
+	esac
+fi
+
+if ask "Install cloud CLIs (azure-cli, gcloud)?"; then
+	case "$PKG_MGR" in
+		pacman)
+			pkg_ensure_installed azure-cli
+			;;
+		dnf)
+			if ! pkg_is_installed packages-microsoft-prod; then
+				pkg_install https://packages.microsoft.com/config/rhel/10/packages-microsoft-prod.rpm
+			fi
+			pkg_ensure_installed azure-cli
+			;;
+		*)
+			echo "Install azure-cli: https://learn.microsoft.com/cli/azure/install-azure-cli-linux"
+			;;
+	esac
+	# gcloud: the AUR on Arch, Google's tarball install in ~/google-cloud-sdk
+	# elsewhere. .shrc.part puts it on PATH.
+	if ! command -v gcloud &>/dev/null && [ ! -d ~/google-cloud-sdk ]; then
+		if [ "$PKG_MGR" = pacman ]; then
+			aur_ensure_installed google-cloud-cli
+		else
+			run_installer https://sdk.cloud.google.com bash --disable-prompts --install-dir="$HOME"
+		fi
+	fi
+fi
+
+if ask "Install DevOps CLIs (terraform, cosign, trivy, rclone, freerdp)?"; then
+	case "$PKG_MGR" in
+		pacman)
+			pkg_ensure_installed terraform cosign trivy rclone freerdp
+			;;
+		dnf)
+			pkg_ensure_installed trivy rclone freerdp
+			if ! command -v terraform &>/dev/null; then
+				if [ ! -f /etc/yum.repos.d/hashicorp.repo ]; then
+					sudo dnf config-manager addrepo --from-repofile=https://rpm.releases.hashicorp.com/fedora/hashicorp.repo
+				fi
+				pkg_ensure_installed terraform
+			fi
+			if ! command -v cosign &>/dev/null; then
+				mkdir -vp ~/.local/bin
+				curl -fSL https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64 -o ~/.local/bin/cosign
+				chmod +x ~/.local/bin/cosign
+			fi
+			;;
+		*)
+			pkg_ensure_installed trivy rclone freerdp
+			echo "Install terraform and cosign by hand on $PKG_MGR."
+			;;
+	esac
+fi
+
+# Google Drive remotes: gdrive = main Google account, gdrive-ext = ext account.
+# Both use Artem's own OAuth client from cockpit-core/secrets (the public
+# repo holds no secret). Each remote opens a browser once: sign in with the
+# account named in the prompt. Tokens stay in ~/.config/rclone/rclone.conf.
+RCLONE_CLIENT=~/DATA/cockpit-core/secrets/rclone-gdrive-oauth-client.json
+if command -v rclone &>/dev/null && [ -f "$RCLONE_CLIENT" ]; then
+	for remote_account in gdrive:main gdrive-ext:ext; do
+		remote=${remote_account%%:*}
+		account=${remote_account#*:}
+		if rclone listremotes | grep -qx "$remote:"; then
+			echo "rclone remote $remote: already configured."
+		elif ask "Connect rclone remote $remote (browser sign-in, $account Google account)?"; then
+			# No xtrace here: it would print the client secret.
+			{ set +x; } 2>/dev/null
+			rclone config create "$remote" drive scope=drive \
+				client_id="$(jq -r .installed.client_id "$RCLONE_CLIENT")" \
+				client_secret="$(jq -r .installed.client_secret "$RCLONE_CLIENT")"
+			set -x
+		fi
+	done
+fi
+
+############################################
+# TAILSCALE, OLLAMA, ANDROID
+############################################
+if ! command -v tailscale &>/dev/null && ask "Install Tailscale?"; then
+	if command -v omarchy-install-service-tailscale &>/dev/null; then
+		# Also adds the bar panel, Taildrop receiving and `tailscale up`.
+		omarchy-install-service-tailscale
+	else
+		run_installer https://tailscale.com/install.sh sh
+		sudo systemctl enable --now tailscaled
+		echo "Join the tailnet: sudo tailscale up"
+	fi
+fi
+
+if ! command -v ollama &>/dev/null && ask "Install Ollama?"; then
+	if [ "$PKG_MGR" = pacman ]; then
+		pkg_ensure_installed ollama
+		sudo systemctl enable --now ollama.service
+	else
+		# The official script installs the binary and an ollama.service.
+		run_installer https://ollama.com/install.sh sh
+	fi
+fi
+
+if ask "Install Android tools (adb, MTP, Android Studio)?"; then
+	case "$PKG_MGR" in
+		pacman)
+			pkg_ensure_installed android-tools libmtp
+			aur_ensure_installed android-studio
+			;;
+		dnf)
+			pkg_ensure_installed android-tools libmtp-examples
+			;;
+		*)
+			pkg_ensure_installed android-tools
+			;;
+	esac
+	if [ "$PKG_MGR" != pacman ] && ! command -v android-studio &>/dev/null; then
+		if command -v flatpak &>/dev/null; then
+			flatpak install -y flathub com.google.AndroidStudio
+		else
+			echo "Install Android Studio from https://developer.android.com/studio"
+		fi
+	fi
+fi
+
+############################################
+# GNOME KEYBOARD SHORTCUTS
+############################################
 # || true: gsettings exits non-zero on schemas missing here (e.g. dash-to-dock)
 # and we don't want that to abort the rest of setup.
-if [ -r /etc/os-release ] && grep -q '^ID=fedora' /etc/os-release; then
-	if command -v gsettings &>/dev/null; then
-		bash ~/linux-files/scripts/de/gnome/gnome_shortcut_script.sh || true
-	else
-		echo "gsettings not found; skipping GNOME keyboard shortcuts."
-	fi
+if command -v gnome-shell &>/dev/null && command -v gsettings &>/dev/null; then
+	bash "$LF/scripts/de/gnome/gnome_shortcut_script.sh" || true
 fi
 
 ############################################
@@ -501,7 +825,7 @@ fi
 LOCAL_GIT=~/DATA/local-git
 mkdir -vp ~/g
 if [ -d "$LOCAL_GIT" ]; then
-	for name in cockpit-core logseq-personal logseq-work; do
+	for name in cockpit-core obsidian-personal obsidian-work; do
 		if [ -d "$LOCAL_GIT/$name.git" ]; then
 			ln -sfn "$LOCAL_GIT/$name.git" "$HOME/g/$name.git"
 		fi
@@ -528,8 +852,8 @@ ensure_local_git_remote() {
 }
 
 ensure_local_git_remote ~/DATA/cockpit-core cockpit-core
-ensure_local_git_remote ~/logseq/logseq-personal logseq-personal
-ensure_local_git_remote ~/logseq/logseq-work logseq-work
+ensure_local_git_remote ~/obsidian/obsidian-personal obsidian-personal
+ensure_local_git_remote ~/obsidian/obsidian-work obsidian-work
 
 # Playground
 mkdir -p ~/Playground
@@ -537,31 +861,48 @@ mkdir -p ~/Playground
 #  ln -sf $DATA_DIR/Playground ~/Playground/shared
 #fi
 
-# Logseq
-mkdir -vp ~/logseq
-# App-level config (~/.logseq) is machine-local; symlink the portable bits.
-# Per-graph config (each graph's logseq/config.edn) is synced with the graph.
-# preferences.json is volatile UI state and intentionally not linked.
-mkdir -vp ~/.logseq/config
-ln -sf ~/linux-files/dotfiles/logseq/.logseq/config/config.edn ~/.logseq/config/config.edn
-ln -sf ~/linux-files/dotfiles/logseq/.logseq/config/plugins.edn ~/.logseq/config/plugins.edn
+# Obsidian: the vaults (~/obsidian/obsidian-personal, ~/obsidian/obsidian-work)
+# arrive through Syncthing.
+mkdir -vp ~/obsidian
 
-# VMs (disk images stay local; launch configs live in ~/DATA/IT/vm-configs)
-mkdir -vp ~/vms
-if [ ! -f ~/vms/AGENTS.md ]; then
-	cat > ~/vms/AGENTS.md <<'EOF'
-# ~/vms — local VM payloads
+# VMs: QEMU/KVM, the Ubuntu EPAM VM and the Windows 11 VM.
+# Launch scripts live in ~/linux-files/vm-configs/<vm>/ and are symlinked into
+# ~/vms/<vm>/, next to the local-only disk, ISO and UEFI/TPM state. A run
+# script creates an empty disk on first start and boots the ISO to install.
+# localvm@<vm>.service runs a VM headless (VNC + QMP); vm.sh drives it.
+VM_CONFIGS=$LF/vm-configs
+if ask "Set up the local VMs (QEMU, Ubuntu EPAM VM, Windows 11)?"; then
+	case "$PKG_MGR" in
+		pacman) pkg_ensure_installed qemu-desktop qemu-img edk2-ovmf swtpm ;;
+		apt)    pkg_ensure_installed qemu-system-x86 qemu-utils ovmf swtpm swtpm-tools ;;
+		*)      pkg_ensure_installed qemu-kvm qemu-img edk2-ovmf swtpm swtpm-tools ;;
+	esac
+	mkdir -vp ~/vms/epam-vm ~/vms/windows
+	link "$VM_CONFIGS/ubuntu/run.sh" ~/vms/epam-vm/run.sh
+	link "$VM_CONFIGS/windows/run_vm.sh" ~/vms/windows/run_vm.sh
+	link "$LF/systemd-units/localvm@.service" ~/.config/systemd/user/localvm@.service
+	systemctl --user daemon-reload
 
-This directory holds large, **local-only** VM files (`.qcow2` disks, `.iso`
-installers, OVMF/TPM state). It is NOT synced and is wiped by an OS reinstall.
+	# Ubuntu ISO: official release, checked against Ubuntu's SHA256SUMS.
+	UBUNTU_REL=26.04
+	UBUNTU_ISO=ubuntu-26.04.1-desktop-amd64.iso
+	if [ ! -f ~/vms/epam-vm/$UBUNTU_ISO ]; then
+		curl -fL -o ~/vms/epam-vm/$UBUNTU_ISO.part "https://releases.ubuntu.com/$UBUNTU_REL/$UBUNTU_ISO"
+		mv ~/vms/epam-vm/$UBUNTU_ISO.part ~/vms/epam-vm/$UBUNTU_ISO
+		(cd ~/vms/epam-vm && curl -fsL "https://releases.ubuntu.com/$UBUNTU_REL/SHA256SUMS" | grep " \*$UBUNTU_ISO\$" | sha256sum -c -) || echo "WARNING: $UBUNTU_ISO checksum failed"
+	fi
+	# The YubiKey goes to the Ubuntu VM: host pcscd must ignore it.
+	sudo "$VM_CONFIGS/ubuntu/host-setup.sh"
 
-Launch scripts / configs are version-controlled separately in
-`~/DATA/IT/vm-configs/` (Syncthing-synced, survives reinstalls). Do not keep a
-VM's run script only here — its canonical home is `vm-configs`. To rebuild a VM,
-recreate its disk image here and copy the matching run script from
-`~/DATA/IT/vm-configs/<vm>/`.
-EOF
-	echo "Wrote ~/vms/AGENTS.md (points VM configs at ~/DATA/IT/vm-configs)."
+	# Microsoft has no stable direct link for the Windows ISO.
+	if [ ! -f ~/vms/windows/Win11_25H2_EnglishInternational_x64_v2.iso ]; then
+		echo "Windows VM: download the Windows 11 ISO (English International, x64)"
+		echo "from https://www.microsoft.com/software-download/windows11 and save it as"
+		echo "~/vms/windows/Win11_25H2_EnglishInternational_x64_v2.iso"
+	fi
+	echo "Install a VM: ~/vms/epam-vm/run.sh or ~/vms/windows/run_vm.sh (GTK window)."
+	echo "Then run it headless: systemctl --user start localvm@ubuntu (or @windows)."
+	echo "Tailnet access to VNC/RDP: $VM_CONFIGS/README-remote-access.md"
 fi
 
 # IT (Syncthing) + cockpit-core symlinks
@@ -572,55 +913,125 @@ if [ -d ~/DATA/IT ]; then
 else
 	echo "WARNING: ~/DATA/IT not found — is Syncthing set up on this machine?"
 	echo "Skipping ~/IT and ~/cockpit-core symlinks until DATA/IT syncs."
-	read -p "Press enter to continue ... "
+	if [ -t 0 ]; then
+		read -r -p "Press enter to continue ... " || true
+	fi
+fi
+
+############################################
+# USER SERVICES
+############################################
+WORK_HUB=~/obsidian/obsidian-work
+COCKPIT_CORE=~/cockpit-core
+if [ ! -d "$COCKPIT_CORE" ] && [ -d ~/DATA/cockpit-core ]; then
+	COCKPIT_CORE=~/DATA/cockpit-core
+fi
+USER_UNITS=~/.config/systemd/user
+
+# lid-no-suspend.service holds a logind lid-switch inhibitor;
+# scripts/devices/laptop/toggle-lid-sleep.sh starts and stops it.
+link "$LF/systemd-units/lid-no-suspend.service" "$USER_UNITS/lid-no-suspend.service"
+
+# EPAM hub, relay and shared Chrome live in the work hub.
+EPAM_UNITS=$WORK_HUB/.ai/epam/systemd
+if [ -d "$EPAM_UNITS" ] && ask "Link the EPAM user services and enable hub + relay?"; then
+	for unit in "$EPAM_UNITS"/*.service; do
+		link "$unit" "$USER_UNITS/$(basename "$unit")"
+	done
+	link "$WORK_HUB/.ai/nsg/nsg-guard.sh" ~/.local/bin/nsg-guard
+	systemctl --user daemon-reload
+	systemctl --user enable --now epam-hub.service epam-relay.service
+fi
+# No user bus (e.g. a bare ssh login) is not a reason to abort.
+systemctl --user daemon-reload || true
+
+# The timer accepts proven Grok Bot boxes into Syncthing. Its installer
+# creates any pairing secret it can't find, so run it only after the hubs
+# have synced, or the boxes' secrets won't match.
+STW_INSTALL=$COCKPIT_CORE/skills/syncthing-workflow/scripts/install-laptop.sh
+if [ -f "$STW_INSTALL" ]; then
+	echo "syncthing-workflow: run only after cockpit-core and obsidian-work synced."
+	if ask "Install the syncthing-workflow timer?"; then
+		bash "$STW_INSTALL"
+	fi
 fi
 
 ############################################
 # SETUP AI CONFIGURATIONS
 ############################################
 
-AI_GLOBAL=~/linux-files/ai/CLAUDE_GLOBAL_CONFIG.md
-LOGSEQ_WORK=~/logseq/logseq-work
-COCKPIT_CORE=~/cockpit-core
-if [ ! -d "$COCKPIT_CORE" ] && [ -d ~/DATA/cockpit-core ]; then
-	COCKPIT_CORE=~/DATA/cockpit-core
-fi
-WORK_SKILLS=$LOGSEQ_WORK/.agents/skills
+AI_GLOBAL=$LF/ai/CLAUDE_GLOBAL_CONFIG.md
+WORK_SKILLS=$WORK_HUB/.agents/skills
 PERSONAL_SKILLS=$COCKPIT_CORE/skills
 
-# Shared global instructions
-[ -d ~/.claude ] && ln -sf "$AI_GLOBAL" ~/.claude/CLAUDE.md
-[ -d ~/.codex ] && ln -sf "$AI_GLOBAL" ~/.codex/AGENTS.md
-[ -d ~/.opencode ] && ln -sf "$AI_GLOBAL" ~/.opencode/AGENTS.md
+# Node from mise (Omarchy's runtime manager). npm globals go to
+# ~/.npm-global, which .shrc.part puts on PATH.
+NPM_GLOBALS="@bitwarden/cli @codemieai/code @earendil-works/pi-coding-agent"
+# opencode-session.js targets claude-code-router 2.x.
+NPM_GLOBALS="$NPM_GLOBALS @musistudio/claude-code-router@2"
+if ask "Install Node (mise) and npm tools (bw, codemie, pi, ccr)?"; then
+	if ! command -v mise &>/dev/null; then
+		if [ "$PKG_MGR" = pacman ]; then
+			pkg_ensure_installed mise
+		else
+			run_installer https://mise.run sh
+		fi
+	fi
+	mise use -g node@lts
+	mise exec -- npm config set prefix ~/.npm-global
+	mise exec -- npm install -g $NPM_GLOBALS
+fi
+
+# Agent CLIs: each vendor's own installer, run only when the tool is
+# missing. They update themselves afterwards.
+if ask "Install agent CLIs (claude, codex, grok, opencode, cursor-agent, agy)?"; then
+	command -v claude &>/dev/null || run_installer https://claude.ai/install.sh bash
+	command -v codex &>/dev/null || CODEX_NON_INTERACTIVE=1 run_installer https://chatgpt.com/codex/install.sh sh
+	command -v grok &>/dev/null || run_installer https://x.ai/cli/install.sh bash
+	command -v opencode &>/dev/null || run_installer https://opencode.ai/install bash
+	command -v cursor-agent &>/dev/null || run_installer https://cursor.com/install bash
+	command -v agy &>/dev/null || run_installer https://antigravity.google/cli/install.sh bash
+fi
+
+if [ "$PKG_MGR" = pacman ] && ask "Install Antigravity and Antigravity IDE (AUR)?"; then
+	aur_ensure_installed antigravity antigravity-ide
+fi
+
+if ask "Install extra agent tools (herdr, t3, muse, Claude Desktop)?"; then
+	command -v herdr &>/dev/null || run_installer https://herdr.dev/install.sh sh
+	command -v t3 &>/dev/null || run_installer https://t3.codes/install.sh sh
+	# The muse launcher is the command itself; it fetches the binary on first run.
+	if ! command -v muse &>/dev/null; then
+		mkdir -vp ~/.local/bin
+		curl -fsSL https://api.meta.ai/muse-launcher.sh -o ~/.local/bin/muse
+		chmod +x ~/.local/bin/muse
+	fi
+	if ! command -v claude-desktop &>/dev/null; then
+		case "$PKG_MGR" in
+			pacman) aur_ensure_installed claude-desktop ;;
+			*) echo "Claude Desktop: https://support.claude.com/en/articles/10065433-install-claude-desktop" ;;
+		esac
+	fi
+fi
 
 # OpenCode
-mkdir -vp ~/.config/opencode
-OPENCODE_CONFIG=~/linux-files/dotfiles/opencode/opencode.json
-ln -sf "$OPENCODE_CONFIG" ~/.config/opencode/opencode.json
+link "$LF/dotfiles/opencode/opencode.json" ~/.config/opencode/opencode.json
 
-# Portable agent preferences. Skip a link when the repo file is absent
-# so a partial sync cannot replace a real file with a dangling symlink.
-# Auth, sessions, and Codex config.toml stay in $HOME.
-link_agent_settings() {
-	local source=$1
-	local dest=$2
-	if [ ! -f "$source" ]; then
-		echo "Missing $source; leaving $dest unchanged."
-		return 0
-	fi
-	mkdir -vp "$(dirname "$dest")"
-	ln -sf "$source" "$dest"
-}
-link_agent_settings ~/linux-files/dotfiles/claude/settings.json \
-	~/.claude/settings.json
-link_agent_settings ~/linux-files/dotfiles/claude-alt/settings.json \
-	~/.claude-alt/settings.json
-link_agent_settings ~/linux-files/dotfiles/grok/config.toml \
-	~/.grok/config.toml
-link_agent_settings ~/linux-files/dotfiles/grok-alt/config.toml \
-	~/.grok-alt/config.toml
-link_agent_settings ~/linux-files/dotfiles/pi/settings.json \
-	~/.pi/agent/settings.json
+# Portable agent preferences. Auth, sessions, and Codex config.toml stay
+# in $HOME.
+link "$LF/dotfiles/claude/settings.json" ~/.claude/settings.json
+link "$LF/dotfiles/claude-alt/settings.json" ~/.claude-alt/settings.json
+link "$LF/dotfiles/grok/config.toml" ~/.grok/config.toml
+link "$LF/dotfiles/grok-alt/config.toml" ~/.grok-alt/config.toml
+link "$LF/dotfiles/pi/settings.json" ~/.pi/agent/settings.json
+
+# Shared global instructions
+for home in ~/.claude ~/.claude-alt; do
+	[ -d "$home" ] && link "$AI_GLOBAL" "$home/CLAUDE.md"
+done
+for home in ~/.codex ~/.codex-alt ~/.opencode; do
+	[ -d "$home" ] && link "$AI_GLOBAL" "$home/AGENTS.md"
+done
 
 # Link every valid hub skill into an agent's global skills directory.
 # Usage: link_skill_dir HUB_SKILLS_DIR AGENT_SKILLS_DIR
@@ -659,52 +1070,16 @@ if [ -d ~/.hermes ]; then
 	link_skill_dir "$PERSONAL_SKILLS" ~/.hermes/skills
 fi
 
-# Claude Code memories — logseq-work project
-CLAUDE_PROJ=~/.claude/projects/-home-artem-logseq-logseq-work
-CLAUDE_MEM=$CLAUDE_PROJ/memory
-LOGSEQ_MEM=$LOGSEQ_WORK/.ai/claude-memories
-
-if [ ! -d "$LOGSEQ_WORK" ]; then
-	echo "logseq-work not found at $LOGSEQ_WORK."
-	echo "Skipping the Claude memory link."
-elif [ ! -d "$CLAUDE_PROJ" ]; then
-	echo "Claude project for logseq-work not yet created."
-	echo "Open Claude Code in $LOGSEQ_WORK once, then re-run setup.sh."
-elif [ -L "$CLAUDE_MEM" ]; then
-	echo "Claude memories already linked: $CLAUDE_MEM"
+# Agent sessions and memories live in the Syncthing folder
+# ~/DATA/agentic-context. Its own script links every agent home into it and
+# merges whatever a home already recorded.
+AGENTIC_CONTEXT=~/DATA/agentic-context
+if [ -x "$AGENTIC_CONTEXT/link-contexts.sh" ]; then
+	"$AGENTIC_CONTEXT/link-contexts.sh"
 else
-	proceed=y
-	MEM_REAL_HAS_FILES=n
-	MEM_SYNC_HAS_FILES=n
-	if [ -d "$CLAUDE_MEM" ]; then
-		if [ -n "$(ls -A "$CLAUDE_MEM")" ]; then
-			MEM_REAL_HAS_FILES=y
-		fi
-	fi
-	if [ -d "$LOGSEQ_MEM" ]; then
-		if [ -n "$(ls -A "$LOGSEQ_MEM")" ]; then
-			MEM_SYNC_HAS_FILES=y
-		fi
-	fi
-	if [ "$MEM_REAL_HAS_FILES" = y ] && [ "$MEM_SYNC_HAS_FILES" = y ]; then
-		echo "Both $CLAUDE_MEM and $LOGSEQ_MEM have content."
-		PROMPT="Merge $CLAUDE_MEM into $LOGSEQ_MEM and relink? [y/N]: "
-		read -r -p "$PROMPT" proceed
-	fi
-	case "${proceed,,}" in
-		y|yes)
-			mkdir -vp "$LOGSEQ_MEM"
-			if [ -d "$CLAUDE_MEM" ] && [ ! -L "$CLAUDE_MEM" ]; then
-				cp -rn "$CLAUDE_MEM"/. "$LOGSEQ_MEM"/
-				rm -rf "$CLAUDE_MEM"
-			fi
-			ln -sfn "$LOGSEQ_MEM" "$CLAUDE_MEM"
-			echo "Linked $CLAUDE_MEM -> $LOGSEQ_MEM"
-			;;
-		*)
-			echo "Skipped Claude memory linking."
-			;;
-	esac
+	echo "$AGENTIC_CONTEXT not synced yet: accept the agentic-context folder"
+	echo "in Syncthing, then re-run setup.sh."
 fi
 
-echo "Consider setting up: opencode, openclaw, hermes, homebrew, pi, tailscale"
+echo "Manual steps: log in to each agent CLI; sudo tailscale up (outside Omarchy);"
+echo "Grok Bot AppImage from https://x.ai/bot; the Windows 11 ISO for the VM."

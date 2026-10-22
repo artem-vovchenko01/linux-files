@@ -1,16 +1,17 @@
 #!/bin/bash
 
 # share-sessions.sh  --  let an alt-account home reuse the primary account's
-# recorded sessions.
+# machine-local session state.
 #
 # Every one of these CLIs has a single "home" env var (CODEX_HOME, GROK_HOME,
-# CLAUDE_CONFIG_DIR) that roots both the login and the recorded conversations.
-# The *-alt wrappers point it at a second directory to keep the logins apart,
-# and the session history splits along with it: a session started on one
-# account does not appear in the other's resume picker.
+# CLAUDE_CONFIG_DIR) that roots both the login and the recorded state.
+# The *-alt wrappers point it at a second directory to keep the logins apart.
+# The transcripts themselves are symlinks into ~/DATA/agentic-context in both
+# homes (its link-contexts.sh makes them). What this links is the rest: prompt
+# history, shell snapshots, and indexes that belong to this machine.
 #
-# Pointing the alt home's session directories at the primary home's puts the
-# history back in one pool while each home keeps its own credential file.
+# Pointing those alt-home entries at the primary home's keeps one pool while
+# each home keeps its own credential file.
 #
 # Usage: source this file, then
 #   share_sessions <primary_home> <alt_home> dir:<name> file:<name> ...

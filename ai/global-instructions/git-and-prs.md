@@ -6,7 +6,7 @@ Whenever you create a pull request on a remote (GitHub, Azure DevOps, GitLab, et
 
 ## branch names carry the ticket ID
 
-In any repo whose project tracks work in tickets, the branch name must name the ticket the work belongs to: `<type>/TICKET-123-short-description`. Do not push a ticketless branch because CI merely warns — a rename after the PR exists means abandoning that PR and opening a new one. Find the ticket before you push (in MigVisor: `ai/epam/jira.sh jql '...assignee = currentUser()...'`), and when nothing fits, ask me instead of guessing. The description part stays short and plain-language; the ticket ID belongs in the branch only, never in the PR title.
+In any repo whose project tracks work in tickets, the branch name must name the ticket the work belongs to: `<type>/TICKET-123-short-description`. Do not push a ticketless branch because CI merely warns — a rename after the PR exists means abandoning that PR and opening a new one. Find the ticket before you push (in MigVisor: `~/obsidian/obsidian-work/.ai/epam/jira.sh jql '...assignee = currentUser()...'`), and when nothing fits, ask me instead of guessing. The description part stays short and plain-language; the ticket ID belongs in the branch only, never in the PR title.
 
 Pick the branch *type* from what the repo's remote actually holds (`git ls-remote --heads origin`, group by the first path segment), not from what the validator tolerates — a prefix that merely passes CI can still be one the team never uses. In the MigVisor Explainer repos that means `feat/`, `fix/`, `hotfix/`, `refactor/`; never `ci/`, even for pipeline work.
 

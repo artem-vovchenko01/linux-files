@@ -1,0 +1,17 @@
+[Unit]
+Description=Local QEMU VM %i (headless, VNC + QMP)
+After=graphical-session.target pipewire-pulse.service
+
+[Service]
+Type=simple
+Environment=VM_DISPLAY=none
+ExecStart=%h/linux-files/scripts/vm/vm.sh run %i
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=90
+KillMode=mixed
+KillSignal=SIGTERM
+ExecStop=%h/linux-files/scripts/vm/vm.sh powerdown %i
+
+[Install]
+WantedBy=default.target

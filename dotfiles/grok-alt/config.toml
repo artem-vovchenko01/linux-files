@@ -18,8 +18,8 @@ compact_mode = true
 permission_mode = "ask"
 
 [models]
-default = "grok-4.7"
-default_reasoning_effort = "high"
+default = "grok-4.7-build-fast"
+default_reasoning_effort = "medium"
 
 [privacy]
 privacy_banner_acked = "2026-08-12T23:38:01Z"

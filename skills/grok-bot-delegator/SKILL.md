@@ -22,18 +22,23 @@ Delegate anything that a terminal can finish. Keep in Grok Bot only what needs
 the bot itself: its browser, its app logins, its routines, and the judgment
 about what Artem actually wants.
 
-## Four copies of this skill
+## Copies of this skill
 
-The same skill lives in four directories, as real files, not symlinks —
-Syncthing replicates each hub on its own, and a link across hubs would break:
+The canonical copy is the work hub's:
+`~/logseq/logseq-work/.agents/skills/grok-bot-delegator/`. The corporate
+Grok Bot VM has only that hub, so the skill must live there.
 
-- `~/cockpit-core/skills/grok-bot-delegator/` — personal hub
-- `~/logseq/logseq-work/.agents/skills/grok-bot-delegator/` — work hub
-- `~/logseq/logseq-personal/.agents/skills/grok-bot-delegator/` — personal graph
-- `~/linux-files/skills/grok-bot-delegator/` — linux-files / dotfiles repo
+Two more full copies exist as real files, not symlinks, because some boxes
+sync one hub without the other:
 
-Edit one copy, then copy the whole folder over the other three. State in your
-report which copies you changed.
+- `~/obsidian/obsidian-personal/.agents/skills/grok-bot-delegator/`
+- `~/linux-files/skills/grok-bot-delegator/`
+
+`~/cockpit-core/skills/grok-bot-delegator/` is a stub that points here.
+
+Edit the canonical copy, then copy the whole folder over the two other full
+copies. Never turn the stub back into a full copy. State in your report
+which copies you changed.
 
 ## Where the work runs
 

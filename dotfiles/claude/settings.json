@@ -1,6 +1,7 @@
 {
   "env": {
-    "DISABLE_AUTOUPDATER": "1"
+    "DISABLE_AUTOUPDATER": "1",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5"
   },
   "model": "opus",
   "disableClaudeAiConnectors": true,
@@ -8,10 +9,28 @@
   "modelSettings": {
     "claude-opus-5": {
       "effortLevel": "high"
+    },
+    "claude-sonnet-5": {
+      "effortLevel": "medium"
+    },
+    "claude-sonnet-5-5": {
+      "effortLevel": "high"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    },
+    "claude-haiku-5-5": {
+      "effortLevel": "high"
     }
   },
   "tui": "fullscreen",
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark",
-  "agentPushNotifEnabled": true
+  "switchModelsOnFlag": false,
+  "agentPushNotifEnabled": true,
+  "voiceEnabled": true
 }
