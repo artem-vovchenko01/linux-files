@@ -14,6 +14,10 @@ o.bind("SUPER + D", "Omarchy menu", "omarchy-menu toggle")
 o.bind("SUPER + E", "File manager", { omarchy = "nautilus" })
 o.bind("SUPER + SHIFT + Q", "Close window", hl.dsp.window.close())
 
+-- Replaces Omarchy's top-bar toggle; Super+T still toggles floating too.
+hl.unbind("SUPER + SHIFT + SPACE")
+o.bind("SUPER + SHIFT + SPACE", "Toggle window floating/tiling", hl.dsp.window.float({ action = "toggle" }))
+
 -- Vim keys: focus with Super+H/J/K/L, move with Super+Shift+H/J/K/L.
 -- Replaces Omarchy's Super+J (toggle split), Super+K (keybindings help)
 -- and Super+L (toggle workspace layout).
