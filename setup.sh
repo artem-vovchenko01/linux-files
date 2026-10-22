@@ -87,9 +87,10 @@ done
 
 if $IS_OMARCHY; then
 	echo "Omarchy: keeping its Hyprland, terminal, tmux, nvim and font configs."
-	# Personal input overrides only (natural touchpad scroll).
+	# Personal overrides only: input (layouts, touchpad) and keybindings.
 	link "$LF/dotfiles/omarchy/hypr/input.lua" ~/.config/hypr/input.lua
-	"$LF/scripts/tiling-wm/terminal-font-size.sh" 11
+	link "$LF/dotfiles/omarchy/hypr/bindings.lua" ~/.config/hypr/bindings.lua
+	"$LF/scripts/tiling-wm/terminal-font-size.sh" 14
 else
 	# Hyprland desktop (Omarchy 4 has its own: Lua config + Quickshell)
 	link "$LF/dotfiles/hyprland/hyprland.conf" ~/.config/hypr/hyprland.conf
@@ -501,6 +502,32 @@ if ! have_app obsidian Obsidian || ! have_app localsend LocalSend; then
 	fi
 fi
 
+# Telegram's own tarball, not the distro package: it updates itself in place,
+# so it lives in a user-writable folder.
+TG_DIR=~/.local/opt/Telegram
+if ! command -v telegram-desktop &>/dev/null && [ ! -x "$TG_DIR/Telegram" ]; then
+	if ask "Install Telegram (official build from telegram.org)?"; then
+		TG_TAR=$(mktemp)
+		mkdir -p ~/.local/opt ~/.local/bin
+		curl -fSL --retry 3 https://telegram.org/dl/desktop/linux -o "$TG_TAR"
+		tar -xJf "$TG_TAR" -C ~/.local/opt
+		rm -f "$TG_TAR"
+		ln -sf "$TG_DIR/Telegram" ~/.local/bin/telegram
+	fi
+fi
+# The tarball has no launcher entry: Telegram writes its .desktop file,
+# D-Bus service and icons on first run. Start it once in the tray.
+TG_APPS=(~/.local/share/applications/org.telegram.desktop*.desktop)
+if [ -x "$TG_DIR/Telegram" ] && [ ! -e "${TG_APPS[0]}" ]; then
+	if [ -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ]; then
+		"$TG_DIR/Telegram" -startintray &>/dev/null &
+		sleep 5
+		"$TG_DIR/Telegram" -quit &>/dev/null
+	else
+		echo "Run 'telegram' once in a desktop session to add it to the launcher."
+	fi
+fi
+
 ############################################
 # WORK AND CLOUD TOOLS
 ############################################
@@ -632,10 +659,25 @@ ensure_local_git_remote() {
 	local repo=$1
 	local name=$2
 	local url="$HOME/g/$name.git"
-	if [ ! -d "$repo/.git" ]; then
+	if [ ! -d "$repo" ] || [ ! -e "$url" ]; then
 		return 0
 	fi
-	if [ ! -e "$url" ]; then
+	# Syncthing ignores .git/** but still creates an empty .git, so a fresh
+	# machine has the files without history. Attach the bare repo in place
+	# (~/DATA/local-git/README.md), once Syncthing has copied all of it.
+	if [ ! -f "$repo/.git/HEAD" ]; then
+		if ! git --git-dir="$url" rev-parse -q --verify 'main^{commit}' >/dev/null; then
+			echo "$name: $url has no main yet (Syncthing still copying?); skipped."
+			return 0
+		fi
+		git -C "$repo" init -q -b main
+		git -C "$repo" remote add local "$url"
+		if ! git -C "$repo" fetch -q local; then
+			echo "$name: fetch from $url failed (objects still syncing?); re-run later."
+			return 0
+		fi
+		git -C "$repo" reset -q --mixed local/main
+		git -C "$repo" branch -q --set-upstream-to=local/main main
 		return 0
 	fi
 	if git -C "$repo" remote get-url local >/dev/null 2>&1; then
@@ -741,24 +783,18 @@ fi
 # Grok Bot desktop: x.ai serves the AppImage only through its page, so the
 # browser downloads it and setup.sh moves it into ~/Applications.
 # A pasted download link (right-click the button, Copy link) is used as is.
-if ! have_app grok-bot GrokBot && ask "Install Grok Bot (download the AppImage from x.ai/bot)?"; then
-	xdg-open https://x.ai/bot &>/dev/null || echo "Open https://x.ai/bot"
-	echo "Paste the AppImage download link, or download it to ~/Downloads"
-	read -r -p "and press Enter: " gb_url </dev/tty || gb_url=""
-	gb=""
-	if [ -n "$gb_url" ]; then
-		gb=$(mktemp --suffix=.AppImage)
-		curl -fSL "$gb_url" -o "$gb" || gb=""
-	else
-		gb=$(ls -t ~/Downloads/*[Gg]rok*.AppImage 2>/dev/null | head -1 || true)
-	fi
-	if [ -n "$gb" ]; then
-		mkdir -p ~/Applications
-		install -m 755 "$gb" ~/Applications/GrokBot.AppImage
-		rm -f "$gb"
-		echo "Grok Bot: ~/Applications/GrokBot.AppImage"
-	else
-		echo "No Grok Bot AppImage found; re-run setup.sh after downloading."
+# The app's updater keeps the current AppImage behind
+# ~/.local/share/grok-bot/appimage. The official download page links the
+# current build.
+if ! have_app grok-bot GrokBot && [ ! -e ~/.local/share/grok-bot/appimage ]; then
+	if ask "Install Grok Bot (AppImage from cursor.com/download/bot)?"; then
+		GB_RE='https://downloads\.cursor\.com/grokbot/stable/[^"\\]*/linux/x64/[^"\\]*\.AppImage'
+		GB_URL=$(curl -fsSL https://cursor.com/download/bot | grep -oE "$GB_RE" | head -1 || true)
+		if [ -n "$GB_URL" ]; then
+			fetch_appimage "$GB_URL" GrokBot
+		else
+			echo "Could not resolve the AppImage; download it from https://cursor.com/download/bot"
+		fi
 	fi
 fi
 
@@ -785,6 +821,9 @@ fi
 
 # OpenCode
 link "$LF/dotfiles/opencode/opencode.json" ~/.config/opencode/opencode.json
+
+# herdr
+link "$LF/dotfiles/herdr/config.toml" ~/.config/herdr/config.toml
 
 # Portable agent preferences. Auth, sessions, and Codex config.toml stay
 # in $HOME.

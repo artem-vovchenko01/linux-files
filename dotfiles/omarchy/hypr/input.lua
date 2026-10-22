@@ -11,6 +11,16 @@ hl.config({
   },
 })
 
+-- Layouts: us first, so Omarchy's Latin shortcuts work in every layout.
+-- Super+Space cycles them (bindings.lua). Options keep Omarchy's defaults.
+hl.config({
+  input = {
+    kb_layout = "us,ua,ru,pl",
+    kb_variant = ",,,",
+    kb_options = "compose:caps,shift:both_capslock_cancel",
+  },
+})
+
 -- Keyboard layout and options.
 -- See https://wiki.hypr.land/Configuring/Basics/Variables/#input
 -- hl.config({

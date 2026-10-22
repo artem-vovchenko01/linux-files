@@ -32,5 +32,6 @@
   "theme": "dark",
   "switchModelsOnFlag": false,
   "agentPushNotifEnabled": true,
-  "voiceEnabled": true
+  "voiceEnabled": true,
+  "hooks": {"SessionStart":[{"matcher":"^(startup|resume|clear|compact|fork)$","hooks":[{"type":"command","command":"bash '/home/artem/.claude/hooks/herdr-agent-state.sh' session","timeout":10}]}]}
 }

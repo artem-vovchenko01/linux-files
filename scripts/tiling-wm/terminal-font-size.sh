@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # menu: Set the font size of Omarchy's terminals (foot, alacritty, ghostty, kitty)
 #
-# terminal-font-size.sh [SIZE]   default 11
+# terminal-font-size.sh [SIZE]   default 14
 #
 # Edits Omarchy's own configs in place: Omarchy owns them, and
 # `omarchy font set` rewrites them with sed, which would break a symlink.
 # That command also resets foot to size 9, so run this again after it.
 set -euo pipefail
 
-SIZE=${1:-11}
+SIZE=${1:-14}
 
 foot=~/.config/foot/foot.ini
 [ -f "$foot" ] && sed -i -E "s/^(font=[^:]*):size=[0-9.]+/\1:size=$SIZE/" "$foot"
