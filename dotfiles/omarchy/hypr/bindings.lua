@@ -37,3 +37,17 @@ for key, dir in pairs(vim_keys) do
   o.bind("SUPER + " .. key, "Focus " .. dir[2] .. " window", hl.dsp.focus({ direction = dir[1] }))
   o.bind("SUPER + SHIFT + " .. key, "Move window " .. dir[2], hl.dsp.window.move({ direction = dir[2], group_aware = true }))
 end
+
+-- Tabs, like i3/sway "layout tabbed": Super+W makes the window a tab group.
+-- Super+N/P switch tabs, Super+Shift+N/P move the tab within the group.
+-- Replaces Omarchy's Super+W (close, kept on Super+Shift+Q),
+-- Super+P (pseudo), Super+Shift+N (editor), Super+Shift+P (Google Photos).
+hl.unbind("SUPER + W")
+hl.unbind("SUPER + P")
+hl.unbind("SUPER + SHIFT + N")
+hl.unbind("SUPER + SHIFT + P")
+o.bind("SUPER + W", "Toggle tab group", hl.dsp.group.toggle())
+o.bind("SUPER + N", "Next tab", hl.dsp.group.next())
+o.bind("SUPER + P", "Previous tab", hl.dsp.group.prev())
+o.bind("SUPER + SHIFT + N", "Move tab forward", hl.dsp.group.move_window({ forward = true }))
+o.bind("SUPER + SHIFT + P", "Move tab back", hl.dsp.group.move_window({ forward = false }))
