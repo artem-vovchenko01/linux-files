@@ -1,3 +1,4 @@
+# menu: Pick an ssh host from a list and open it in kitty
 HOSTS=$(cat ~/.ssh/config ~/IT/configs/ssh/ssh-config | grep '^Host ' | awk '{print $2}')
 
 CHOICE=$(echo "$HOSTS" | wofi --dmenu)

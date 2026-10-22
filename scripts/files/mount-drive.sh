@@ -1,3 +1,4 @@
+# menu: Mount a drive under /mnt (wofi)
 set -o pipefail
 DISK=$(lsblk -o name,size,type,fstype,label,mountpoints -l | sed '/NAME/d; /SWAP/d; /luks/d; /lvm/d' | sort -k7 | wofi --dmenu | awk '{print $1}')
 [[ $PIPESTATUS -ne 0 ]] && exit

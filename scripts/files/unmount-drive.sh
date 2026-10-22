@@ -1,3 +1,4 @@
+# menu: Unmount a drive mounted under /mnt (wofi)
 set -o pipefail
 DIR=$(lsblk -o name,mountpoints,size,type,fstype,label -l | grep /mnt | wofi --dmenu | awk '{print $2}')
 [[ $PIPESTATUS -ne 0 ]] && exit

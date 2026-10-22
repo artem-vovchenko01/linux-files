@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# menu: Set a random wallpaper
 set -euo pipefail
 
 if [ -d "$HOME/IT/Resources/Wallpapers" ]; then

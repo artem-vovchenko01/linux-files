@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# menu: Find duplicate files in a folder you pick
 
 # Temp directory
 TMP_DIR=$(mktemp -d)

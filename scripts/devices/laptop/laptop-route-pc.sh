@@ -1,3 +1,4 @@
+# menu: Laptop: share its internet with the PC (NAT)
 sudo sysctl -w  net.ipv4.ip_forward=1
 
 sudo iptables -t nat -A POSTROUTING -d 0/0 -s 192.168.0/24 -j MASQUERADE

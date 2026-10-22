@@ -17,6 +17,15 @@ or one-time links.
   `.agents/skills/`, and `.opencode/skills/`. `setup.sh` exposes both hubs to
   Hermes globally. OpenClaw loads the two source directories directly.
 - `my-git-os/` is archived/legacy and not the primary path.
+- `setup.sh` and the work setup (`~/obsidian/obsidian-work/.ai/setup.sh`)
+  share `setup-lib.sh` (ask, link, package helpers). Everything EPAM (work
+  git identity, GCM, GlobalProtect, az/gcloud/aws/databricks, logins, ADO
+  repo clones into `~/EPAM/<project>/<repo>`, local VMs, EPAM services) lives
+  in the work setup; `setup.sh` calls it as its last step.
+- `cmds` (`scripts/cmds.sh`, linked into `~/.local/bin`) is the fuzzy menu of
+  all scripts. Folders come from `scripts/cmds.sources`, which includes the
+  work hub's `.ai/cmds.sources`. A `# menu: <text>` line sets a script's
+  description; `.menu_config` `IGNORE=` hides names, as for `menu.sh`.
 
 ## Environment
 
@@ -34,6 +43,10 @@ or one-time links.
 
 ## Gotchas
 
+- Syncthing hub `.stignore` files contain `#include .stglobalignore`, and
+  that file only arrives by sync. On a fresh machine the missing include puts
+  the folder in an error state, so it never syncs: comment the line out until
+  `.stglobalignore` arrives, then put it back.
 - Claude login addresses live in `ai/private/account-emails.md`. That
   directory is gitignored. The tracked rule is
   `ai/global-instructions/alt-accounts.md`, and it names no address.

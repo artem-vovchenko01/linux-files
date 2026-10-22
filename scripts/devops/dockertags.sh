@@ -1,4 +1,5 @@
 #!/bin/bash
+# menu: List tags of a Docker image on a registry: dockertags IMAGE [FILTER]
 
 if [ $# -lt 1 ]
 then

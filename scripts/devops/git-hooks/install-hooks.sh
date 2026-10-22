@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# menu: Install these git hooks into the current repo
 set -euo pipefail
 
 repo_root=$(git rev-parse --show-toplevel)

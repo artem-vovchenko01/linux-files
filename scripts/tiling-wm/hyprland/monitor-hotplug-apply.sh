@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# menu: Hyprland: apply the laptop/external monitor layout
 set -euo pipefail
 
 INTERNAL_PREFERRED="eDP-1"

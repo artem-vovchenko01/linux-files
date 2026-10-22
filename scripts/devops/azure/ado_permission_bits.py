@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# menu: Decode an Azure DevOps ACE permission bitmask
 bits = int(input("Specify INT value that represents set of perm bits from AccessControlEntry: "))
 print("Binary repr:")
 bin = str(bin(bits))

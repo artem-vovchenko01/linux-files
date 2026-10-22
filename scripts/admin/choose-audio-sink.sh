@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# menu: Pick the default speaker/headphones (wofi)
 set -euo pipefail
 
 DEFAULT="$(pactl get-default-sink)"

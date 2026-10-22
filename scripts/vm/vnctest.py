@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# menu: Probe a VNC server: handshake and first-frame time
 """Minimal RFB probe: connect, handshake, time to first full frame."""
 import socket, struct, sys, time
 def rx(s, n):

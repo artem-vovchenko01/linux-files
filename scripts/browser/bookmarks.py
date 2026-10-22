@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# menu: Save or restore Chromium and Firefox bookmarks (save|restore)
 """Save or restore Chromium and Firefox bookmarks.
 
   bookmarks.py save            copy bookmarks into ~/DATA/IT/browser-bookmarks

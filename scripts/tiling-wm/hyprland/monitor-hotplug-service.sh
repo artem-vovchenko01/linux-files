@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# menu: Hyprland: watch monitor hotplug and apply the layout
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

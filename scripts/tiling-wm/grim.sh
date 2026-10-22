@@ -1,4 +1,5 @@
 #! /bin/sh
+# menu: Screenshot to ~/Pictures/Screenshots and clipboard (region|full)
 set -eo pipefail
 
 PICTURES=~/Pictures

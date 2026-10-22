@@ -29,164 +29,8 @@ if [ -d /usr/share/omarchy ] || [ -d ~/.local/share/omarchy ]; then
 fi
 echo "Omarchy: $IS_OMARCHY"
 
-############################################
-# HELPERS
-############################################
-
-# ask QUESTION: true on y/yes. Without a terminal the answer is no.
-ask() {
-	local ans=""
-	if [ -t 0 ]; then
-		read -r -p "$1 [y/N]: " ans || true
-	fi
-	case "${ans,,}" in
-		y|yes) return 0 ;;
-		*) return 1 ;;
-	esac
-}
-
-# link SRC DEST: point DEST at SRC. A real file or directory at DEST is
-# renamed to DEST.bak-<time> first. A missing SRC leaves DEST alone, so a
-# partial sync can't leave a dangling link.
-link() {
-	local src=$1
-	local dest=$2
-	if [ ! -e "$src" ]; then
-		echo "Missing $src; leaving $dest unchanged."
-		return 0
-	fi
-	mkdir -p "$(dirname "$dest")"
-	if [ -e "$dest" ] && [ ! -L "$dest" ]; then
-		mv -v "$dest" "$dest.bak-$(date +%Y%m%d%H%M%S)"
-	fi
-	ln -sfn "$src" "$dest"
-}
-
-# run_installer URL [INTERPRETER] [ARGS...]: run a vendor's install script.
-# The whole script is downloaded before it runs, never a truncated one.
-run_installer() {
-	local url=$1
-	local interp=${2:-bash}
-	local tmp
-	tmp=$(mktemp)
-	curl -fsSL "$url" -o "$tmp"
-	"$interp" "$tmp" "${@:3}"
-	rm -f "$tmp"
-}
-
-# have_app CMD NAME: CMD is on PATH or ~/Applications holds a NAME*.AppImage.
-have_app() {
-	command -v "$1" &>/dev/null || compgen -G ~/Applications/"$2"'*.AppImage' >/dev/null
-}
-
-# fetch_appimage URL NAME: download to ~/Applications/NAME.AppImage once.
-fetch_appimage() {
-	local dest=~/Applications/$2.AppImage
-	if have_app "$2" "$2"; then
-		echo "Already present: $2"
-		return 0
-	fi
-	mkdir -p ~/Applications
-	curl -fSL "$1" -o "$dest.part"
-	chmod +x "$dest.part"
-	mv "$dest.part" "$dest"
-}
-
-############################################
-# PACKAGE MANAGER DETECTION
-############################################
-if command -v pacman &>/dev/null; then
-	PKG_MGR=pacman
-	# Plain -S with --needed, like Omarchy's own pkg-add: -Sy without -u
-	# risks a partial upgrade. Names the repos don't know are skipped, the
-	# same as dnf --skip-unavailable.
-	pkg_install() {
-		local pkg
-		local known=()
-		for pkg in "$@"; do
-			if pacman -Si "$pkg" &>/dev/null; then
-				known+=("$pkg")
-			else
-				echo "Not in the repos, skipped: $pkg"
-			fi
-		done
-		if (( ${#known[@]} > 0 )); then
-			sudo pacman -S --needed "${known[@]}"
-		fi
-	}
-elif command -v apt &>/dev/null; then
-	PKG_MGR=apt
-	pkg_install() { sudo apt update && sudo apt install -y "$@"; }
-elif command -v dnf &>/dev/null; then
-	PKG_MGR=dnf
-	# --skip-unavailable: a single unknown name shouldn't abort the whole batch
-	pkg_install() { sudo dnf install -y --skip-unavailable "$@"; }
-elif command -v zypper &>/dev/null; then
-	PKG_MGR=zypper
-	pkg_install() { sudo zypper install -y "$@"; }
-else
-	PKG_MGR=unknown
-	pkg_install() { echo "No supported package manager found. Install manually: $*"; return 1; }
-fi
-echo "Detected package manager: $PKG_MGR"
-
-pkg_is_installed() {
-	case "$PKG_MGR" in
-		pacman)
-			pacman -Qq "$1" &>/dev/null
-			;;
-		apt)
-			dpkg -s "$1" &>/dev/null
-			;;
-		dnf|zypper)
-			rpm -q "$1" &>/dev/null
-			;;
-		*)
-			return 1
-			;;
-	esac
-}
-
-pkg_ensure_installed() {
-	local missing=()
-	local pkg
-
-	for pkg in "$@"; do
-		if pkg_is_installed "$pkg"; then
-			echo "Already installed: $pkg"
-		else
-			missing+=("$pkg")
-		fi
-	done
-
-	if (( ${#missing[@]} > 0 )); then
-		pkg_install "${missing[@]}"
-	fi
-}
-
-# AUR packages go through yay, which Omarchy ships.
-aur_ensure_installed() {
-	local missing=()
-	local pkg
-	if ! command -v yay &>/dev/null; then
-		echo "yay not found. Install from the AUR by hand: $*"
-		return 0
-	fi
-	for pkg in "$@"; do
-		pkg_is_installed "$pkg" || missing+=("$pkg")
-	done
-	if (( ${#missing[@]} > 0 )); then
-		yay -S --needed "${missing[@]}"
-	fi
-}
-
-install_root_file() {
-	local src="$1"
-	local dst="$2"
-	local mode="${3:-0644}"
-
-	sudo install -D -m "$mode" "$src" "$dst"
-}
+# ask, link, package helpers and PKG_MGR detection.
+source "$LF/setup-lib.sh"
 
 ############################################
 # CONFIGS
@@ -194,6 +38,8 @@ install_root_file() {
 
 # Shell
 link "$LF/dotfiles/bash/.shrc.part" ~/.shrc.part.sh
+# cmds: fuzzy menu of my scripts (scripts/cmds.sources lists the folders).
+link "$LF/scripts/cmds.sh" ~/.local/bin/cmds
 grep -qF .shrc.part.sh ~/.bashrc || echo "source ~/.shrc.part.sh" >> ~/.bashrc
 
 # Claude Code Router plugin (adds the OpenCode Go session header)
@@ -204,14 +50,7 @@ link "$LF/dotfiles/ssh/.ssh/config" ~/.ssh/config
 
 # Git
 link "$LF/dotfiles/git/.gitconfig" ~/.gitconfig
-# ~/.gitconfig includes ~/.gitconfig-work: work email and EPAM Azure DevOps
-# tenants. It stays out of this public repo, in the synced work-resources.
-GIT_WORK=~/DATA/work-resources/GENERAL/gitconfig-work
-if [ -f "$GIT_WORK" ]; then
-	link "$GIT_WORK" ~/.gitconfig-work
-else
-	echo "WARNING: $GIT_WORK not synced yet; git has no work identity."
-fi
+# ~/.gitconfig includes ~/.gitconfig-work; the work setup links it.
 
 # Git credential helper: ~/.gitconfig sets `credential.helper = libsecret` so
 # HTTPS credentials land in the Secret Service keyring (gnome-keyring/KWallet)
@@ -248,6 +87,9 @@ done
 
 if $IS_OMARCHY; then
 	echo "Omarchy: keeping its Hyprland, terminal, tmux, nvim and font configs."
+	# Personal input overrides only (natural touchpad scroll).
+	link "$LF/dotfiles/omarchy/hypr/input.lua" ~/.config/hypr/input.lua
+	"$LF/scripts/tiling-wm/terminal-font-size.sh" 11
 else
 	# Hyprland desktop (Omarchy 4 has its own: Lua config + Quickshell)
 	link "$LF/dotfiles/hyprland/hyprland.conf" ~/.config/hypr/hyprland.conf
@@ -338,7 +180,9 @@ apply_syncthing_redirect() {
 	current=$(readlink ~/.config/systemd/user/syncthing.service.d/override.conf || true)
 	if [ "$current" = "$SYNCTHING_DROPIN" ]; then
 		echo "Syncthing already reads its config from $SYNCTHING_SRC."
+		python3 "$LF/scripts/syncthing/st-folders.py" settle
 		python3 "$LF/scripts/syncthing/st-folders.py" save
+		systemctl --user enable --now syncthing || true
 		return
 	fi
 	# Don't silently shadow a different identity already in the default location.
@@ -357,8 +201,12 @@ apply_syncthing_redirect() {
 	python3 "$LF/scripts/syncthing/st-folders.py" restore
 	link "$SYNCTHING_DROPIN" ~/.config/systemd/user/syncthing.service.d/override.conf
 	systemctl --user daemon-reload
-	systemctl --user enable --now syncthing 2>/dev/null || true
-	echo "Syncthing config dir set to $SYNCTHING_SRC; service (re)started."
+	if systemctl --user enable --now syncthing; then
+		echo "Syncthing config dir set to $SYNCTHING_SRC; service (re)started."
+	else
+		echo "WARNING: Syncthing did not start. Run:"
+		echo "  systemctl --user enable --now syncthing"
+	fi
 }
 
 if [ -f "$SYNCTHING_DROPIN" ]; then
@@ -581,36 +429,6 @@ if ask "Install latest lazygit & lazydocker?"; then
 fi
 
 ############################################
-# GIT CREDENTIAL MANAGER (Azure DevOps / EPAM)
-############################################
-# ~/.gitconfig routes dev.azure.com through GCM (Microsoft Entra OAuth) while
-# libsecret stays the default for every other host. GCM isn't in distro repos
-# and ships no rpm; the x64 tarball bundles the binary with its Skia/HarfBuzz
-# libs, so extract it whole under ~/.local and link the helper onto PATH. The
-# libs must sit beside the binary, hence the symlink (not a copied binary).
-# EPAM Azure DevOps over HTTPS only. Repo lives under git-ecosystem, not microsoft.
-if ! command -v git-credential-manager &>/dev/null; then
-	if ask "Install Git Credential Manager (Azure DevOps auth)?"; then
-		GCM_API="https://api.github.com/repos/git-ecosystem/git-credential-manager/releases/latest"
-		GCM_GREP='https://[^"]*gcm-linux-x64[^"]*\.tar\.gz'
-		GCM_URL=$(curl -fsSL "$GCM_API" | grep -o "$GCM_GREP" | grep -v symbols | head -1 || true)
-		if [[ -n "$GCM_URL" ]]; then
-			GCM_DIR=~/.local/share/git-credential-manager
-			GCM_TAR=$(mktemp)
-			mkdir -vp "$GCM_DIR" ~/.local/bin
-			curl -fSL "$GCM_URL" -o "$GCM_TAR"
-			tar -xzf "$GCM_TAR" -C "$GCM_DIR"
-			rm -f "$GCM_TAR"
-			ln -sf "$GCM_DIR/git-credential-manager" ~/.local/bin/git-credential-manager
-		else
-			echo "Could not resolve GCM tarball asset; install manually."
-		fi
-	else
-		echo "Skipped GCM; Azure DevOps over HTTPS will prompt until installed."
-	fi
-fi
-
-############################################
 # DESKTOP APPS
 ############################################
 # Google Chrome also runs the shared EPAM profile (epam-chrome.service).
@@ -686,52 +504,6 @@ fi
 ############################################
 # WORK AND CLOUD TOOLS
 ############################################
-if ! command -v gpclient &>/dev/null && ask "Install GlobalProtect VPN client (EPAM)?"; then
-	case "$PKG_MGR" in
-		pacman)
-			pkg_ensure_installed globalprotect-openconnect
-			;;
-		dnf)
-			GP_API=https://api.github.com/repos/yuezk/GlobalProtect-openconnect/releases/latest
-			GP_URL=$(curl -fsSL "$GP_API" | grep -o 'https://[^"]*x86_64\.rpm' | head -1 || true)
-			if [ -n "$GP_URL" ]; then
-				pkg_install "$GP_URL"
-			else
-				echo "Could not resolve the GlobalProtect rpm; see https://github.com/yuezk/GlobalProtect-openconnect"
-			fi
-			;;
-		*)
-			echo "Install GlobalProtect from https://github.com/yuezk/GlobalProtect-openconnect"
-			;;
-	esac
-fi
-
-if ask "Install cloud CLIs (azure-cli, gcloud)?"; then
-	case "$PKG_MGR" in
-		pacman)
-			pkg_ensure_installed azure-cli
-			;;
-		dnf)
-			if ! pkg_is_installed packages-microsoft-prod; then
-				pkg_install https://packages.microsoft.com/config/rhel/10/packages-microsoft-prod.rpm
-			fi
-			pkg_ensure_installed azure-cli
-			;;
-		*)
-			echo "Install azure-cli: https://learn.microsoft.com/cli/azure/install-azure-cli-linux"
-			;;
-	esac
-	# gcloud: the AUR on Arch, Google's tarball install in ~/google-cloud-sdk
-	# elsewhere. .shrc.part puts it on PATH.
-	if ! command -v gcloud &>/dev/null && [ ! -d ~/google-cloud-sdk ]; then
-		if [ "$PKG_MGR" = pacman ]; then
-			aur_ensure_installed google-cloud-cli
-		else
-			run_installer https://sdk.cloud.google.com bash --disable-prompts --install-dir="$HOME"
-		fi
-	fi
-fi
-
 if ask "Install DevOps CLIs (terraform, cosign, trivy, rclone, freerdp)?"; then
 	case "$PKG_MGR" in
 		pacman)
@@ -887,46 +659,6 @@ mkdir -p ~/Playground
 # arrive through Syncthing.
 mkdir -vp ~/obsidian
 
-# VMs: QEMU/KVM, the Ubuntu EPAM VM and the Windows 11 VM.
-# Launch scripts live in ~/linux-files/vm-configs/<vm>/ and are symlinked into
-# ~/vms/<vm>/, next to the local-only disk, ISO and UEFI/TPM state. A run
-# script creates an empty disk on first start and boots the ISO to install.
-# localvm@<vm>.service runs a VM headless (VNC + QMP); vm.sh drives it.
-VM_CONFIGS=$LF/vm-configs
-if ask "Set up the local VMs (QEMU, Ubuntu EPAM VM, Windows 11)?"; then
-	case "$PKG_MGR" in
-		pacman) pkg_ensure_installed qemu-desktop qemu-img edk2-ovmf swtpm ;;
-		apt)    pkg_ensure_installed qemu-system-x86 qemu-utils ovmf swtpm swtpm-tools ;;
-		*)      pkg_ensure_installed qemu-kvm qemu-img edk2-ovmf swtpm swtpm-tools ;;
-	esac
-	mkdir -vp ~/vms/epam-vm ~/vms/windows
-	link "$VM_CONFIGS/ubuntu/run.sh" ~/vms/epam-vm/run.sh
-	link "$VM_CONFIGS/windows/run_vm.sh" ~/vms/windows/run_vm.sh
-	link "$LF/systemd-units/localvm@.service" ~/.config/systemd/user/localvm@.service
-	systemctl --user daemon-reload
-
-	# Ubuntu ISO: official release, checked against Ubuntu's SHA256SUMS.
-	UBUNTU_REL=26.04
-	UBUNTU_ISO=ubuntu-26.04.1-desktop-amd64.iso
-	if [ ! -f ~/vms/epam-vm/$UBUNTU_ISO ]; then
-		curl -fL -o ~/vms/epam-vm/$UBUNTU_ISO.part "https://releases.ubuntu.com/$UBUNTU_REL/$UBUNTU_ISO"
-		mv ~/vms/epam-vm/$UBUNTU_ISO.part ~/vms/epam-vm/$UBUNTU_ISO
-		(cd ~/vms/epam-vm && curl -fsL "https://releases.ubuntu.com/$UBUNTU_REL/SHA256SUMS" | grep " \*$UBUNTU_ISO\$" | sha256sum -c -) || echo "WARNING: $UBUNTU_ISO checksum failed"
-	fi
-	# The YubiKey goes to the Ubuntu VM: host pcscd must ignore it.
-	sudo "$VM_CONFIGS/ubuntu/host-setup.sh"
-
-	# Microsoft has no stable direct link for the Windows ISO.
-	if [ ! -f ~/vms/windows/Win11_25H2_EnglishInternational_x64_v2.iso ]; then
-		echo "Windows VM: download the Windows 11 ISO (English International, x64)"
-		echo "from https://www.microsoft.com/software-download/windows11 and save it as"
-		echo "~/vms/windows/Win11_25H2_EnglishInternational_x64_v2.iso"
-	fi
-	echo "Install a VM: ~/vms/epam-vm/run.sh or ~/vms/windows/run_vm.sh (GTK window)."
-	echo "Then run it headless: systemctl --user start localvm@ubuntu (or @windows)."
-	echo "Tailnet access to VNC/RDP: $VM_CONFIGS/README-remote-access.md"
-fi
-
 # IT (Syncthing) + cockpit-core symlinks
 if [ -d ~/DATA/IT ]; then
 	ln -sfn ~/DATA/IT ~/IT
@@ -954,16 +686,6 @@ USER_UNITS=~/.config/systemd/user
 # scripts/devices/laptop/toggle-lid-sleep.sh starts and stops it.
 link "$LF/systemd-units/lid-no-suspend.service" "$USER_UNITS/lid-no-suspend.service"
 
-# EPAM hub, relay and shared Chrome live in the work hub.
-EPAM_UNITS=$WORK_HUB/.ai/epam/systemd
-if [ -d "$EPAM_UNITS" ] && ask "Link the EPAM user services and enable hub + relay?"; then
-	for unit in "$EPAM_UNITS"/*.service; do
-		link "$unit" "$USER_UNITS/$(basename "$unit")"
-	done
-	link "$WORK_HUB/.ai/nsg/nsg-guard.sh" ~/.local/bin/nsg-guard
-	systemctl --user daemon-reload
-	systemctl --user enable --now epam-hub.service epam-relay.service
-fi
 # No user bus (e.g. a bare ssh login) is not a reason to abort.
 systemctl --user daemon-reload || true
 
@@ -1013,6 +735,31 @@ if ask "Install agent CLIs (claude, codex, grok, opencode, cursor-agent, agy)?";
 	command -v opencode &>/dev/null || run_installer https://opencode.ai/install bash
 	command -v cursor-agent &>/dev/null || run_installer https://cursor.com/install bash
 	command -v agy &>/dev/null || run_installer https://antigravity.google/cli/install.sh bash
+fi
+
+# The agy CLI above is separate from the Antigravity GUI apps below.
+# Grok Bot desktop: x.ai serves the AppImage only through its page, so the
+# browser downloads it and setup.sh moves it into ~/Applications.
+# A pasted download link (right-click the button, Copy link) is used as is.
+if ! have_app grok-bot GrokBot && ask "Install Grok Bot (download the AppImage from x.ai/bot)?"; then
+	xdg-open https://x.ai/bot &>/dev/null || echo "Open https://x.ai/bot"
+	echo "Paste the AppImage download link, or download it to ~/Downloads"
+	read -r -p "and press Enter: " gb_url </dev/tty || gb_url=""
+	gb=""
+	if [ -n "$gb_url" ]; then
+		gb=$(mktemp --suffix=.AppImage)
+		curl -fSL "$gb_url" -o "$gb" || gb=""
+	else
+		gb=$(ls -t ~/Downloads/*[Gg]rok*.AppImage 2>/dev/null | head -1 || true)
+	fi
+	if [ -n "$gb" ]; then
+		mkdir -p ~/Applications
+		install -m 755 "$gb" ~/Applications/GrokBot.AppImage
+		rm -f "$gb"
+		echo "Grok Bot: ~/Applications/GrokBot.AppImage"
+	else
+		echo "No Grok Bot AppImage found; re-run setup.sh after downloading."
+	fi
 fi
 
 if [ "$PKG_MGR" = pacman ] && ask "Install Antigravity and Antigravity IDE (AUR)?"; then
@@ -1110,5 +857,18 @@ if [ -d "$BOOKMARKS_STORE" ] && ask "Restore browser bookmarks (close Chromium a
 	python3 "$LF/scripts/browser/bookmarks.py" restore || true
 fi
 
-echo "Manual steps: log in to each agent CLI; sudo tailscale up (outside Omarchy);"
-echo "Grok Bot AppImage from https://x.ai/bot; the Windows 11 ISO for the VM."
+############################################
+# SETUP WORK CONFIGURATIONS
+############################################
+# EPAM: repos, logins (az, ADO, gcloud, Databricks, AWS), VPN, VMs and the
+# hub services. It lives in the work hub, so it runs once that has synced.
+WORK_SETUP=~/obsidian/obsidian-work/.ai/setup.sh
+if [ -f "$WORK_SETUP" ]; then
+	if ask "Setup work configurations (EPAM)?"; then
+		bash "$WORK_SETUP"
+	fi
+else
+	echo "Work setup: $WORK_SETUP not synced yet; re-run setup.sh later."
+fi
+
+echo "Manual steps: log in to each agent CLI; sudo tailscale up (outside Omarchy)."

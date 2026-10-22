@@ -1,3 +1,4 @@
+# menu: Pick from clipboard history (cliphist)
 set -exo pipefail
 
 SELECTION="$(cliphist list | wofi --dmenu)"

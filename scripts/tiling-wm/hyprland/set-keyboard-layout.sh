@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# menu: Hyprland: switch keyboard layout: INDEX CODE
 set -euo pipefail
 
 if [[ $# -lt 2 ]]; then

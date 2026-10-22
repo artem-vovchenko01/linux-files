@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# menu: Connect to an EPAM DPAF VM (wofi pick)
 SCRIPTS=~/linux-files/scripts
 VMS_PATH=~/EPAM/EPMA-DPAF/resources/creds/vms
 

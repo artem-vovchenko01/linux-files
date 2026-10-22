@@ -32,6 +32,11 @@ Syncthing folder under `~` with its saved `.stignore`
 restored identity. The phone and the Grok Bot boxes reconnect by
 themselves through global discovery.
 
+The last step, "Setup work configurations", runs
+`~/obsidian/obsidian-work/.ai/setup.sh` once the work hub has synced:
+EPAM repos, logins, VPN, VMs and services. On the first pass the hub is
+usually missing, so it runs on the second pass.
+
 ## 3. Wait for the hubs to sync (agent)
 
 The Syncthing GUI and REST API are on `127.0.0.1:8384`. The API key is in

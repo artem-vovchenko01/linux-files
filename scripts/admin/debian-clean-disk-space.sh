@@ -1,3 +1,4 @@
+# menu: Free disk space on Debian/Ubuntu: logs, apt cache, journal
 sudo rm -rf /tmp/*
 sudo rm -rf /var/tmp/*
 sudo rm -vf /var/log/wtmp /var/log/btmp

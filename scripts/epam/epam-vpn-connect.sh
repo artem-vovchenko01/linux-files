@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# menu: Connect the EPAM GlobalProtect VPN (~/.work-vpn-server)
 
 set -euo pipefail
 

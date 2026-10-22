@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# menu: Pick a wallpaper (wofi)
 set -euo pipefail
 
 if [ -d "$HOME/IT/Resources/Wallpapers" ]; then

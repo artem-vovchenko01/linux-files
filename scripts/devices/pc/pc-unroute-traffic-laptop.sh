@@ -1,3 +1,4 @@
+# menu: PC: back to the router as default gateway
 #if [ "$(ip route | grep default | wc -l)" -eq 2 ]; then
 #	sudo ip route del default
 #fi

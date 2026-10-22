@@ -1,3 +1,4 @@
+# menu: PC: send internet traffic through the laptop
 HOST=182
 if [ -n "$1" ]; then
 	HOST=$1

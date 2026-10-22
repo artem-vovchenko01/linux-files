@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# menu: Copy a file or dir to an EPAM DPAF VM (wofi)
 set -o pipefail
 
 SCRIPTS=~/linux-files/scripts

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# menu: Pick the default microphone (wofi)
 set -euo pipefail
 
 DEFAULT="$(pactl get-default-source)"

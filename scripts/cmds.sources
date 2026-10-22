@@ -1,0 +1,5 @@
+# Sources for cmds (scripts/cmds.sh): one "LABEL DIR" per line.
+# "include FILE" reads another sources file; missing dirs and files are
+# skipped, so a hub that has not synced yet just does not show.
+lf ~/linux-files/scripts
+include ~/obsidian/obsidian-work/.ai/cmds.sources

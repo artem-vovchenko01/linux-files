@@ -1,3 +1,4 @@
+# menu: Restart the wired NetworkManager connection
 sudo systemctl restart NetworkManager
 nmcli g reload
 nmcli c down Wired\ connection\ 1
