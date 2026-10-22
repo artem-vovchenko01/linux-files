@@ -9,34 +9,36 @@ runs the steps and asks Artem only where a step says so. Read
     git clone https://github.com/artem-vovchenko01/linux-files ~/linux-files
     ~/linux-files/bootstrap.sh
 
-This installs git, gpg and the Claude CLI and unpacks the restore kit
-(`restore-kit-*.tar.gpg` on the Ventoy stick) into `~/DATA`:
-`IT` (Syncthing identity), `work-resources`, `Secrets` (SSH keys, Telegram
-account, private notes; map in `~/DATA/Secrets/README.md`).
-The kit passphrase is in Bitwarden. Without the stick, download
-`gdrive-ext:Laptop_archive_2026-10/Restore/restore-kit-IT-2026-10-22.tar.gpg`
-from drive.google.com (the ext Google account) and run
-`RESTORE_KIT=<file> ~/linux-files/bootstrap.sh`. It holds `IT` only;
-`Secrets` and `work-resources` then come from the phone through Syncthing. Check that `~/DATA/IT/configs/syncthing/config.xml`
-exists. Without it Syncthing starts with a new device ID, and every peer
-must accept the new ID (`cockpit-core` skill `syncthing-workflow`).
+This installs git, gpg and the Claude CLI.
 
 ## 2. setup.sh, first pass (Artem runs it in a terminal)
 
 `setup.sh` asks y/N before each install and needs sudo, so Artem runs
-`~/linux-files/setup.sh` himself. The first pass installs packages and
-Syncthing, creates every Syncthing folder under `~` with its saved
-`.stignore` (`scripts/syncthing/st-folders.py restore`), and starts
-Syncthing with the restored identity. The phone and
-the Grok Bot boxes reconnect by themselves through global discovery.
+`~/linux-files/setup.sh` himself. It asks where the restore kit is:
+
+- `s`: the Ventoy stick, `restore-kit-*.tar.gpg`. It holds `IT` (Syncthing
+  identity), `work-resources` and `Secrets` (SSH keys, Telegram account,
+  private notes; map in `~/DATA/Secrets/README.md`).
+- `d`: Google Drive. setup.sh opens the folder in the browser and waits
+  while Artem signs in with the ext Google account and downloads
+  `restore-kit-IT-*.tar.gpg` to `~/Downloads`. It holds `IT` only;
+  `Secrets` and `work-resources` then come from the phone.
+- `n`: a new device ID. Every peer must accept it (`cockpit-core` skill
+  `syncthing-workflow`).
+
+gpg asks for the kit passphrase from Bitwarden. Then setup.sh creates every
+Syncthing folder under `~` with its saved `.stignore`
+(`scripts/syncthing/st-folders.py restore`) and starts Syncthing with the
+restored identity. The phone and the Grok Bot boxes reconnect by
+themselves through global discovery.
 
 ## 3. Wait for the hubs to sync (agent)
 
 The Syncthing GUI and REST API are on `127.0.0.1:8384`. The API key is in
 `~/DATA/IT/configs/syncthing/config.xml`. Wait until these folders are at
 100%: `cockpit-core`, `obsidian-personal`, `obsidian-work`,
-`agentic-context`, `local-git`. The external HDD folders show an error
-until the HDD is mounted. That error is expected.
+`agentic-context`, `local-git`. The external HDD folders are paused until the HDD
+is plugged in.
 
 ## 4. setup.sh, second pass (Artem)
 

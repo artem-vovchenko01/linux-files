@@ -1,6 +1,0 @@
-[Unit]
-Description=Save Chromium and Firefox bookmarks to ~/DATA/IT/browser-bookmarks
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/python3 %h/linux-files/scripts/browser/bookmarks.py save

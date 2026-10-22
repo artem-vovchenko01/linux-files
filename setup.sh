@@ -283,25 +283,55 @@ fi
 # config.xml is NOT symlinked: Syncthing rewrites it via atomic rename, which
 # replaces a symlink with a real file. Instead we point its config dir
 # (STCONFDIR) at ~/DATA/IT via a systemd drop-in and keep the database
-# (STDATADIR) on local storage. On a fresh machine the config + device identity
-# can also be restored from a backup left on the HDD (see syncthing-config-backup)
-# or from the encrypted restore kit (bootstrap.sh unpacks it into ~/DATA).
+# (STDATADIR) on local storage. On a fresh machine the identity comes from an
+# encrypted restore kit: on the Ventoy stick (IT + work-resources + Secrets)
+# or on Google Drive (IT only). Its passphrase is in Bitwarden.
 mkdir -vp ~/DATA
 if ! command -v syncthing &>/dev/null && ask "Install Syncthing now (needed to restore it)?"; then
 	pkg_ensure_installed syncthing
 fi
 SYNCTHING_SRC=~/DATA/IT/configs/syncthing
 SYNCTHING_DROPIN=$LF/systemd-units/syncthing.service.d/override.conf
-SYNCTHING_BACKUP_NAME=syncthing-config-backup
+RESTORE_DRIVE_URL=https://drive.google.com/drive/folders/1Z-2VjsGQuBMT91-Q921ffovOa3kB2wxV
 
-# Look for a config backup on any mounted HDD partition.
-syncthing_hdd_backup=""
-for m in /run/media/"$USER"/*/; do
-	if [ -f "$m$SYNCTHING_BACKUP_NAME/config.xml" ]; then
-		syncthing_hdd_backup="$m$SYNCTHING_BACKUP_NAME"
-		break
-	fi
-done
+# Ask where the restore kit is until ~/DATA/IT exists or Artem skips.
+restore_syncthing_identity() {
+	local choice kit
+	local stick=/dev/disk/by-label/Ventoy
+	while [ ! -f "$SYNCTHING_SRC/config.xml" ]; do
+		echo
+		echo "Syncthing identity (~/DATA/IT) is missing. Restore it from:"
+		echo "  [s] the Ventoy stick (restore-kit-*.tar.gpg)"
+		echo "  [d] Google Drive (download it in the browser)"
+		echo "  [n] nowhere: start with a new device ID"
+		read -r -p "Choice [s/d/n]: " choice </dev/tty || choice=n
+		kit=""
+		case "${choice,,}" in
+			s)
+				if [ -e "$stick" ] && ! findmnt -S "$stick" &>/dev/null; then
+					udisksctl mount -b "$stick" || true
+				fi
+				kit=$(ls /run/media/"$USER"/*/restore-kit-*.tar.gpg 2>/dev/null | tail -1 || true)
+				[ -n "$kit" ] || echo "No restore kit under /run/media/$USER. Plug in the stick."
+				;;
+			d)
+				echo "Sign in with the ext Google account and download"
+				echo "restore-kit-IT-*.tar.gpg into ~/Downloads: $RESTORE_DRIVE_URL"
+				xdg-open "$RESTORE_DRIVE_URL" &>/dev/null || true
+				read -r -p "Press Enter when the download has finished ... " </dev/tty || true
+				kit=$(ls -t ~/Downloads/restore-kit-*.tar.gpg 2>/dev/null | head -1 || true)
+				[ -n "$kit" ] || echo "No restore-kit-*.tar.gpg in ~/Downloads."
+				;;
+			n)
+				return 1
+				;;
+		esac
+		if [ -n "$kit" ]; then
+			echo "Unpacking $kit into ~ (gpg asks for the passphrase)."
+			gpg --decrypt "$kit" | tar -xf - -C ~ || echo "Unpacking failed. Wrong passphrase?"
+		fi
+	done
+}
 
 apply_syncthing_redirect() {
 	local current
@@ -332,22 +362,11 @@ apply_syncthing_redirect() {
 }
 
 if [ -f "$SYNCTHING_DROPIN" ]; then
-	if [ -f "$SYNCTHING_SRC/config.xml" ]; then
-		# A config is already present locally (e.g. ~/DATA/IT synced from a peer).
-		if [ -n "$syncthing_hdd_backup" ]; then
-			echo "Syncthing: a local config already exists at $SYNCTHING_SRC (synced IT folder)."
-			echo "          An HDD backup also exists at $syncthing_hdd_backup — ignoring it; the synced copy wins."
-		fi
-		echo "Syncthing: will repoint the service at $SYNCTHING_SRC and restart."
-		apply_syncthing_redirect
-	elif [ -n "$syncthing_hdd_backup" ]; then
-		echo "Syncthing: no synced ~/DATA/IT config; restoring from HDD backup at $syncthing_hdd_backup."
-		mkdir -vp "$SYNCTHING_SRC"
-		cp -v "$syncthing_hdd_backup"/* "$SYNCTHING_SRC"/
+	if [ -f "$SYNCTHING_SRC/config.xml" ] || restore_syncthing_identity; then
 		apply_syncthing_redirect
 	else
-		echo "Syncthing: backup not found — no HDD backup ($SYNCTHING_BACKUP_NAME) and no synced ~/DATA/IT."
-		echo "          Run bootstrap.sh with the restore kit, or plug in the HDD backup, then re-run."
+		echo "Syncthing: not restored. Re-run setup.sh to restore the identity,"
+		echo "or let the peers accept a new device ID (skill syncthing-workflow)."
 	fi
 fi
 
@@ -1084,16 +1103,12 @@ else
 	echo "in Syncthing, then re-run setup.sh."
 fi
 
-# Browser bookmarks: copies live in ~/DATA/IT/browser-bookmarks, refreshed
-# daily by bookmarks-save.timer. Firefox needs a profile first: start it once.
+# Browser bookmarks: copies live in ~/DATA/IT/browser-bookmarks
+# (bookmarks.py save). Firefox needs a profile first: start it once.
 BOOKMARKS_STORE=~/DATA/IT/browser-bookmarks
 if [ -d "$BOOKMARKS_STORE" ] && ask "Restore browser bookmarks (close Chromium and Firefox first)?"; then
 	python3 "$LF/scripts/browser/bookmarks.py" restore || true
 fi
-link "$LF/systemd-units/bookmarks-save.service" "$USER_UNITS/bookmarks-save.service"
-link "$LF/systemd-units/bookmarks-save.timer" "$USER_UNITS/bookmarks-save.timer"
-systemctl --user daemon-reload || true
-systemctl --user enable --now bookmarks-save.timer || true
 
 echo "Manual steps: log in to each agent CLI; sudo tailscale up (outside Omarchy);"
 echo "Grok Bot AppImage from https://x.ai/bot; the Windows 11 ISO for the VM."

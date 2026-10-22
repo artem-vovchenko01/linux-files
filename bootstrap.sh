@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# First step on a fresh machine. Installs git, gpg and the Claude CLI,
-# clones this repo, and unpacks the encrypted restore kit into ~/DATA.
-# Then an agent continues from NEW-MACHINE.md.
+# First step on a fresh machine. Installs git, gpg and the Claude CLI and
+# clones this repo. setup.sh then restores Syncthing from the restore kit,
+# and an agent continues from NEW-MACHINE.md.
 #
 #   git clone https://github.com/artem-vovchenko01/linux-files ~/linux-files
 #   ~/linux-files/bootstrap.sh
@@ -42,26 +42,7 @@ if ! command -v claude &>/dev/null && [ ! -x ~/.local/bin/claude ]; then
 	rm -f "$installer"
 fi
 
-# The kit holds ~/DATA/IT (Syncthing identity), ~/DATA/work-resources
-# and ~/DATA/Secrets (SSH keys, Telegram account). Its passphrase is in
-# Bitwarden. Set RESTORE_KIT=/path/to/kit when the stick is not under
-# /run/media (mount it with `udisksctl mount -b /dev/sdX1`).
-kit=${RESTORE_KIT:-}
-if [ -z "$kit" ]; then
-	kit=$(ls /run/media/"$USER"/*/restore-kit-*.tar.gpg 2>/dev/null | tail -1 || true)
-fi
-if [ -d ~/DATA/IT ]; then
-	echo "~/DATA/IT exists: restore kit not unpacked."
-elif [ -n "$kit" ] && [ -f "$kit" ]; then
-	echo "Unpacking $kit into ~/DATA (gpg asks for the passphrase)."
-	mkdir -p ~/DATA
-	gpg --decrypt "$kit" | tar -xf - -C ~
-else
-	echo "No restore kit found. Syncthing will start with a new identity"
-	echo "unless you set RESTORE_KIT and run bootstrap.sh again."
-fi
-
-PATH=~/.local/bin:$PATH
 echo
-echo "Next: cd ~/linux-files && claude"
+echo "Next: ~/linux-files/setup.sh (asks for the restore kit: stick or Drive)."
+echo "Then: cd ~/linux-files && claude"
 echo "Log in, then say: continue the new machine setup from NEW-MACHINE.md"
