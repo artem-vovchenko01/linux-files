@@ -11,7 +11,8 @@ runs the steps and asks Artem only where a step says so. Read
 
 This installs git, gpg and the Claude CLI and unpacks the restore kit
 (`restore-kit-*.tar.gpg` on the Ventoy stick) into `~/DATA`:
-`IT` (Syncthing identity, SSH creds), `work-resources`, `Private_data`.
+`IT` (Syncthing identity), `work-resources`, `Secrets` (SSH keys, Telegram
+account, private notes; map in `~/DATA/Secrets/README.md`).
 The kit passphrase is in Bitwarden. Check that `~/DATA/IT/configs/syncthing/config.xml`
 exists. Without it Syncthing starts with a new device ID, and every peer
 must accept the new ID (`cockpit-core` skill `syncthing-workflow`).

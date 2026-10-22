@@ -737,10 +737,10 @@ if ask "Install DevOps CLIs (terraform, cosign, trivy, rclone, freerdp)?"; then
 fi
 
 # Google Drive remotes: gdrive = main Google account, gdrive-ext = ext account.
-# Both use Artem's own OAuth client from cockpit-core/secrets (the public
+# Both use Artem's own OAuth client from ~/DATA/Secrets (the public
 # repo holds no secret). Each remote opens a browser once: sign in with the
 # account named in the prompt. Tokens stay in ~/.config/rclone/rclone.conf.
-RCLONE_CLIENT=~/DATA/cockpit-core/secrets/rclone-gdrive-oauth-client.json
+RCLONE_CLIENT=~/DATA/Secrets/rclone/rclone-gdrive-oauth-client.json
 if command -v rclone &>/dev/null && [ -f "$RCLONE_CLIENT" ]; then
 	for remote_account in gdrive:main gdrive-ext:ext; do
 		remote=${remote_account%%:*}

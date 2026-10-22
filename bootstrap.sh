@@ -42,8 +42,8 @@ if ! command -v claude &>/dev/null && [ ! -x ~/.local/bin/claude ]; then
 	rm -f "$installer"
 fi
 
-# The kit holds ~/DATA/IT (Syncthing identity, SSH creds),
-# ~/DATA/work-resources and ~/DATA/Private_data. Its passphrase is in
+# The kit holds ~/DATA/IT (Syncthing identity), ~/DATA/work-resources
+# and ~/DATA/Secrets (SSH keys, Telegram account). Its passphrase is in
 # Bitwarden. Set RESTORE_KIT=/path/to/kit when the stick is not under
 # /run/media (mount it with `udisksctl mount -b /dev/sdX1`).
 kit=${RESTORE_KIT:-}
