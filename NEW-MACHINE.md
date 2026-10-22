@@ -13,7 +13,11 @@ This installs git, gpg and the Claude CLI and unpacks the restore kit
 (`restore-kit-*.tar.gpg` on the Ventoy stick) into `~/DATA`:
 `IT` (Syncthing identity), `work-resources`, `Secrets` (SSH keys, Telegram
 account, private notes; map in `~/DATA/Secrets/README.md`).
-The kit passphrase is in Bitwarden. Check that `~/DATA/IT/configs/syncthing/config.xml`
+The kit passphrase is in Bitwarden. Without the stick, download
+`gdrive-ext:Laptop_archive_2026-10/Restore/restore-kit-IT-2026-10-22.tar.gpg`
+from drive.google.com (the ext Google account) and run
+`RESTORE_KIT=<file> ~/linux-files/bootstrap.sh`. It holds `IT` only;
+`Secrets` and `work-resources` then come from the phone through Syncthing. Check that `~/DATA/IT/configs/syncthing/config.xml`
 exists. Without it Syncthing starts with a new device ID, and every peer
 must accept the new ID (`cockpit-core` skill `syncthing-workflow`).
 
@@ -21,7 +25,9 @@ must accept the new ID (`cockpit-core` skill `syncthing-workflow`).
 
 `setup.sh` asks y/N before each install and needs sudo, so Artem runs
 `~/linux-files/setup.sh` himself. The first pass installs packages and
-Syncthing, and starts Syncthing with the restored identity. The phone and
+Syncthing, creates every Syncthing folder under `~` with its saved
+`.stignore` (`scripts/syncthing/st-folders.py restore`), and starts
+Syncthing with the restored identity. The phone and
 the Grok Bot boxes reconnect by themselves through global discovery.
 
 ## 3. Wait for the hubs to sync (agent)
@@ -36,7 +42,8 @@ until the HDD is mounted. That error is expected.
 
 With the hubs present, the second pass links skills, agent settings and
 agent memories, connects the rclone remotes `gdrive` (main Google account) and
-`gdrive-ext` (ext account), and offers the `syncthing-workflow` timer.
+`gdrive-ext` (ext account), restores browser bookmarks (`scripts/browser/bookmarks.py`; start Firefox
+once before, so it has a profile), and offers the `syncthing-workflow` timer.
 
 ## 5. Hub history (agent)
 
