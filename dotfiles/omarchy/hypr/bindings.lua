@@ -14,6 +14,9 @@ o.bind("SUPER + D", "Omarchy menu", "omarchy-menu toggle")
 o.bind("SUPER + E", "File manager", { omarchy = "nautilus" })
 o.bind("SUPER + SHIFT + Q", "Close window", hl.dsp.window.close())
 
+-- Toggle split lost Super+J to vim focus below. Super+V stays paste.
+o.bind("SUPER + SHIFT + V", "Toggle window split", hl.dsp.layout("togglesplit"))
+
 -- Replaces Omarchy's top-bar toggle; Super+T still toggles floating too.
 hl.unbind("SUPER + SHIFT + SPACE")
 o.bind("SUPER + SHIFT + SPACE", "Toggle window floating/tiling", hl.dsp.window.float({ action = "toggle" }))
