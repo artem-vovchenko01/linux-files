@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "artem.layout-osd",
+  "name": "Keyboard layout OSD",
+  "version": "1.0.0",
+  "description": "Large keyboard layout popup near the top of the screen.",
+  "kinds": [
+    "panel"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "panel": "LayoutOsd.qml"
+  }
+}

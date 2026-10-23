@@ -92,6 +92,10 @@ if $IS_OMARCHY; then
 	link "$LF/dotfiles/omarchy/hypr/input.lua" ~/.config/hypr/input.lua
 	link "$LF/dotfiles/omarchy/hypr/bindings.lua" ~/.config/hypr/bindings.lua
 	link "$LF/dotfiles/omarchy/hypr/looknfeel.lua" ~/.config/hypr/looknfeel.lua
+	# Large keyboard layout popup at the top, summoned by Super+Space.
+	link "$LF/dotfiles/omarchy/plugins/artem.layout-osd" ~/.config/omarchy/plugins/artem.layout-osd
+	omarchy-shell shell rescanPlugins >/dev/null 2>&1 || true
+	omarchy plugin enable artem.layout-osd >/dev/null 2>&1 || true
 	"$LF/scripts/tiling-wm/terminal-font-size.sh" 14
 else
 	# Hyprland desktop (Omarchy 4 has its own: Lua config + Quickshell)

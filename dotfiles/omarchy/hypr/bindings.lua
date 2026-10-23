@@ -6,7 +6,7 @@
 --   omarchy menu keybindings --print
 
 -- Super+Space cycles keyboard layouts (set in input.lua), as before Omarchy,
--- and shows the new one in the Omarchy OSD.
+-- and shows the new one in a large popup at the top (artem.layout-osd plugin).
 -- The Omarchy menu moves to Super+D, the old launcher key.
 hl.unbind("SUPER + SPACE")
 o.bind("SUPER + SPACE", "Next keyboard layout", os.getenv("HOME") .. "/linux-files/scripts/tiling-wm/hyprland/next-keyboard-layout.sh")
