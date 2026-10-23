@@ -336,14 +336,11 @@ if command -v ufw &>/dev/null; then
 	if ask "Firewall: allow all incoming on tailscale0 (VM VNC/RDP, ssh over the tailnet)?"; then
 		sudo ufw allow in on tailscale0 comment tailscale
 	fi
-	if ask "Enable the ssh server and open 22/tcp (rate-limited)?"; then
-		if command -v omarchy-setup-security-sshd &>/dev/null; then
-			omarchy-setup-security-sshd
-		else
-			pkg_ensure_installed openssh
-			sudo systemctl enable --now sshd.service
-			sudo ufw limit 22/tcp comment ssh
-		fi
+	# No 22/tcp rule: ssh comes in only through the tailscale0 rule above, so
+	# it stays closed on public and office Wi-Fi.
+	if ask "Enable the ssh server (reachable over the tailnet only)?"; then
+		pkg_ensure_installed openssh
+		sudo systemctl enable --now sshd.service
 	fi
 fi
 
