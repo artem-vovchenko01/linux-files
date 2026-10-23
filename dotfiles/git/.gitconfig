@@ -27,3 +27,9 @@
 	helper = manager
 	azreposCredentialType = oauth
 	useHttpPath = true
+[credential "https://github.com"]
+	helper = 
+	helper = !/home/artem/.local/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/home/artem/.local/bin/gh auth git-credential
