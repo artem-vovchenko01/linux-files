@@ -731,8 +731,12 @@ USER_UNITS=~/.config/systemd/user
 # scripts/devices/laptop/toggle-lid-sleep.sh starts and stops it.
 link "$LF/systemd-units/lid-no-suspend.service" "$USER_UNITS/lid-no-suspend.service"
 
+# Omarchy has no captive-portal popup; this opens hotspot login pages.
+link "$LF/systemd-units/captive-portal-watch.service" "$USER_UNITS/captive-portal-watch.service"
+
 # No user bus (e.g. a bare ssh login) is not a reason to abort.
 systemctl --user daemon-reload || true
+systemctl --user enable captive-portal-watch.service || true
 
 # The timer accepts proven Grok Bot boxes into Syncthing. Its installer
 # creates any pairing secret it can't find, so run it only after the hubs

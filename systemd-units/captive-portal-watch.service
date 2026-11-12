@@ -1,0 +1,12 @@
+[Unit]
+Description=Open the Wi-Fi login page when a captive portal is detected
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=%h/linux-files/scripts/devices/laptop/captive-portal-watch.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target
