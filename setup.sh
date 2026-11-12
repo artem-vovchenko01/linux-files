@@ -903,6 +903,17 @@ if [ -d "$BOOKMARKS_STORE" ] && ask "Restore browser bookmarks (close Chromium a
 	python3 "$LF/scripts/browser/bookmarks.py" restore || true
 fi
 
+# My AI-built apps (private repo): clone or update it, then pick which to install.
+AI_APPS=~/Projects/ai-applications
+if ask "Restore AI applications (Studium, Koleso, ...) and pick which to install?"; then
+	if [ -d "$AI_APPS/.git" ]; then
+		git -C "$AI_APPS" pull --ff-only || true
+	else
+		git clone https://github.com/artem-vovchenko01/ai-applications "$AI_APPS" || true
+	fi
+	[ -x "$AI_APPS/install.sh" ] && "$AI_APPS/install.sh"
+fi
+
 ############################################
 # SETUP WORK CONFIGURATIONS
 ############################################
