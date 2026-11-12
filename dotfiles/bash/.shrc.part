@@ -438,6 +438,7 @@ fi
 alias codex="codex --dangerously-bypass-approvals-and-sandbox"
 alias codex-yolo="codex"
 alias claude="claude --verbose --dangerously-skip-permissions"
+alias claudex-vertex="claude-vertex"
 # Latest Opus for this session only; the saved default model is untouched.
 alias claude-opus="claude --model opus"
 alias gemini="gemini --approval-mode yolo"
