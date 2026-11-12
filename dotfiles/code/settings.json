@@ -6,7 +6,7 @@
     "editor.wordWrap": "on",
     "window.restoreWindows": "all",
     "redhat.telemetry.enabled": false,
-    "workbench.colorTheme": "Default Dark Modern",
+    "workbench.colorTheme": "Catppuccin Latte",
     "python.defaultInterpreterPath": "/bin/python",
     "claudeCode.selectedModel": "opus",
     "claudeCode.disableLoginPrompt": true,
