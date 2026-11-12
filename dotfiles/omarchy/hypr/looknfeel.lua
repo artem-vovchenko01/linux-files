@@ -64,7 +64,8 @@ hl.config({
 
 hl.config({
   general = {
-    -- Slightly smaller gap at the screen edges (Omarchy default: 10).
-    gaps_out = 6,
+    -- Screen-edge gap (Omarchy default: 10). Top is tighter so windows
+    -- sit closer under the bar. Sides and bottom stay at 6.
+    gaps_out = { top = 2, left = 6, right = 6, bottom = 6 },
   },
 })
