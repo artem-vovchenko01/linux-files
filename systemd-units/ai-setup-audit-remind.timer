@@ -1,0 +1,10 @@
+[Unit]
+Description=Every two weeks: remind Artem to run ai-setup-audit
+
+[Timer]
+# The first and third Monday of each month, 10:00.
+OnCalendar=Mon *-*-01..07,15..21 10:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

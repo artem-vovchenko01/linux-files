@@ -25,31 +25,33 @@ about what Artem actually wants.
 ## Copies of this skill
 
 The canonical copy is the work hub's:
-`~/logseq/logseq-work/.agents/skills/grok-bot-delegator/`. The corporate
+`~/obsidian/obsidian-work/.agents/skills/grok-bot-delegator/`. The corporate
 Grok Bot VM has only that hub, so the skill must live there.
 
-Two more full copies exist as real files, not symlinks, because some boxes
+Three more full copies exist as real files, not symlinks, because some boxes
 sync one hub without the other:
 
+- `~/cockpit-core/skills/grok-bot-delegator/`
 - `~/obsidian/obsidian-personal/.agents/skills/grok-bot-delegator/`
 - `~/linux-files/skills/grok-bot-delegator/`
 
-`~/cockpit-core/skills/grok-bot-delegator/` is a stub that points here.
-
-Edit the canonical copy, then copy the whole folder over the two other full
-copies. Never turn the stub back into a full copy. State in your report
-which copies you changed.
+Edit the canonical copy, then copy it over the others with
+`~/cockpit-core/skills/ai-setup-audit/sync-skill.py grok-bot-delegator`.
+State in your report which copies you changed.
 
 ## Where the work runs
 
-**Prefer this machine.** Fedora laptop, tailnet name `fedora`. Grok Bot runs
-here, so while the laptop is on the bot has direct access to it. All three
-CLIs are installed and logged in, they reach Artem's repos, notes and EPAM
-tooling, and the results land on the disk he actually uses.
+**Prefer omarchy.** Artem's active desktop (Arch Linux and Hyprland,
+machineId `a2cc47e6-6021-4cae-af83-c03c3c7d1a53`). Grok Bot reaches it
+while it is on, the EPAM routes run there, and results land on the disk he
+uses. It is a fresh install: check that the CLIs, `delegate.sh` and the
+hubs are set up there before relying on it. The Fedora laptop is retired
+for now; never target it.
 
 **The cloud computer is the fallback.** Grok Bot's own always-on machine, the
-one that keeps routines running when the laptop is off and when Artem messages
-the bot from the phone. Use it only when the laptop is unavailable. Nothing
+one that keeps routines running when omarchy is off and when Artem messages
+the bot from the phone. Use it when omarchy is unavailable or not set up
+for the task. It never signs in to EPAM. Nothing
 about it is assumed here — find out what it has before relying on it:
 
 ```
@@ -136,7 +138,7 @@ Login checks on their own, when you want them without the usage calls:
 
 ```
 ./delegate.sh "summarise what changed in this repo last week"
-./delegate.sh -l "what is the status of EPMPMVISEX-1201" -d ~/logseq/logseq-work
+./delegate.sh -l "what is the status of EPMPMVISEX-1201" -d ~/obsidian/obsidian-work
 ./delegate.sh -f brief.md -d ~/EPAM/migvisor_explainer
 ./delegate.sh -a codex -m gpt-6-astra -e high -t 3600 -f brief.md
 ./delegate.sh -A -a claude -f brief.md        # second Claude account
@@ -151,8 +153,11 @@ the answer — quote that line when you report back.
 **Start the run in the right directory** (`-d`). The delegate inherits the
 instructions and skills of the hub it starts in:
 
-- `~/logseq/logseq-work` — EPAM and MigVisor work: Teams, Outlook, Jira,
-  Confluence, Azure DevOps, the `.ai/epam/` scripts.
+- `~/obsidian/obsidian-work` — EPAM and MigVisor work: Teams, Outlook, Jira,
+  Confluence, Azure DevOps, the `.ai/epam/` scripts. EPAM logins follow the
+  `epam` skill § Logins: a box never signs in to Microsoft and never runs
+  home-made token scripts; SharePoint, ADO, flows and big uploads go to a CLI
+  agent on omarchy.
 - `~/cockpit-core` — personal ops: Telegram, documents, the machine, Hetzner.
 - a repo path — plain code work.
 

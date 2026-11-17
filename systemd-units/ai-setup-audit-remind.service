@@ -1,0 +1,7 @@
+[Unit]
+Description=Remind Artem on Telegram to run the ai-setup-audit skill
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/cockpit-core/skills/ai-setup-audit/remind.sh
