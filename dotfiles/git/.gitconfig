@@ -24,6 +24,7 @@
 	line-numbers = true
 [credential "https://dev.azure.com"]
 	helper =
+	helper = !\"$HOME/linux-files/scripts/epam/git-credential-az-ado.sh\"
 	helper = manager
 	azreposCredentialType = oauth
 	useHttpPath = true
