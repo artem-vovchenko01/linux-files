@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+agy=$(command -v agy || true)
+if [[ -z "$agy" ]]; then
+    printf '%s\n' 'Install Antigravity CLI (agy) first.' >&2
+    exit 1
+fi
+case "${1-}" in
+    -h|--help|--version) exec "$agy" "$@" ;;
+esac
+
+profile="${XDG_DATA_HOME:-$HOME/.local/share}/agy-alt"
+desktop_bus="${AGY_ALT_DESKTOP_BUS:-${DBUS_SESSION_BUS_ADDRESS:-unix:path=/run/user/$UID/bus}}"
+export DBUS_SESSION_BUS_ADDRESS="$desktop_bus"
+
+# agy uses a fixed keyring entry. Give the alternate login its own Secret Service.
+(
+    umask 077
+    mkdir -p "$profile"
+    flock 9
+    if ! secret-tool lookup service agy-alt purpose unlock >/dev/null; then
+        if [[ ! -t 0 || -n "${1-}" && "${1-}" != login ]]; then
+            printf '%s\n' 'Run agy-alt login in a terminal first.' >&2
+            exit 1
+        fi
+        openssl rand -hex 32 | tr -d '\n' |
+            secret-tool store --label='Antigravity alternate keyring' service agy-alt purpose unlock
+    fi
+) 9>"${XDG_RUNTIME_DIR:-/run/user/$UID}/agy-alt-init.lock"
+
+exec env -u GNOME_KEYRING_CONTROL dbus-run-session -- bash -c '
+    set -euo pipefail
+    profile=$1 desktop_bus=$2 agy=$3
+    shift 3
+    unlock=$(DBUS_SESSION_BUS_ADDRESS="$desktop_bus" secret-tool lookup service agy-alt purpose unlock)
+    [[ -n "$unlock" ]]
+    XDG_DATA_HOME="$profile" gnome-keyring-daemon --foreground --unlock --components=secrets \
+        < <(printf %s "$unlock") >/dev/null &
+    keyring_pid=$!
+    unset unlock
+    trap '"'"'kill "$keyring_pid" 2>/dev/null || true; wait "$keyring_pid" 2>/dev/null || true'"'"' EXIT
+    gdbus wait --session --timeout 5 org.freedesktop.secrets
+    case "${1-}" in
+        login) shift ;;
+        auth-status)
+            secret-tool lookup service gemini username antigravity |
+                jq -er ".id_token_email | select(type == \"string\" and length > 0)"
+            exit
+            ;;
+    esac
+    if [[ ! -t 0 ]] && ! secret-tool lookup service gemini username antigravity >/dev/null; then
+        printf "%s\n" "Run agy-alt login in a terminal first." >&2
+        exit 1
+    fi
+    unset GEMINI_API_KEY AGY_ADC_AUTH
+    export AGY_ALT_DESKTOP_BUS="$desktop_bus"
+    XDG_CONFIG_HOME="$profile/config" "$agy" "$@"
+' agy-alt "$profile" "$desktop_bus" "$agy" "$@"

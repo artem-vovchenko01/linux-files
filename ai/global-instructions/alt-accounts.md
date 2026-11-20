@@ -73,3 +73,15 @@ primary home (`share-sessions.sh` in the same folder, plus
 `CODEX_SQLITE_HOME` for Codex's thread database). A session started on
 either account is listed and resumable from both, so a side agent's work
 can be picked up in a normal `claude` / `codex` / `grok` session.
+
+## Gemini via Antigravity
+
+`agy` uses the primary Google login. `agy-alt` runs the same Antigravity
+CLI with a separate encrypted Secret Service keyring under
+`${XDG_DATA_HOME:-~/.local/share}/agy-alt`. The desktop keyring holds its
+unlock secret. Both commands use the same local conversation store.
+
+Run `agy-alt login` in a terminal for Google OAuth and
+`agy-alt auth-status` to see the signed-in email. In Pulpit select
+**Gemini → Account → agy-alt**. The picker names the account by the
+command's filename.
