@@ -36,12 +36,19 @@ apply() {
   fi
 }
 
+# Per-monitor scale and text size from Pulpit (Settings › Monitor).
+apply_profiles() {
+  local settings=~/cockpit-core/apps/pulpit/settings.py
+  [[ -x $settings ]] && "$settings" apply-monitors >/dev/null 2>&1 || true
+}
+
 # Hotplug settles over a few seconds, so check again after each event.
 apply_with_retries() {
   local delay
   for delay in 1 2 4; do
     sleep "$delay"
     apply
+    apply_profiles
   done
 }
 
@@ -51,5 +58,6 @@ socket="$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock"
 while read -r event; do
   case "$event" in
     monitoradded*|monitorremoved*) apply_with_retries ;;
+    configreloaded*) apply_profiles ;;
   esac
 done < <(socat -U - "UNIX-CONNECT:$socket" 9>&-)
