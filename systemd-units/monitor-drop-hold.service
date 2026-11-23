@@ -1,0 +1,12 @@
+[Unit]
+Description=Keep the session on the laptop panel while a dropped monitor is out, until unlock
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=%h/linux-files/scripts/tiling-wm/hyprland/monitor-drop-hold.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target
