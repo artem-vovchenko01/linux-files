@@ -92,10 +92,21 @@ if $IS_OMARCHY; then
 	link "$LF/dotfiles/omarchy/hypr/input.lua" ~/.config/hypr/input.lua
 	link "$LF/dotfiles/omarchy/hypr/bindings.lua" ~/.config/hypr/bindings.lua
 	link "$LF/dotfiles/omarchy/hypr/looknfeel.lua" ~/.config/hypr/looknfeel.lua
+	# Desk monitor scale; laptop panel off while an external monitor is plugged in.
+	link "$LF/dotfiles/omarchy/hypr/monitors.lua" ~/.config/hypr/monitors.lua
+	# Keep Quickshell off QT_QPA_PLATFORMTHEME=gtk3 (avoids GTK3 Wayland lock crash).
+	mkdir -p ~/.local/bin
+	link "$LF/dotfiles/omarchy/bin/quickshell" ~/.local/bin/quickshell
 	# Large keyboard layout popup at the top, summoned by Super+Space.
 	link "$LF/dotfiles/omarchy/plugins/artem.layout-osd" ~/.config/omarchy/plugins/artem.layout-osd
 	omarchy-shell shell rescanPlugins >/dev/null 2>&1 || true
 	omarchy plugin enable artem.layout-osd >/dev/null 2>&1 || true
+	# Pulpit's pomodoro plaque on the bar, left of the right-hand icons.
+	link "$LF/dotfiles/omarchy/bar/pomodoro.qml" ~/.config/omarchy/bar/modules/pomodoro.qml
+	SJ=~/.config/omarchy/shell.json
+	if [ -f "$SJ" ] && ! jq -e '.bar.layout.right[]? | select(.id == "pomodoro")' "$SJ" >/dev/null; then
+		jq '.bar.layout.right = [{"id": "pomodoro", "type": "qml"}] + (.bar.layout.right // [])' "$SJ" > "$SJ.new" && mv "$SJ.new" "$SJ"
+	fi
 	"$LF/scripts/tiling-wm/terminal-font-size.sh" 14
 else
 	# Hyprland desktop (Omarchy 4 has its own: Lua config + Quickshell)
@@ -649,7 +660,7 @@ fi
 LOCAL_GIT=~/DATA/local-git
 mkdir -vp ~/g
 if [ -d "$LOCAL_GIT" ]; then
-	for name in cockpit-core obsidian-personal obsidian-work; do
+	for name in obsidian-personal obsidian-work; do
 		if [ -d "$LOCAL_GIT/$name.git" ]; then
 			ln -sfn "$LOCAL_GIT/$name.git" "$HOME/g/$name.git"
 		fi
@@ -690,7 +701,6 @@ ensure_local_git_remote() {
 	fi
 }
 
-ensure_local_git_remote ~/DATA/cockpit-core cockpit-core
 ensure_local_git_remote ~/obsidian/obsidian-personal obsidian-personal
 ensure_local_git_remote ~/obsidian/obsidian-work obsidian-work
 
@@ -708,13 +718,30 @@ mkdir -vp ~/obsidian
 if [ -d ~/DATA/IT ]; then
 	ln -sfn ~/DATA/IT ~/IT
 	mkdir -vp ~/IT/hyprland
-	[ -d ~/DATA/cockpit-core ] && ln -sfn ~/DATA/cockpit-core ~/cockpit-core
 else
 	echo "WARNING: ~/DATA/IT not found — is Syncthing set up on this machine?"
-	echo "Skipping ~/IT and ~/cockpit-core symlinks until DATA/IT syncs."
+	echo "Skipping the ~/IT symlink until DATA/IT syncs."
 	if [ -t 0 ]; then
 		read -r -p "Press enter to continue ... " || true
 	fi
+fi
+
+# cockpit-core is a git repo outside Syncthing: GitHub carries it between
+# machines, ~/g/cockpit-core.git is the local backup.
+COCKPIT_REPO=~/Projects/cockpit-core
+if [ ! -d "$COCKPIT_REPO/.git" ]; then
+	git clone -q https://github.com/artem-vovchenko01/cockpit-core.git "$COCKPIT_REPO" ||
+		echo "cockpit-core: clone failed (gh auth login first?); re-run later."
+fi
+if [ -d "$COCKPIT_REPO/.git" ]; then
+	ln -sfn "$COCKPIT_REPO" ~/cockpit-core
+	[ -d ~/g/cockpit-core.git ] || git init -q --bare ~/g/cockpit-core.git
+	git -C "$COCKPIT_REPO" remote get-url local >/dev/null 2>&1 ||
+		git -C "$COCKPIT_REPO" remote add local ~/g/cockpit-core.git
+	# Its secrets live in the Syncthing folder ~/DATA/Secrets.
+	ln -sfn ~/DATA/Secrets/cockpit-core "$COCKPIT_REPO/secrets"
+	ln -sfn ~/DATA/Secrets/telegram-account "$COCKPIT_REPO/skills/use-telegram/secrets"
+	ln -sfn ~/DATA/Secrets/cockpit-core/lexi/google-services.json "$COCKPIT_REPO/apps/lexi/android/app/google-services.json"
 fi
 
 ############################################
@@ -722,9 +749,6 @@ fi
 ############################################
 WORK_HUB=~/obsidian/obsidian-work
 COCKPIT_CORE=~/cockpit-core
-if [ ! -d "$COCKPIT_CORE" ] && [ -d ~/DATA/cockpit-core ]; then
-	COCKPIT_CORE=~/DATA/cockpit-core
-fi
 USER_UNITS=~/.config/systemd/user
 
 # lid-no-suspend.service holds a logind lid-switch inhibitor;
@@ -734,9 +758,19 @@ link "$LF/systemd-units/lid-no-suspend.service" "$USER_UNITS/lid-no-suspend.serv
 # Omarchy has no captive-portal popup; this opens hotspot login pages.
 link "$LF/systemd-units/captive-portal-watch.service" "$USER_UNITS/captive-portal-watch.service"
 
+# Omarchy's agents panel has no Grok collector; this timer writes the record.
+link "$LF/systemd-units/grok-usage.service" "$USER_UNITS/grok-usage.service"
+link "$LF/systemd-units/grok-usage.timer" "$USER_UNITS/grok-usage.timer"
+
+# Pings Artem on Telegram every two weeks to run the ai-setup-audit skill.
+link "$LF/systemd-units/ai-setup-audit-remind.service" "$USER_UNITS/ai-setup-audit-remind.service"
+link "$LF/systemd-units/ai-setup-audit-remind.timer" "$USER_UNITS/ai-setup-audit-remind.timer"
+
 # No user bus (e.g. a bare ssh login) is not a reason to abort.
 systemctl --user daemon-reload || true
 systemctl --user enable captive-portal-watch.service || true
+systemctl --user enable --now grok-usage.timer || true
+systemctl --user enable --now ai-setup-audit-remind.timer || true
 
 # The timer accepts proven Grok Bot boxes into Syncthing. Its installer
 # creates any pairing secret it can't find, so run it only after the hubs
@@ -746,6 +780,36 @@ if [ -f "$STW_INSTALL" ]; then
 	echo "syncthing-workflow: run only after cockpit-core and obsidian-work synced."
 	if ask "Install the syncthing-workflow timer?"; then
 		bash "$STW_INSTALL"
+	fi
+fi
+
+############################################
+# PULPIT CONTROL PANEL
+############################################
+# Pulpit: panels of buttons, lists and status boards on 127.0.0.1:8791
+# Single Pulpit control panel on :8791 (Super+U). Personal config in
+# cockpit-core, work pack in the work hub. install.sh sets up one service
+# (pulpit.service) plus pulpit-link.service and links extra configs as packs.
+PULPIT=~/Projects/pulpit
+if ask "Set up the Pulpit control panel?"; then
+	if [ -d "$PULPIT/.git" ]; then
+		git -C "$PULPIT" pull --ff-only || true
+	else
+		git clone https://github.com/artem-vovchenko01/pulpit "$PULPIT" || true
+	fi
+	PULPIT_ARGS=()
+	[ -f "$COCKPIT_CORE/apps/pulpit/pulpit.toml" ] && PULPIT_ARGS+=("$COCKPIT_CORE/apps/pulpit/pulpit.toml")
+	[ -f "$WORK_HUB/.ai/pulpit/work.toml" ] && PULPIT_ARGS+=(--pack "$WORK_HUB/.ai/pulpit/work.toml")
+	[ -x "$PULPIT/install.sh" ] && "$PULPIT/install.sh" "${PULPIT_ARGS[@]}"
+	# The Tasks lists sync with Telegram through tg-tasks.service; it needs
+	# the use-telegram session (Artem's desktop only).
+	TG_TASKS=$COCKPIT_CORE/apps/pulpit/tg-tasks.service
+	TG_SKILL=$COCKPIT_CORE/skills/use-telegram
+	if [ -f "$TG_TASKS" ] && [ -f "$TG_SKILL/secrets/tg.session" ]; then
+		"$TG_SKILL/tg" whoami >/dev/null || true
+		ln -sf "$TG_TASKS" ~/.config/systemd/user/tg-tasks.service
+		systemctl --user daemon-reload
+		systemctl --user enable --now tg-tasks.service || true
 	fi
 fi
 
