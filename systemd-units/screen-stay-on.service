@@ -1,0 +1,12 @@
+[Unit]
+Description=Keep the screen on so the monitor and its USB network never sleep
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=%h/linux-files/scripts/tiling-wm/hyprland/screen-stay-on.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target
