@@ -144,14 +144,19 @@ is on PATH; the script itself is
 the account your shell runs on and exits 2 when that account reaches
 HANDOFF (90%) or BLOCKED.
 
-**Codex: check your own quota periodically.** Codex runs a heavy model and
-burns the 5-hour window fast. Run `agent-quota codex` at the start of a
-task and again every 20-30 minutes of work or after each large step. When it
-exits 2 (the 5-hour or weekly limit is close), stop starting new work and
-write a handoff to the agent mailbox: what you did, where the artifacts are,
-the current state, and the next steps. Then tell me the numbers and the
-handoff path. Other agents: check at the start of long work, and before you
-delegate.
+**Inside Pulpit (`$PULPIT_CHAT` / `$PULPIT_CONF` is set, or the system prompt
+says `"You run headless from Pulpit"`):** ignore quota limits and keep working
+instead of stopping or writing a handoff — Pulpit can switch agents on the
+fly.
+
+**Codex (outside Pulpit): check your own quota periodically.** Codex runs a
+heavy model and burns the 5-hour window fast. Run `agent-quota codex` at the
+start of a task and again every 20-30 minutes of work or after each large
+step. When it exits 2 (the 5-hour or weekly limit is close), stop starting
+new work and write a handoff to the agent mailbox: what you did, where the
+artifacts are, the current state, and the next steps. Then tell me the
+numbers and the handoff path. Other agents (outside Pulpit): check at the
+start of long work, and before you delegate.
 
 ## Agent mailbox → skill `agent-mailbox`
 
