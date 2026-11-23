@@ -20,16 +20,22 @@ hl.monitor({ output = "desc:HP Inc. HP 724pu", mode = "1920x1200@60", position =
 -- With an external monitor plugged in, the laptop panel is off; without one, on.
 o.launch_on_start(os.getenv("HOME") .. "/linux-files/scripts/tiling-wm/hyprland/omarchy-dock-displays.sh")
 
--- While ~/.local/state/screen-keep-on exists (Pulpit setting "Keep the screen
--- on"), requests to turn screens off do nothing; the lock screen sends one 5 s
--- after locking. Without a signal the HP 724pu sleeps and cuts its USB hub,
--- and the wired network with it. A short gap is enough to start that sleep.
+-- While ~/.local/state/screen-keep-on exists (Pulpit setting "Keep monitor
+-- awake at lock"), lock screen-off requests black out active external monitors
+-- (gamma 0 + DDC brightness 0) instead of DPMS sleep so a monitor's USB hub
+-- and wired network stay up. On the laptop panel alone, real DPMS runs.
 screen_keep_on_dpms = screen_keep_on_dpms or hl.dsp.dpms
 hl.dsp.dpms = function(args)
-  local flag = args and args.action == "disable" and io.open(os.getenv("HOME") .. "/.local/state/screen-keep-on")
-  if flag then
-    flag:close()
-    return hl.dsp.exec_cmd("true")
+  local blackout = os.getenv("HOME") .. "/linux-files/scripts/tiling-wm/hyprland/lock-blackout.sh"
+  if args and args.action == "disable" and not args._real then
+    local flag = io.open(os.getenv("HOME") .. "/.local/state/screen-keep-on")
+    if flag then
+      flag:close()
+      return hl.dsp.exec_cmd(blackout .. " blank")
+    end
   end
-  return screen_keep_on_dpms(args)
+  if args and args.action == "enable" then
+    os.execute(blackout .. " wake >/dev/null 2>&1 &")
+  end
+  return screen_keep_on_dpms({ action = args and args.action, output = args and args.output })
 end

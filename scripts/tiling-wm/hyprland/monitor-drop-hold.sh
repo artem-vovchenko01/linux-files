@@ -19,7 +19,7 @@ hold() {
 	local name desc output
 	name=$(cut -d, -f2 <<<"$1")
 	desc=$(cut -d, -f3- <<<"$1")
-	[[ $name =~ ^(eDP|LVDS|DSI)- ]] && return
+	[[ $name =~ ^(eDP|LVDS|DSI|FALLBACK|HEADLESS) ]] && return
 	locked || return
 	if [[ $desc =~ ^[A-Za-z0-9\ ._-]+$ ]]; then
 		output="desc:$desc"
@@ -29,6 +29,7 @@ hold() {
 		return
 	fi
 	echo "$name dropped out while locked, holding the laptop panel"
+	"$HOME/linux-files/scripts/tiling-wm/hyprland/lock-blackout.sh" wake >/dev/null 2>&1 || true
 	mkdir -p "$(dirname "$HOLD")"
 	local rule
 	rule=$(printf 'hl.monitor({ output = "%s", disabled = true })' "$output")
