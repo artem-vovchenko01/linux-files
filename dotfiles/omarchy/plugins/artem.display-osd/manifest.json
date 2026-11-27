@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "artem.display-osd",
+  "name": "Display identify OSD",
+  "version": "1.0.0",
+  "description": "Click-through per-monitor identification and selection highlight overlay.",
+  "kinds": [
+    "panel"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "panel": "DisplayOsd.qml"
+  }
+}

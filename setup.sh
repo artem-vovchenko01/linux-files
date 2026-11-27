@@ -99,8 +99,11 @@ if $IS_OMARCHY; then
 	link "$LF/dotfiles/omarchy/bin/quickshell" ~/.local/bin/quickshell
 	# Large keyboard layout popup at the top, summoned by Super+Space.
 	link "$LF/dotfiles/omarchy/plugins/artem.layout-osd" ~/.config/omarchy/plugins/artem.layout-osd
+	# Per-monitor identification and selection highlight overlay for Pulpit display settings.
+	link "$LF/dotfiles/omarchy/plugins/artem.display-osd" ~/.config/omarchy/plugins/artem.display-osd
 	omarchy-shell shell rescanPlugins >/dev/null 2>&1 || true
 	omarchy plugin enable artem.layout-osd >/dev/null 2>&1 || true
+	omarchy plugin enable artem.display-osd >/dev/null 2>&1 || true
 	# Pulpit's pomodoro plaque on the bar, left of the right-hand icons.
 	link "$LF/dotfiles/omarchy/bar/pomodoro.qml" ~/.config/omarchy/bar/modules/pomodoro.qml
 	SJ=~/.config/omarchy/shell.json
