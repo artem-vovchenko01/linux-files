@@ -7,7 +7,11 @@ set -u
 SELF=$(readlink -f "$0")
 STATE="${XDG_STATE_HOME:-$HOME/.local/state}/lock-blackout"
 LOCK="$STATE/lock"
-mkdir -p "$STATE"
+# saved/<i2c bus> holds a monitor's brightness from before the blackout. It
+# stays until a restore is read back, so a failed or raced restore is retried.
+SAVED="$STATE/saved"
+DDC_LOCK="$STATE/ddc.lock"
+mkdir -p "$SAVED"
 
 locked() {
 	[[ $(omarchy-shell lock isLocked 2>/dev/null) == true ]]
@@ -55,45 +59,58 @@ bus_for_monitor() {
 	[[ $bus =~ ^[0-9]+$ ]] && echo "$bus"
 }
 
+get_brightness() {
+	ddcutil --bus "$1" --skip-ddc-checks getvcp 10 --brief 2>/dev/null | awk '$1=="VCP" && toupper($2)=="10" && $4 ~ /^[0-9]+$/ { print $4; exit }'
+}
+
+# Dim and restore hold DDC_LOCK, so a restore never interleaves with a dim.
 dim_ddc_bg() {
 	command -v ddcutil >/dev/null 2>&1 || return 0
 	local mons mon bus raw
 	mons=$(hyprctl monitors -j 2>/dev/null | jq -r '.[] | select(.disabled == false and (.name | test("^(eDP|LVDS|DSI|FALLBACK|HEADLESS)") | not)) | .name')
 	[[ -n $mons ]] || return 0
-	: >"$STATE/ddc.tmp"
+	exec 8>"$DDC_LOCK"
+	flock 8
 	for mon in $mons; do
-		[[ -f $STATE/active ]] || { rm -f "$STATE/ddc.tmp"; return 0; }
+		[[ -f $STATE/active ]] || break
 		bus=$(bus_for_monitor "$mon") || continue
 		[[ -n $bus ]] || continue
-		raw=$(ddcutil --bus "$bus" --skip-ddc-checks getvcp 10 --brief 2>/dev/null | awk '$1=="VCP" && toupper($2)=="10" && $4 ~ /^[0-9]+$/ { print $4; exit }')
+		raw=$(get_brightness "$bus")
 		[[ $raw =~ ^[0-9]+$ ]] || continue
+		# At 0 the monitor is still dark from an earlier blackout: keep that save.
 		if (( raw > 0 )); then
-			printf '%s %s\n' "$bus" "$raw" >>"$STATE/ddc.tmp"
+			echo "$raw" >"$SAVED/$bus"
 		fi
-		if [[ -f $STATE/active ]]; then
-			ddcutil --bus "$bus" --skip-ddc-checks --noverify setvcp 10 0 >/dev/null 2>&1 || true
-			# If wake happened mid-I2C call, immediately put brightness back.
-			if [[ ! -f $STATE/active && $raw -gt 0 ]]; then
-				ddcutil --bus "$bus" --skip-ddc-checks --noverify setvcp 10 "$raw" >/dev/null 2>&1 || true
-			fi
-		fi
+		[[ -f $STATE/active ]] || break
+		ddcutil --bus "$bus" --skip-ddc-checks --noverify setvcp 10 0 >/dev/null 2>&1 || true
 	done
-	if [[ -f $STATE/active && -s $STATE/ddc.tmp ]]; then
-		mv -f "$STATE/ddc.tmp" "$STATE/ddc"
-	else
-		rm -f "$STATE/ddc.tmp"
-	fi
+	flock -u 8
+	[[ -f $STATE/active ]] || restore_ddc_bg
 }
 
 restore_ddc_bg() {
-	local file="$1"
-	command -v ddcutil >/dev/null 2>&1 || { rm -f "$file"; return 0; }
-	local bus raw
-	while read -r bus raw; do
-		[[ $bus =~ ^[0-9]+$ && $raw =~ ^[0-9]+$ ]] || continue
-		ddcutil --bus "$bus" --skip-ddc-checks --noverify setvcp 10 "$raw" >/dev/null 2>&1 || true
-	done <"$file"
-	rm -f "$file"
+	command -v ddcutil >/dev/null 2>&1 || return 0
+	exec 8>"$DDC_LOCK"
+	flock 8
+	local file bus raw try
+	for file in "$SAVED"/*; do
+		[[ -f $STATE/active ]] && return 0
+		[[ -f $file ]] || continue
+		bus=${file##*/}
+		read -r raw <"$file" || raw=""
+		if [[ ! $bus =~ ^[0-9]+$ || ! $raw =~ ^[0-9]+$ ]]; then
+			rm -f "$file"
+			continue
+		fi
+		for try in 1 2 3 4 5; do
+			ddcutil --bus "$bus" --skip-ddc-checks --noverify setvcp 10 "$raw" >/dev/null 2>&1 || true
+			if [[ $(get_brightness "$bus") == "$raw" ]]; then
+				rm -f "$file"
+				break
+			fi
+			sleep 1
+		done
+	done
 }
 
 stop_watcher() {
@@ -129,15 +146,8 @@ do_wake() {
 			hyprctl hyprsunset gamma "$gamma" >/dev/null 2>&1 || true
 		fi
 	fi
-	if [[ -f $STATE/ddc ]]; then
-		local snap="$STATE/ddc.restore.$$"
-		mv -f "$STATE/ddc" "$snap"
-		setsid bash -c 'exec "$1" restore-ddc "$2"' _ "$SELF" "$snap" >/dev/null 2>&1 </dev/null 9>&- &
-	fi
-	if [[ -f $STATE/ddc.tmp ]]; then
-		local snap2="$STATE/ddc.restore2.$$"
-		mv -f "$STATE/ddc.tmp" "$snap2"
-		setsid bash -c 'exec "$1" restore-ddc "$2"' _ "$SELF" "$snap2" >/dev/null 2>&1 </dev/null 9>&- &
+	if compgen -G "$SAVED/*" >/dev/null; then
+		setsid bash -c 'exec "$1" restore-ddc' _ "$SELF" >/dev/null 2>&1 </dev/null 9>&- &
 	fi
 	stop_watcher
 }
@@ -211,7 +221,7 @@ blank) do_blank "${2:-}" ;;
 wake) do_wake ;;
 watch) do_watch ;;
 dim-ddc) dim_ddc_bg ;;
-restore-ddc) restore_ddc_bg "${2:-}" ;;
+restore-ddc) restore_ddc_bg ;;
 status)
 	[[ -f $STATE/active ]] && echo "blacked-out" || echo "normal"
 	;;

@@ -24,6 +24,8 @@ o.launch_on_start(os.getenv("HOME") .. "/linux-files/scripts/tiling-wm/hyprland/
 -- awake at lock"), lock screen-off requests black out active external monitors
 -- (gamma 0 + DDC brightness 0) instead of DPMS sleep so a monitor's USB hub
 -- and wired network stay up. On the laptop panel alone, real DPMS runs.
+-- A session that ended blacked out gets its brightness back at start.
+o.launch_on_start(os.getenv("HOME") .. "/linux-files/scripts/tiling-wm/hyprland/lock-blackout.sh wake")
 screen_keep_on_dpms = screen_keep_on_dpms or hl.dsp.dpms
 hl.dsp.dpms = function(args)
   local blackout = os.getenv("HOME") .. "/linux-files/scripts/tiling-wm/hyprland/lock-blackout.sh"
